@@ -1,0 +1,23 @@
+import argparse
+
+from rally.common.subclient_communicator import SubClientCommunicator
+from rally.common.rally_config import RallyConfiguration
+from rally.protocol import clientprotocol_pb2
+
+parser = argparse.ArgumentParser(description='The steering GUI')
+parser.add_argument("-p", "--port", type=int, help="UDP port of the main client", required=True)
+parser.add_argument("-c", "--client_index", type=int, help="Client index, used in communication", required=True)
+parser.add_argument("-u", "--user_id", type=int, help="User ID", required=True)
+args = parser.parse_args()
+
+rally_configuration = RallyConfiguration()
+track_information = rally_configuration.track_information
+
+
+def on_status_updates(status_information):
+    print("Current rebus information:")
+    for rebus_status in status_information.rebus_statuses.rebus_status:
+        print(rebus_status)
+
+sub_client_communicator = SubClientCommunicator(args, status_receiver=on_status_updates)
+sub_client_communicator.start()

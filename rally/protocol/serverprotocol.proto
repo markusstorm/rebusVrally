@@ -1,0 +1,21 @@
+syntax = "proto2";
+
+package server;
+
+message LoginRequest {
+  required string teamname = 1;
+  required string password = 2;
+  required string name = 3;
+  optional int32 version = 4;
+  enum DifficultyType {
+    EASY = 1;
+    NORMAL = 2;
+  }
+  optional DifficultyType difficulty = 5;
+}
+
+message LoginResponse {
+  required bool success = 1;
+  optional int32 user_id = 2;
+  optional string message = 3;
+}

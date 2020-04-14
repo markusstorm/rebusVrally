@@ -1,0 +1,233 @@
+syntax = "proto2";
+
+package client;
+
+message ServerPositionUpdate {
+  required bool stopped = 1;
+  required float speed = 2;
+  required int32 current_section = 3;
+  required double distance = 4; //distance in current section (meters)
+  enum RallyStage {
+    NOT_STARTED = 0;
+    MORNING = 1;
+    AT_LUNCH = 2;
+    AFTERNOON = 3;
+    AT_END = 4;
+    ENDED = 5;
+  }
+  optional RallyStage rally_stage = 5 [default = NOT_STARTED];
+  optional bool looking_for_rebus = 6;
+  optional bool rally_started = 7;
+}
+
+message BusSeatAllocation {
+    required int32 seat_index = 1;
+    optional int32 player_id = 2;
+    optional string player_name = 3;
+}
+
+message BusSeating {
+    repeated BusSeatAllocation bus_seat_allocations = 1;
+}
+
+message PhotoAnswer {
+    required int32 section_number = 1;
+    required int32 section_index = 2;
+    optional int32 answer = 3;
+}
+
+message PhotoAnswers {
+    repeated PhotoAnswer photo_answers = 1;
+}
+
+message PlateAnswer {
+    required int32 section_number = 1;
+    required int32 section_index = 2;
+    optional string answer = 3;
+}
+
+message PlateAnswers {
+    repeated PlateAnswer plate_answers = 1;
+}
+
+message RebusAnswer {
+    required int32 section_number = 1;
+    optional string answer = 2;
+}
+
+message RebusAnswers {
+    repeated RebusAnswer rebus_answers = 1;
+}
+
+message PhotoSheetAllocation {
+    required int32 sheet_number = 1;
+    required int32 allocation_place = 2;
+    optional bool up_for_switch = 3;
+}
+
+message PhotoSheetAllocations {
+    repeated PhotoSheetAllocation photo_sheet_allocation = 1;
+}
+
+message Rebus {
+    required int32 section = 1;
+
+    enum RebusType {
+        NORMAL = 0;
+        HELP = 1;
+        SOLUTION = 2;
+    }
+    required RebusType type = 2 [default = NORMAL];
+
+    optional string rebus_text = 3;
+    optional string extra_text = 4;
+}
+
+message RebusList {
+    repeated Rebus rebuses = 1;
+}
+
+message RebusSolution {
+  required int32 section = 1;
+  required string solution = 2;
+  required int32 east = 3;
+  required int32 north = 4;
+  required string target_description = 5;
+  required int32 target_east = 6;
+  required int32 target_north = 7;
+  required string target_picture = 8;
+}
+
+message RebusSolutions {
+  optional bool locked = 1; //Locked for some time due to using it recently
+  repeated RebusSolution rebus_solutions = 2;
+}
+
+message ServerStatusUpdate {
+  optional ServerPositionUpdate pos_update = 1;
+  optional BusSeating bus_seating = 2;
+  optional PhotoAnswers photo_answers = 3;
+  optional RebusAnswers rebus_answers = 4;
+  optional PhotoSheetAllocations photo_sheet_allocations = 5;
+  optional RebusList rebus_list = 6;
+  optional PlateAnswers plate_answers = 7;
+  optional RebusSolutions rebus_solutions = 8;
+}
+
+message ServerRequestResponse {
+  required bool success = 1; //TODO: not designed yet
+}
+
+message BroadcastMessage {
+  required string message = 1;
+  required string date_time = 2;
+  optional int32 urgency = 3;
+}
+
+message ServerToClient {
+  required int64 counter = 1;
+  oneof messages {
+    //ServerPositionUpdate pos_update = 2;
+    ServerStatusUpdate status_update = 3;
+    ServerRequestResponse request_response = 4;
+    BroadcastMessage broadcast_message = 5;
+  }
+}
+
+message ClientPositionUpdate {
+  required float speed = 1;
+  required double distance = 2; //distance in current section (meters)
+  required int32 current_section = 3;
+    enum DirectionType {
+        NONE = 0;
+        LEFT = 1;
+        RIGHT = 2;
+    }
+    optional DirectionType indicator = 4 [default = NONE];
+}
+
+message ReachedEndOfSection {
+  required string section_name = 1; //Unsure, but to make sure that everything's right...?
+  //or should the server calculate if the end was reached instead?
+}
+
+message MakeATurn {
+  required ClientPositionUpdate position = 1;
+  //required int32 direction = 2;
+  required int32 new_section = 2;
+}
+
+message SetPhotoSheetSwitchable {
+  required int32 sheet_number_1 = 1;
+  required bool switchable = 2;
+}
+
+message SwitchPhotoSheet {
+  required int32 sheet_number_1 = 1;
+  required int32 sheet_number_2 = 2;
+  //Will be updated via ServerStatusUpdate
+}
+
+message SelectSeat {
+  required int32 user_id = 1;
+  required int32 seat_index = 2;
+}
+
+message SubClientRegister {
+  required int32 client_index = 1;
+  required int32 udp_port = 2;
+}
+
+message OpenRebusSolution {
+  required int32 user_id = 1; //Use user_id in server to identify the team? TODO: not needed, we are communicating with the team server directly?
+  required int32 section = 2; //rallysträcka
+  optional bool open_help = 3;
+  optional bool open_solution = 4;
+}
+
+message SetPhotoAnswer {
+    required int32 section = 1;
+    required int32 index = 2;
+    required int32 answer = 3;
+}
+
+message SetPlateAnswer {
+    required int32 section = 1;
+    required int32 index = 2;
+    required string answer = 3;
+}
+
+message SetRebusAnswer {
+    required int32 section = 1;
+    required string answer = 2;
+}
+
+message SearchForRebus {
+    required int32 dummy = 1;
+}
+
+message TestRebusSolution {
+  required int32 section = 1;
+  required string answer = 2;
+  required int32 map_east = 3;
+  required int32 map_north = 4;
+}
+
+message ClientToServer {
+  required int64 counter = 1;
+  oneof messages {
+    ClientPositionUpdate pos_update = 2;
+    ReachedEndOfSection end_of_section = 3; //What shall the server answer?
+    MakeATurn make_a_turn = 4;
+    SetPhotoSheetSwitchable set_photo_sheet_switchable = 5;
+    SwitchPhotoSheet switch_photo_sheet = 6;
+    SelectSeat select_seat = 7;
+    SubClientRegister sub_client_register = 8;
+    OpenRebusSolution open_rebus_solution = 9;
+    SetPhotoAnswer set_photo_answer = 10;
+    SetPlateAnswer set_plate_answer = 11;
+    SetRebusAnswer set_rebus_answer = 12;
+    SearchForRebus search_for_rebus = 13;
+    TestRebusSolution test_rebus_solution = 14;
+  }
+}

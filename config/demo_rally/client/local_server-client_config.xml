@@ -1,0 +1,5 @@
+<rally login_background="#LOCATION#/goethe_demo.png">
+  <login_details server_address="127.0.0.1" team="demo" password="1234" username=""/>
+
+  <sections file="#LOCATION#/../common/rally_sections.xml"/>
+</rally>

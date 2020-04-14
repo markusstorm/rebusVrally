@@ -1,0 +1,44 @@
+<html>
+<head>
+<title>Rebusrally-status</title>
+    <script language="JavaScript">
+        function on_send_message() {
+            var message = document.getElementById("sendmessage").value;
+            document.getElementById("sendmessage").value = "";
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "/sendmessage", true);
+            xhttp.setRequestHeader("Content-type", "text/plain");
+            xhttp.send(message);
+        }
+
+        function on_start_rally() {
+            var answer = confirm("This starts the rally, are you sure?");
+            if (answer) {
+                var xhttp = new XMLHttpRequest();
+                xhttp.open("POST", "/startrally", true);
+                xhttp.setRequestHeader("Content-type", "text/plain");
+                xhttp.send("START");
+            }
+        }
+
+        function on_start_afternoon() {
+            var answer = confirm("This starts the afternoon, are you sure?");
+            if (answer) {
+                var xhttp = new XMLHttpRequest();
+                xhttp.open("POST", "/startafternoon", true);
+                xhttp.setRequestHeader("Content-type", "text/plain");
+                xhttp.send("START");
+            }
+        }
+    </script>
+</head>
+<body>
+Send a message to all <input type="text" id="sendmessage" name="sendmessage" value=""/><input type="button" onclick="on_send_message()" value="Send"/><br>
+<br>
+<input type="button" onclick="on_start_rally()" value="Start the rally! (publish first rebus)"/><br>
+<br>
+<input type="button" onclick="on_start_afternoon()" value="Start the afternoon! (publish lunch rebus)"/><br>
+<br>
+<input type="button" onclick="on_debug_restart()" value="Reset bus position"/><br>
+</body>
+</html>
