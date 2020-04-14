@@ -1,0 +1,10 @@
+_site/
+.sass-cache/
+__pycache__
+*.mov
+*.mp4
+.idea
+build
+dist
+config.ini
+startup.ini
