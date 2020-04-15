@@ -1,0 +1,57 @@
+<rebuses>
+	<rebus section="1" is_first="true" map_east="26" map_north="80">
+	  <normal text="https://www.youtube.com/watch?v=yif0c0bRA48"/>
+	  <help text="KÄRRA"/>
+	  <solution text="Myra"/>
+	  <target description="Korsningen" map_east="26" map_north="78" zoomed_map_url="https://drive.google.com/open?id=1eVUUTQH1JsnCKkYaf1sfd8ge4Ym62w0o"/>
+	</rebus>
+
+	<rebus section="2" map_east="22" map_north="79">
+	  <normal text="BBERGIMJÖRKE"/>
+	  <help text="JÖRKIBEBERG"/>
+	  <solution text="Björkeberg"/>
+	  <target description="Korsningen" map_east="26" map_north="79" zoomed_map_url="https://drive.google.com/open?id=17vw0jxtNYLSuO_fdUyCoh5qC79u36FKe"/>
+	</rebus>
+
+	<rebus section="3" map_east="23" map_north="85">
+	  <normal text="UGNILET"/>
+	  <help text="FRIDSAMET"/>
+	  <solution text="Lugnet"/>
+	  <target description="Korsningen" map_east="25" map_north="80" zoomed_map_url="https://drive.google.com/open?id=1ycjoVeaXg7B4OmpJqGhVmI4vAgs5z3m2"/>
+	</rebus>
+
+	<rebus section="4" map_east="26" map_north="76">
+	  <normal text="LÅKRIÅA"/>
+	  <help text="ÅLRAOMÅK"/>
+	  <solution text="Ålåkra"/>
+	  <target description="Korsningen" map_east="24" map_north="81" zoomed_map_url="https://drive.google.com/open?id=1wmlJm9wXVSljW043K1CUhs9zj_eUK_jP"/>
+	</rebus>
+
+	<rebus section="5" is_lunch="true" map_east="23" map_north="82">
+	  <normal text="https://www.kulturkollo.se/2015/01/17/alskade-kulla-gulla/"/>
+	  <help text="LATTJOLA"/>
+	  <solution text="Kulla"/>
+	  <target description="Korsningen" map_east="23" map_north="79" zoomed_map_url="https://drive.google.com/open?id=1jw3Xd6i0akov689kgfTZtuK14J173iZo"/>
+	</rebus>
+
+	<rebus section="6" map_east="27" map_north="80">
+	  <normal text="PRAKTTAD"/>
+	  <help text="G5771673D"/>
+	  <solution text="Glanstad"/>
+	  <target description="Korsningen" map_east="24" map_north="79" zoomed_map_url="https://drive.google.com/open?id=1FqUyyMRrnVqFgGValaeAmIozDaGpXYZB"/>
+	</rebus>
+
+	<rebus section="7" map_east="27" map_north="83">
+	  <normal text="GÅRIJÄRNDEN"/>
+	  <help text="26GÅRDEN"/>
+	  <solution text="Järngården"/>
+	  <target description="Korsningen" map_east="25" map_north="79" zoomed_map_url="https://drive.google.com/open?id=1zAm82W90O92a9D_Ewh_iqmdTAtyGr6pN"/>
+	</rebus>
+
+	<rebus section="8" map_east="22" map_north="86">
+	  <normal text="16281515EN"/>
+	  <help text="SPENOMNIP"/>
+	  <solution text="Snippen"/>
+	  <target description="Korsningen" map_east="26" map_north="78" zoomed_map_url="https://drive.google.com/open?id=1YjaB5KDMCoi5La4fRqHvbXmJOpRiPxOq"/>
+	</rebus>
+</rebuses>

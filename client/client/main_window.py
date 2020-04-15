@@ -17,7 +17,7 @@ class MainWindow:
         # server_conn.report_lost_connection = self.on_lost_connection
         # server_conn.message_receiver = self.on_message_received
         self.rally_configuration = rally_configuration
-        self.sub_processes = SubProcesses(self.subprocess_communicator, self.rally_configuration, self.running_as_exe)
+        self.sub_processes = SubProcesses(self.subprocess_communicator, self.rally_configuration, self.running_as_exe, self.server_connection.temporary_config_file)
         self.positions_map = {"Utanför bussen": 0,
                               "Förare": 1,
                               "Kartläsare": 2,

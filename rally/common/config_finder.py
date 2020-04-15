@@ -2,25 +2,24 @@ import configparser
 import os
 import re
 
-from rally.common.rally_config import RallyConfiguration
 
-
-class ConfigFinder:
+class BaseConfigFinder:
     """ Looks for rally configuration XML files and reads them """
-    def __init__(self, is_server, ask_for_other_location, specific_config=None):
+    def __init__(self, configuration_factory, ask_for_other_location, specific_config=None):
+        self.config_folder = None
         self.rally_configs = []
-        self.is_server = is_server
+        self.configuration_factory = configuration_factory
         # Guess that the config folder is located two folders down from the cwd
         if specific_config is not None and len(specific_config) > 0:
             self.read_config(specific_config)
             if len(self.rally_configs) == 0:
                 print("ERROR! Unable to read rally configuration {0}!".format(specific_config))
         else:
-            config_folder = os.path.abspath(os.path.join(os.getcwd(), "./config/"))
+            config_folder = os.path.abspath(os.path.join(os.getcwd(), "./configs/"))
             if not os.path.exists(config_folder):
-                config_folder = os.path.abspath(os.path.join(os.getcwd(), "../config/"))
+                config_folder = os.path.abspath(os.path.join(os.getcwd(), "../configs/"))
             if not os.path.exists(config_folder):
-                config_folder = os.path.abspath(os.path.join(os.getcwd(), "../../config/"))
+                config_folder = os.path.abspath(os.path.join(os.getcwd(), "../../configs/"))
             if os.path.exists(config_folder):
                 self.read_config_folder(config_folder)
             if len(self.rally_configs) == 0:
@@ -49,6 +48,8 @@ class ConfigFinder:
                                 config_parser.write(configout)
             if len(self.rally_configs) == 0:
                 print("ERROR! Unable to find any rally configurations in {0}!".format(config_folder))
+            else:
+                self.config_folder = config_folder
 
     def read_config_folder(self, config_folder):
         files = [f for f in os.listdir(config_folder) if re.match(r'.*\.xml$', f)]
@@ -57,7 +58,7 @@ class ConfigFinder:
 
     def read_config(self, file_to_read):
             try:
-                config = RallyConfiguration(file_to_read, self.is_server)
+                config = self.configuration_factory(file_to_read)
                 self.rally_configs.append(config)
             except ValueError as e:
                 print(e)

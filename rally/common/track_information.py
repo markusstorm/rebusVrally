@@ -83,11 +83,22 @@ class Segment:
         # -> frames = distance * fps / speed
         return int(dist_in_segment * self.section.fps / self.speed) # TODO: take start offset into account + self.start_frame
 
+    def build_client_config_xml(self, xml_segments):
+        xml_segment = ET.SubElement(xml_segments, "segment",
+                                    start_lat=str(self.start_latlon.lat),
+                                    start_lon=str(self.start_latlon.lon),
+                                    end_lat=str(self.end_latlon.lat),
+                                    end_lon=str(self.end_latlon.lon),
+                                    speed_km=str(self.speed*3.6),
+                                    start_frame=str(self.start_frame),
+                                    end_frame=str(self.end_frame))
+
 
 class Section:
     def __init__(self, section, track_information):
         self.section_number = int(section.attrib["number"])
-        self.movie_file = os.path.abspath(os.path.join(section.attrib["file"].replace("#LOCATION#", track_information.location)))
+        self.org_file_str = section.attrib["file"]
+        self.movie_file = os.path.abspath(os.path.join(track_information.rally_config_object.replace_locations(section.attrib["file"])))
         self.fps = float(section.attrib["fps"])
         self.start_offset_frame = 0
         if "start_offset_frame" in section.attrib:
@@ -143,21 +154,38 @@ class Section:
                 return rebus
         return None
 
+    def build_client_config_xml(self, rally_sections):
+        xml_section = ET.SubElement(rally_sections, "section",
+                                    number=str(self.section_number),
+                                    file=self.org_file_str,
+                                    fps=str(self.fps),
+                                    start_offset_frame=str(self.start_offset_frame),
+                                    end_frame=str(self.end_frame))
+        xml_segments = ET.SubElement(xml_section, "segments")
+        for segment in self.segments:
+            segment.build_client_config_xml(xml_segments)
+
+
 class TrackInformation:
-    def __init__(self, config_file):
+    def __init__(self, rally_config_object, config_file=None, xml=None):
         self.sections = {}
+        self.rally_config_object = rally_config_object
+        try:
+            if config_file is not None:
+                tree = ET.parse(config_file)
+                xml = tree.getroot()
 
-        self.location = os.path.dirname(os.path.abspath(config_file))
+            self.start_section = 1
+            if "start_section" in xml.attrib:
+                self.start_section = int(xml.attrib["start_section"])
+            for section_xml in xml.findall("section"):
+                section = Section(section_xml, self)
+                self.sections[section.section_number] = section
+        except FileNotFoundError as e:
+            raise ValueError("ERROR! Sections configuration file {0} not found! {1}".format(config_file, e))
+        except ET.ParseError as e:
+            raise ValueError("ERROR! Error when reading sections configuration {0}: {1}".format(config_file, e))
 
-        tree = ET.parse(config_file)
-        root = tree.getroot()
-
-        self.start_section = 1
-        if "start_section" in root.attrib:
-            self.start_section = int(root.attrib["start_section"])
-        for section_xml in root.findall("section"):
-            section = Section(section_xml, self)
-            self.sections[section.section_number] = section
 
     def get_section(self, section_number):
         if section_number in self.sections:
@@ -187,5 +215,11 @@ class TrackInformation:
                     7: "Från R7 till R8",
                     8: "Från R8 till slutet"}
         return sections
+
+    def build_client_config_xml(self, root):
+        rally_sections = ET.SubElement(root, "sections", start_section=str(self.start_section))
+        for section in self.sections.values():
+            section.build_client_config_xml(rally_sections)
+
 
 #t = TrackInformation()

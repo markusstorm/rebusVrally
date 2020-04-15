@@ -1,5 +1,5 @@
-from rally.common.rally_config import RebusConfig
 from rally.protocol import clientprotocol_pb2
+from server.server_config import RebusConfig
 
 
 class RebusStatus:

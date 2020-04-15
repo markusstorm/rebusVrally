@@ -1,4 +1,6 @@
+import os
 import socket
+import tempfile
 import threading
 import time
 
@@ -30,6 +32,7 @@ class ServerConnection(threading.Thread):
         self.status_information = StatusInformation()
         self.enter_client_loop = False
         self.logged_in = False
+        self.temporary_config_file = None
 
     def stop(self):
         self.terminate = True
@@ -116,11 +119,16 @@ class ServerConnection(threading.Thread):
                 # unpack_result, data = protobuf_utils.protobuf_unpack(data, loginresponse)
                 if unpack_result > 0:
                     if loginresponse.HasField("success"):
-                        if loginresponse.success and loginresponse.HasField("user_id"):
+                        if loginresponse.success and loginresponse.HasField("user_id") and loginresponse.HasField("configuration"):
                             print("Logged in to server")
                             self.logged_in = True
                             self.status_information.user_id = loginresponse.user_id
                             self.status_information.username = self.username
+                            temporary_config_file_fd, self.temporary_config_file = tempfile.mkstemp()
+                            #print("Created temporary file {0} to store the configuration".format(self.temporary_config_file))
+                            #print(loginresponse.configuration)
+                            with open(temporary_config_file_fd, "wb") as f:
+                                f.write(loginresponse.configuration.encode("utf-8"))
                             message = ""
                         else:
                             if loginresponse.HasField("message"):

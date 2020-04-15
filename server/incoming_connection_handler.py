@@ -95,6 +95,7 @@ class IncomingConnectionHandler(threading.Thread):
             loginresponse.success = login_result
             if client is not None:
                 loginresponse.user_id = client.user_id
+                loginresponse.configuration = self.main_server.rally_configuration.get_client_config_xml()
             loginresponse.message = error_message
             #try:
             protobuf_utils.protobuf_send(self.connection, loginresponse)

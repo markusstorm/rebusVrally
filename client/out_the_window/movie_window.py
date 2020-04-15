@@ -6,8 +6,9 @@ import cv2
 import PIL.Image, PIL.ImageTk
 import time
 import argparse
+
+from client.common.client_config import ClientRallyConfig
 from rally.common.subclient_communicator import SubClientCommunicator
-from rally.common.rally_config import RallyConfiguration
 
 #https://stackoverflow.com/questions/56534609/hardware-accelerated-decoding-with-opencv-and-python-on-windows-msmt-intelmfx
 
@@ -17,12 +18,13 @@ parser = argparse.ArgumentParser(description='The steering GUI')
 parser.add_argument("-p", "--port", type=int, help="UDP port of the main client", required=True)
 parser.add_argument("-c", "--client_index", type=int, help="Client index, used in communication", required=True)
 parser.add_argument("-u", "--user_id", type=int, help="User ID", required=True)
-parser.add_argument("-r", "--rally_configuration", type=str, help="Path to the rally configuration to use", required=False)
+parser.add_argument("-r", "--rally_configuration", type=str, help="Path to the rally configuration to use", required=True)
+parser.add_argument("-d", "--data_path", type=str, help="Path to root of where rally data is stored", required=True)
 parser.add_argument("-v", "--view_direction", type=str, help="View direction (left, front, right)", required=True)
 args = parser.parse_args()
 print(args)
 
-rally_configuration = RallyConfiguration(args.rally_configuration, False)
+rally_configuration = ClientRallyConfig(args.rally_configuration, args.data_path)
 track_information = rally_configuration.track_information
 
 #Blur: https://www.geeksforgeeks.org/opencv-motion-blur-in-python/

@@ -18,4 +18,5 @@ message LoginResponse {
   required bool success = 1;
   optional int32 user_id = 2;
   optional string message = 3;
+  optional string configuration = 4;
 }

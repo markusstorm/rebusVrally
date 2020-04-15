@@ -1,0 +1,13 @@
+<rally id="local_demo" title="Demo-rally (lokalt)" has_difficulty="true" local="true">
+  <start_messages>
+	<message>Välkommen till ett demo av Sötgötarnas VIRTUELLA rebusrally!</message>
+	<message>Här kan du öva på att köra bussen, lösa rebusar och det mesta som kommer att hända under det riktiga rallyt.</message>
+	<message>Lycka till!</message>
+  </start_messages>
+
+  <sections file="#LOCATION#/demo_rally/sections.xml"/>
+
+  <rebuses file="#LOCATION#/demo_rally/rebuses.xml"/>
+
+  <teams file="#LOCATION#/demo_rally/teams.xml"/>
+</rally>

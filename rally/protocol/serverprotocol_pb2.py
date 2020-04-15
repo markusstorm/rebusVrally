@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='server',
   syntax='proto2',
   serialized_options=None,
-  serialized_pb=b'\n\x14serverprotocol.proto\x12\x06server\"\xb2\x01\n\x0cLoginRequest\x12\x10\n\x08teamname\x18\x01 \x02(\t\x12\x10\n\x08password\x18\x02 \x02(\t\x12\x0c\n\x04name\x18\x03 \x02(\t\x12\x0f\n\x07version\x18\x04 \x01(\x05\x12\x37\n\ndifficulty\x18\x05 \x01(\x0e\x32#.server.LoginRequest.DifficultyType\"&\n\x0e\x44ifficultyType\x12\x08\n\x04\x45\x41SY\x10\x01\x12\n\n\x06NORMAL\x10\x02\"B\n\rLoginResponse\x12\x0f\n\x07success\x18\x01 \x02(\x08\x12\x0f\n\x07user_id\x18\x02 \x01(\x05\x12\x0f\n\x07message\x18\x03 \x01(\t'
+  serialized_pb=b'\n\x14serverprotocol.proto\x12\x06server\"\xb2\x01\n\x0cLoginRequest\x12\x10\n\x08teamname\x18\x01 \x02(\t\x12\x10\n\x08password\x18\x02 \x02(\t\x12\x0c\n\x04name\x18\x03 \x02(\t\x12\x0f\n\x07version\x18\x04 \x01(\x05\x12\x37\n\ndifficulty\x18\x05 \x01(\x0e\x32#.server.LoginRequest.DifficultyType\"&\n\x0e\x44ifficultyType\x12\x08\n\x04\x45\x41SY\x10\x01\x12\n\n\x06NORMAL\x10\x02\"Y\n\rLoginResponse\x12\x0f\n\x07success\x18\x01 \x02(\x08\x12\x0f\n\x07user_id\x18\x02 \x01(\x05\x12\x0f\n\x07message\x18\x03 \x01(\t\x12\x15\n\rconfiguration\x18\x04 \x01(\t'
 )
 
 
@@ -134,6 +134,13 @@ _LOGINRESPONSE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='configuration', full_name='server.LoginResponse.configuration', index=3,
+      number=4, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -147,7 +154,7 @@ _LOGINRESPONSE = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=213,
-  serialized_end=279,
+  serialized_end=302,
 )
 
 _LOGINREQUEST.fields_by_name['difficulty'].enum_type = _LOGINREQUEST_DIFFICULTYTYPE

@@ -2,11 +2,11 @@ import datetime
 import random
 from functools import partial
 
-from rally.common.rally_config import RebusConfig
 from rally.common.rebuses import RebusStatuses
 from rally.common.status_information import Plate, Photo
 from rally.protocol import clientprotocol_pb2
 from server.minibus import MiniBus
+from server.server_config import RebusConfig
 
 
 class RebusSolution:

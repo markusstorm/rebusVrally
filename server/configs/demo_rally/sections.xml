@@ -1,6 +1,6 @@
-<rally_sections start_section="1">
+<sections start_section="1">
 	<!-- TODO: remove 55555555 -->
-    <section number="1" file="#LOCATION#/../video/1.mp4" fps="30.008598" start_offset_frame="200" end_frame="6900">
+    <section number="1" file="#DATA#/demo_rally/data/1.mp4" fps="30.008598" start_offset_frame="200" end_frame="6900">
         <turns>
             <turn direction="right" frame_offset="2130" description="Right to next section" next_section="2" automatic="true"/>
         </turns>
@@ -9,7 +9,7 @@
         </segments>
     </section>
 
-    <section number="2" file="#LOCATION#/../video/2.mp4" fps="30.009656" start_offset_frame="700" end_frame="6200">
+    <section number="2" file="#DATA#/demo_rally/data/2.mp4" fps="30.009656" start_offset_frame="700" end_frame="6200">
         <turns>
             <turn direction="right" frame_offset="5250" description="Right to next section" next_section="3" automatic="true"/>
         </turns>
@@ -18,7 +18,7 @@
         </segments>
     </section>
 
-    <section number="3" file="#LOCATION#/../video/3.mp4" fps="30.018246" start_offset_frame="350" end_frame="3280">
+    <section number="3" file="#DATA#/demo_rally/data/3.mp4" fps="30.018246" start_offset_frame="350" end_frame="3280">
         <turns>
             <turn direction="left" frame_offset="1015" description="Left to next section" next_section="4" automatic="true"/>
         </turns>
@@ -27,7 +27,7 @@
         </segments>
     </section>
 
-    <section number="4" file="#LOCATION#/../video/4.mp4" fps="30.008404" start_offset_frame="1000" end_frame="7100">
+    <section number="4" file="#DATA#/demo_rally/data/4.mp4" fps="30.008404" start_offset_frame="1000" end_frame="7100">
         <turns>
             <turn direction="left" frame_offset="5250" description="Left to next section" next_section="5" automatic="true"/>
         </turns>
@@ -39,7 +39,7 @@
         </segments>
     </section>
 
-    <section number="5" file="#LOCATION#/../video/5.mp4" fps="30.003562" start_offset_frame="150" end_frame="16800">
+    <section number="5" file="#DATA#/demo_rally/data/5.mp4" fps="30.003562" start_offset_frame="150" end_frame="16800">
         <turns>
             <turn direction="left" frame_offset="11000" description="Left to next section" next_section="6" automatic="true"/>
         </turns>
@@ -52,7 +52,7 @@
         </segments>
     </section>
 
-    <section number="6" file="#LOCATION#/../video/6.mp4" fps="30.002796" start_offset_frame="1400" end_frame="21000">
+    <section number="6" file="#DATA#/demo_rally/data/6.mp4" fps="30.002796" start_offset_frame="1400" end_frame="21000">
         <turns>
             <turn direction="straight" frame_offset="17100" description="Goal" next_section="100" automatic="true"/>
         </turns>
@@ -66,4 +66,4 @@
             <segment start_lat="0" start_lon="0" end_lat="0" end_lon="0" speed_km="50" start_frame="0" end_frame="55555555"/>
         </segments>
     </section>
-</rally_sections>
+</sections>

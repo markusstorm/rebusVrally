@@ -1,4 +1,3 @@
-from rally.common.rally_config import RebusConfig
 from rally.common.rebuses import RebusStatuses
 from rally.protocol import clientprotocol_pb2
 
@@ -103,8 +102,6 @@ class StatusInformation:
             self.update_rebus_status(status_update.rebus_answers)
         if status_update.HasField("rebus_solutions"):
             self.update_rebus_solutions(status_update.rebus_solutions)
-
-
 
     def update_seating(self, seating_update):
         for i in range(0, 10):

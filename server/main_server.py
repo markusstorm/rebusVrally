@@ -2,8 +2,8 @@ import datetime
 import threading
 import time
 
-from rally.common.rally_config import RallyConfiguration, RebusConfig
 from rally.protocol import clientprotocol_pb2
+from server.server_config import RebusConfig
 from server.team_server import TeamServer
 from server.flask_server import WebHandler
 

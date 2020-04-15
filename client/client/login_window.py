@@ -7,8 +7,9 @@ from tkinter.ttk import Combobox
 
 from PIL import ImageTk, Image
 
+from client.client.client_config_finder import ClientConfigFinder
 from client.client.server_connection import ServerConnection
-from rally.common.config_finder import ConfigFinder
+from client.common.client_config import ClientRallyConfig
 
 
 class LoginWindow:
@@ -16,7 +17,7 @@ class LoginWindow:
         self.running_as_exe = running_as_exe
         self.server_connection = None
         self.location = os.getcwd()
-        self.current_configuration = None
+        self.current_login_configuration = None
         self.logged_in = False
         self.local_server_process = None
         self.config_parser = configparser.ConfigParser()
@@ -26,14 +27,15 @@ class LoginWindow:
         self.login_window.title("Sötgötarnas rebusrally VT2020") # TODO: from config
         self.login_window.protocol("WM_DELETE_WINDOW", self.close_window)
 
-        self.config_finder = ConfigFinder(is_server=False, ask_for_other_location=self.ask_for_other_location)
+        self.config_finder = ClientConfigFinder(ask_for_other_location=self.ask_for_other_location)
         if len(self.config_finder.rally_configs) == 0:
             print("ERROR! Unable to find a configuration") #TODO: messagebox instead
             self.login_window.destroy()
             return
 
         # Choose one configuration to start with
-        self.current_configuration = self.config_finder.get_newest_config()
+        self.current_login_configuration = self.config_finder.get_newest_config()
+        self.rally_config = None
 
         self.photos_img = None
         self.background_label = None
@@ -63,8 +65,8 @@ class LoginWindow:
         return filename
 
     def layout(self):
-        if self.current_configuration.login_background is not None:
-            self.photos_img = ImageTk.PhotoImage(Image.open(self.current_configuration.login_background))
+        if self.current_login_configuration.login_background is not None:
+            self.photos_img = ImageTk.PhotoImage(Image.open(self.current_login_configuration.login_background))
             w = self.photos_img.width()
             h = self.photos_img.height()
             self.login_window.geometry('%dx%d+0+0' % (w, h))
@@ -79,7 +81,7 @@ class LoginWindow:
         current_index = 0
         titles = []
         for config in self.config_finder.rally_configs:
-            if config == self.current_configuration:
+            if config == self.current_login_configuration:
                 current_index = len(titles)
             titles.append(config.title)
         self.configuration_combobox = Combobox(f, values=self.config_finder.get_all_titles())
@@ -89,7 +91,7 @@ class LoginWindow:
 
         main_row += 1
         difficultyLabel = Label(f, text="Välj svårighetsgrad").grid(row=main_row, column=0)
-        self.difficulty_combobox = Combobox(f, values=self.current_configuration.get_difficulties())
+        self.difficulty_combobox = Combobox(f, values=self.current_login_configuration.get_difficulties())
         self.difficulty_combobox.current(0)
         #self.configuration_combobox.bind("<<ComboboxSelected>>", self.on_rally_cb_changed)
         self.difficulty_combobox.grid(row=main_row, column=1)
@@ -127,12 +129,12 @@ class LoginWindow:
         self.loginButton.grid(row=main_row, column=1)
 
         self.entries = [self.configuration_combobox, self.serverEntry, self.teamnameEntry, self.passwordEntry,
-                        self.usernameEntry, self.loginButton]
+                        self.usernameEntry, self.loginButton, self.difficulty_combobox]
 
         f.pack()
         f.update()
 
-        if self.current_configuration.login_background is not None:
+        if self.current_login_configuration.login_background is not None:
             f.place(x=max((w - f.winfo_width()) / 2, 0), y=max(0, h - f.winfo_height()))
         else:
             f.grid(row=0, column=0)
@@ -145,7 +147,7 @@ class LoginWindow:
         self.update_login_information()
 
     def stop(self):
-        self.current_configuration = None
+        self.current_login_configuration = None
         self.handle_local_server()
 
     def handle_local_server(self):
@@ -153,18 +155,18 @@ class LoginWindow:
             self.local_server_process.terminate()
             self.local_server_process = None
 
-        if self.current_configuration is None:
+        if self.current_login_configuration is None:
             return
 
-        if not self.current_configuration.is_local:
+        if not self.current_login_configuration.is_local:
             return
 
         if self.running_as_exe:
-            args = ["server_main.exe", "-r", self.current_configuration.file_name, "-l"]
+            args = ["server_main.exe", "-i", self.current_login_configuration.rally_id, "-l"]
             working_dir = os.getcwd()
         else:
             program = os.path.abspath(os.path.join(os.getcwd(), "../../server/server_main.py"))
-            args = [sys.executable, program, "-r", self.current_configuration.file_name, "-l"]
+            args = [sys.executable, program, "-i", self.current_login_configuration.rally_id, "-l"]
             working_dir = os.path.dirname(program)
         print("Starting local server, wait a second to let it start...")
         self.local_server_process = subprocess.Popen(args, cwd=working_dir)
@@ -173,18 +175,18 @@ class LoginWindow:
         selected_config_title = self.configuration_combobox.get()
         config = self.config_finder.get_rally_from_title(selected_config_title)
         if config != None:
-            self.current_configuration = config
+            self.current_login_configuration = config
 
         self.handle_local_server()
 
         # Get settings from the rally configuration
-        server = self.current_configuration.default_server_address
-        teamname = self.current_configuration.default_team_name
-        password = self.current_configuration.default_password
-        username = self.current_configuration.default_username
+        server = self.current_login_configuration.default_server_address
+        teamname = self.current_login_configuration.default_team_name
+        password = self.current_login_configuration.default_password
+        username = self.current_login_configuration.default_username
 
         # If the user has made changes before
-        section_name = "login_{0}".format(self.current_configuration.rally_id)
+        section_name = "login_{0}".format(self.current_login_configuration.rally_id)
         if section_name in self.config_parser:
             login_section = self.config_parser[section_name]
             if "server" in login_section and len(login_section["server"]) > 0:
@@ -210,7 +212,7 @@ class LoginWindow:
                 len(teamname) > 0 and
                 len(username) > 0 and
                 len(password) > 0):
-            section_name = "login_{0}".format(self.current_configuration.rally_id)
+            section_name = "login_{0}".format(self.current_login_configuration.rally_id)
             self.config_parser[section_name] = {}
             self.config_parser[section_name]["server"] = server
             self.config_parser[section_name]["teamname"] = teamname
@@ -221,7 +223,7 @@ class LoginWindow:
             for entry in self.entries:
                 entry.config(state="disabled")
 
-            difficulty = self.current_configuration.get_difficulty_from_string(self.difficulty_combobox.get())
+            difficulty = self.current_login_configuration.get_difficulty_from_string(self.difficulty_combobox.get())
 
             self.login(server, teamname, password, username, difficulty)
 
@@ -245,9 +247,17 @@ class LoginWindow:
 #     exit_program = True
 #     sys.exit(0)
     def login(self, server, teamname, password, username, difficulty):
-        print("Login")
+        #print("Login")
         # Tries to login and the result is reported to report_login_result
         # If the login is unsuccessful, then the ServerConnection exits its thread
         self.server_connection = ServerConnection(server, teamname, password, username, self.report_login_result, None, difficulty)
         self.server_connection.start()
 
+    def get_rally_config(self):
+        if self.rally_config is None:
+            if self.server_connection.temporary_config_file is None or len(self.server_connection.temporary_config_file) == 0:
+                print("Error! Can't get information about the temporary file containing the client rally configuration!")
+                return None
+            data_path = self.current_login_configuration.location
+            self.rally_config = ClientRallyConfig(self.server_connection.temporary_config_file, data_path)
+        return self.rally_config

@@ -5,8 +5,8 @@ from tkinter import messagebox
 
 from PIL import ImageTk, Image
 
+from client.common.client_config import ClientRallyConfig
 from rally.common.subclient_communicator import SubClientCommunicator
-from rally.common.rally_config import RallyConfiguration
 from rally.protocol import clientprotocol_pb2
 
 
@@ -340,10 +340,12 @@ if __name__ == '__main__':
     parser.add_argument("-c", "--client_index", type=int, help="Client index, used in communication", required=True)
     parser.add_argument("-u", "--user_id", type=int, help="User ID", required=True)
     parser.add_argument("-r", "--rally_configuration", type=str, help="Path to the rally configuration to use",
-                        required=False)
+                        required=True)
+    parser.add_argument("-d", "--data_path", type=str, help="Path to root of where rally data is stored",
+                        required=True)
     args = parser.parse_args()
 
-    rally_configuration = RallyConfiguration(args.rally_configuration, False)
+    rally_configuration = ClientRallyConfig(args.rally_configuration, args.data_path)
     track_information = rally_configuration.track_information
 
     steering_gui = SteeringWindow(args.client_index, track_information)
