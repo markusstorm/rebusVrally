@@ -2,7 +2,6 @@ from tkinter import *
 
 from client.client.login_window import LoginWindow
 from client.client.main_window import MainWindow
-from client.common.client_config import ClientRallyConfig
 
 if __name__ == '__main__':
     running_as_exe = False

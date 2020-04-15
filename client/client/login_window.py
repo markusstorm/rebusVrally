@@ -24,7 +24,7 @@ class LoginWindow:
         self.config_parser.read("config.ini")
 
         self.login_window = Toplevel()
-        self.login_window.title("Sötgötarnas rebusrally VT2020") # TODO: from config
+        self.login_window.title("Sötgötarnas rebus(V)rally")
         self.login_window.protocol("WM_DELETE_WINDOW", self.close_window)
 
         self.config_finder = ClientConfigFinder(ask_for_other_location=self.ask_for_other_location)

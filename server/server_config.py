@@ -153,11 +153,14 @@ class ServerRallyConfig(BaseRallyConfig):
         self.track_information.build_client_config_xml(root)
 
         tree = ET.ElementTree(root)
-        print(tree)
-        xmlstr = ET.tostring(tree.getroot(), encoding='utf8', method='xml')
+        xmlstr = ET.tostring(tree.getroot(), method='xml')
+        print(xmlstr)
         return xmlstr
 
 
 if __name__ == '__main__':
-    sr = ServerRallyConfig("../../server/configs/local_demo_rally.xml")
+    #sr = ServerRallyConfig("../../server/configs/local_demo_rally.xml")
+    sr = ServerRallyConfig("c:/Users/Markus/AppData/Local/Temp/tmp3bqtemp3")
     print(sr)
+    print(sr.title)
+
