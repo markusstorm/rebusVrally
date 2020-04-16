@@ -23,6 +23,8 @@ class WebHandler(threading.Thread):
 
         self.flask_app.add_url_rule("/debug_restart", view_func=self.debug_restart, methods=['POST'])
 
+        self.flask_app.add_url_rule("/warp/<team>/<section>", view_func=self.warp_team, methods=['POST'])
+
     def run(self):
         self.flask_app.run(host=self.host, port=63352)
 
@@ -56,3 +58,14 @@ class WebHandler(threading.Thread):
 
     def debug_restart(self):
         return "NOT implemented"
+
+    def warp_team(self, team, section):
+        team_server = self.main_server.find_team_server(team)
+        frame = 0
+        if len(request.data) > 0:
+            s = request.data.decode("utf-8")
+            frame = int(s)
+
+        if team_server is not None:
+            team_server.minibus.warp(int(section), int(frame))
+        return ""

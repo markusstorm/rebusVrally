@@ -44,6 +44,7 @@ class BaseRallyConfig:
         if "local" in root.attrib:
             self.is_local = root.attrib["local"].strip().casefold() == "true".casefold()
 
+        print("Config: reading sections")
         for sections in root.findall("sections"):
             if self.track_information is None:
                 if "file" in sections.attrib:

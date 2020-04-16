@@ -168,6 +168,7 @@ class Section:
         for segment in self.segments:
             if segment.start_frame <= frame_number <= segment.end_frame:
                 return segment.calculate_distance(frame_number)
+        return 0.0
 
     def calculate_frame_from_distance(self, distance):
         for segment in self.segments:

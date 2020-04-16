@@ -108,16 +108,19 @@ class ServerRallyConfig(BaseRallyConfig):
     def parse_xml(self, root):
         BaseRallyConfig.parse_xml(self, root)
 
+        print("Config: reading start_messages")
         for start_messages in root.findall("start_messages"):
             for message in start_messages.findall("message"):
                 # print("Start message: {0}".format(message.text))
                 self.start_messages.append(message.text)
 
+        print("Config: reading rebuses")
         for rebuses in root.findall("rebuses"):
             if "file" in rebuses.attrib:
                 rebuses_file = self.replace_locations(rebuses.attrib["file"])
                 self.rebuses = RebusConfig.read_file(rebuses_file)
 
+        print("Config: reading teams")
         for teams in root.findall("teams"):
             if "file" in teams.attrib:
                 teams_file = self.replace_locations(teams.attrib["file"])

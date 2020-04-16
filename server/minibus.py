@@ -32,6 +32,13 @@ class MiniBus:
                 seating[i] = {"name": player.name}
         return json
 
+    def warp(self, section_number, frame):
+        self.speed = 0
+        self.stopped = True
+        self.current_section = section_number
+        section = self.track_information.get_section(self.current_section)
+        self.distance = section.calculate_section_distance(frame)
+
     def update_pos_from_driver(self, pos_update):
         section = self.track_information.get_section(self.current_section)
         if pos_update.HasField("speed"):

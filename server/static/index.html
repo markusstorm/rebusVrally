@@ -30,6 +30,16 @@
                 xhttp.send("START");
             }
         }
+
+        function on_warp() {
+            var team = document.getElementById("warp_team").value;
+            var section = document.getElementById("warp_section").value;
+            var frame = document.getElementById("warp_frame").value;
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "/warp/" + team + "/" + section, true);
+            xhttp.setRequestHeader("Content-type", "text/plain");
+            xhttp.send(frame);
+        }
     </script>
 </head>
 <body>
@@ -39,6 +49,9 @@ Send a message to all <input type="text" id="sendmessage" name="sendmessage" val
 <br>
 <input type="button" onclick="on_start_afternoon()" value="Start the afternoon! (publish lunch rebus)"/><br>
 <br>
+Warp team <input type="text" id="warp_team" name="warp_team" value="1"/> to section <input type="text" id="warp_section" name="warp_section" value="1"/> frame <input type="text" id="warp_frame" name="warp_frame" value=""/> <input type="button" onclick="on_warp()" value="Warp"/><br>
+<!--
 <input type="button" onclick="on_debug_restart()" value="Reset bus position"/><br>
+-->
 </body>
 </html>
