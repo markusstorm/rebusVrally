@@ -20,6 +20,7 @@ class SteeringWindow:
         self.connected = False
         self.speed = 0.0
         self.distance = 0.0
+        self.accumulated_movement = 0.0
         self.track_information = track_information
         self.current_section = track_information.start_section
         self.looking_for_rebus = False
@@ -131,8 +132,8 @@ class SteeringWindow:
                 self.backing_label.place_forget()
 
         self.stopped = status_information.stopped or status_information.looking_for_rebus
-        if self.stopped:
-            self.distance = status_information.distance
+        #if self.stopped:
+        self.distance = status_information.distance
         if status_information.looking_for_rebus != self.looking_for_rebus:
             self.looking_for_rebus = status_information.looking_for_rebus
             if self.looking_for_rebus:
@@ -143,7 +144,7 @@ class SteeringWindow:
 
         self.rally_is_started = status_information.rally_is_started
         if not self.connected:
-            self.distance = status_information.distance
+            #self.distance = status_information.distance
             self.current_section = status_information.current_section
             self.connected = True
         else:
@@ -151,7 +152,7 @@ class SteeringWindow:
                 # New section!
                 # speed = 0.0
                 self.indicator_light = SteeringWindow.NONE
-                self.distance = status_information.distance
+                #self.distance = status_information.distance
                 self.current_section = status_information.current_section
 
     def send_to_client(self):
@@ -162,7 +163,8 @@ class SteeringWindow:
         client_to_server.counter = self.my_client_index
         client_to_server.pos_update.SetInParent()
         client_to_server.pos_update.speed = self.speed
-        client_to_server.pos_update.distance = self.distance
+        client_to_server.pos_update.delta_distance = self.accumulated_movement
+        self.accumulated_movement = 0.0
         client_to_server.pos_update.current_section = self.current_section
         client_to_server.pos_update.indicator = self.indicator_light
         self.sub_client_communicator.send(client_to_server)
@@ -275,23 +277,35 @@ class SteeringWindow:
             self.window.after(100, self.update_speed)
             return
 
-        section = self.track_information.get_section(self.current_section)
-
         now = datetime.datetime.now()
         if self.prev_sample is not None:
             diff = now - self.prev_sample
             secs = diff.total_seconds()
-            self.distance += self.speed * secs
-            if self.distance < 0.0:
-                self.distance = 0.0
-            if section is not None:
-                if self.distance < section.get_start_distance():
-                    self.distance = section.get_start_distance()
-                    if self.backing:
-                        self.backing = False
-                        self.speed = 0
-                        self.backup_timeout = None
+            self.accumulated_movement += self.speed * secs
+
+            # if self.distance < 0.0:
+            #     self.distance = 0.0
+            # if section is not None:
+            #     if self.distance < section.get_start_distance():
+            #         self.distance = section.get_start_distance()
+            #         if self.backing:
+            #             self.backing = False
+            #             self.speed = 0
+            #             self.backup_timeout = None
         self.prev_sample = now
+
+        interpolated_distance = self.distance + self.accumulated_movement
+        if interpolated_distance < 0.0:
+            # 0.0 is the start frame of the video (start_offset_frames into the video)
+            interpolated_distance = 0.0
+            if self.backing:
+                self.backing = False
+                self.speed = 0
+                self.backup_timeout = None
+
+        # section = self.track_information.get_section(self.current_section)
+        # if interpolated_distance > section.get_default_end_distance():
+        #     interpolated_distance = section.get_default_end_distance()
 
         if self.backing:
             if self.backup_timeout is not None:

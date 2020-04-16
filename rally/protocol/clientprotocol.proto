@@ -136,7 +136,7 @@ message ServerToClient {
 
 message ClientPositionUpdate {
   required float speed = 1;
-  required double distance = 2; //distance in current section (meters)
+  required double delta_distance = 2; //distance in current section (meters)
   required int32 current_section = 3;
     enum DirectionType {
         NONE = 0;

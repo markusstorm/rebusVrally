@@ -44,10 +44,12 @@ class MiniBus:
         if pos_update.HasField("speed"):
             self.speed = pos_update.speed
             self.stopped = abs(self.speed) < 0.001
-        if pos_update.HasField("distance"):
-            self.distance = pos_update.distance
+        if pos_update.HasField("delta_distance"):
+            self.distance += pos_update.delta_distance
             if self.distance < section.get_start_distance():
                 self.distance = section.get_start_distance()
+            if self.distance > section.get_default_end_distance():
+                self.distance = section.get_default_end_distance()
         if pos_update.HasField("indicator"):
             self.indicator_light = pos_update.indicator
         # TODO: this just moves the car into the next section automatically, require the user to turn instead
@@ -55,7 +57,7 @@ class MiniBus:
         #section = self.track_information.get_section(self.current_section)
         turn = section.get_correct_turn()
         if turn is not None:
-            turn_distance = section.calculate_section_distance(turn.frame_offset)
+            turn_distance = section.calculate_default_video_distance_from_frame(turn.frame_offset)
             if self.distance >= turn_distance:
                 turn_matched = False
                 if turn.direction == Turn.STRAIGHT_AHEAD and self.indicator_light == clientprotocol_pb2.ClientPositionUpdate.NONE:

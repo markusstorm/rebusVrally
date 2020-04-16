@@ -9,6 +9,7 @@ import time
 import argparse
 
 from client.common.client_config import ClientRallyConfig
+from client.out_the_window.video_capture import MyVideoCapture
 from rally.common.subclient_communicator import SubClientCommunicator
 
 #https://stackoverflow.com/questions/56534609/hardware-accelerated-decoding-with-opencv-and-python-on-windows-msmt-intelmfx
@@ -26,7 +27,7 @@ parser.add_argument("-v", "--view_direction", type=str, help="View direction (le
 parser.add_argument("-m", "--disallow_moving_direction", action="append", help="Disallow video to be shown for specified view (left, front, right) when the bus is moving", required=False)
 parser.add_argument("-s", "--disallow_stopped_direction", action="append", help="Disallow video to be shown for specified view (left, front, right) when the bus is stopped", required=False)
 args = parser.parse_args()
-print(args)
+#print(args)
 
 
 def remove_from_list(input, disallow):
@@ -43,20 +44,17 @@ allowed_when_stopped = remove_from_list({Video.LEFT: True, Video.FRONT: True, Vi
 allowed_when_moving = remove_from_list({Video.LEFT: True, Video.FRONT: True, Video.RIGHT: True}, args.disallow_moving_direction)
 
 
-rally_configuration = ClientRallyConfig(args.rally_configuration, args.data_path)
-track_information = rally_configuration.track_information
-
-
 #Blur: https://www.geeksforgeeks.org/opencv-motion-blur-in-python/
 
 class App:
-    def __init__(self, window, direction_str):
-
+    def __init__(self, window, direction_str, track_information):
+        self.terminate = False
+        self.track_information = track_information
         window_title = "Utsikt {0}".format(direction_translator[direction_str])
         self.main_direction = Video.direction_map_to_int[direction_str]
         self.viewing_direction = self.main_direction
         print("Main direction is: {0}".format(Video.direction_map_to_str[self.main_direction]))
-
+        self.force_update = False
         self.connected = False
         self.reconfiguring = False
         self.speed = 0.0
@@ -74,7 +72,8 @@ class App:
         self.sub_client_communicator.start()
 
         # open video source (by default this will try to open the computer webcam)
-        self.vid = MyVideoCapture()
+        self.view_video_caps = {Video.LEFT: None, Video.FRONT: None, Video.RIGHT: None}
+        self.view_video_caps[self.viewing_direction] = MyVideoCapture(self.track_information, self.viewing_direction)
 
         self.window = window
         self.window.title(window_title)
@@ -86,14 +85,27 @@ class App:
         self.frame_label = None
 
         #print("A")
+
         self.window.mainloop()
+        self.terminate = True
+
+    def current_video_cap(self):
+        # TODO: make sure there is an object here!
+        return self.view_video_caps[self.viewing_direction]
 
     def change_video(self):
         self.reconfiguring = True
-        self.vid.change_section(self.current_section, self.distance)
+
+        # Forget about the videos that aren't shown
+        vid_cap = self.current_video_cap()
+        self.view_video_caps = {Video.LEFT: None, Video.FRONT: None, Video.RIGHT: None}
+        self.view_video_caps[self.viewing_direction] = vid_cap
+
+        vid_cap.change_section(self.current_section, self.distance)
+        self.force_update = True
         if self.canvas is None:
             # Create a canvas that can fit the above video source size
-            self.canvas = tkinter.Canvas(self.window, width = self.vid.width, height = self.vid.height)
+            self.canvas = tkinter.Canvas(self.window, width=vid_cap.width, height=vid_cap.height)
             self.canvas.grid(row=0, column=0, columnspan=3, sticky=tkinter.W)
 
             self.buttons[Video.LEFT] = tkinter.Button(self.window, text="Titta åt vänster")
@@ -140,11 +152,17 @@ class App:
 
         if self.viewing_direction != direction:
             self.viewing_direction = direction
-            # TODO: change video!
+            if self.view_video_caps[direction] is None:
+                self.view_video_caps[direction] = MyVideoCapture(self.track_information, self.viewing_direction)
+                self.view_video_caps[direction].change_section(self.current_section, self.distance)
+            self.force_update = True
+            #print("Force update")
 
     def update_view_buttons(self):
+        if self.terminate:
+            return
         global allowed_when_stopped, allowed_when_moving
-        section = track_information.get_section(self.current_section)
+        section = self.track_information.get_section(self.current_section)
         for direction in self.buttons:
             state = "normal"
             if self.stopped:
@@ -183,13 +201,18 @@ class App:
 
     def _update(self):
         if not self.connected:
+            #print("Not connected")
             return False
         if self.reconfiguring:
+            #print("Reconfiguring")
             return False
 
+        vid_cap = self.current_video_cap()
+
         if self.first_display:
+            #print("First display")
             self.first_display = False
-            ret, frame = self.vid.get_frame()
+            ret, frame = vid_cap.get_frame()
             if ret:
                 self.photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(frame))
                 self.canvas.create_image(0, 0, image=self.photo, anchor=tkinter.NW)
@@ -197,14 +220,16 @@ class App:
 
         # wait for position data to start arriving
         if self.pos_time is None:
+            #print("No position")
             return False
-        if self.speed == 0.0:
+        if self.speed == 0.0 and not self.force_update:
+            #print("Speed is 0")
             return False
 
         now = datetime.datetime.now()
         diff = now - self.pos_time
         interpolated_distance = self.distance + self.speed * diff.total_seconds()
-        section = track_information.get_section(self.current_section)
+        section = self.track_information.get_section(self.current_section)
         if section is not None:
             if interpolated_distance < section.get_start_distance():
                 interpolated_distance = section.get_start_distance()
@@ -214,20 +239,25 @@ class App:
         #video_speed = 50.0 / 3.6
         # With that speed, the current distance corresponds to
         #video_target_secs = interpolated_distance / video_speed
-        video_target_secs = track_information.get_section(self.current_section).calculate_video_second_from_distance(interpolated_distance)
+        video_target_secs = self.track_information.get_section(self.current_section).calculate_other_video_second_from_distance(interpolated_distance, self.viewing_direction)
 
         # Before we try to show a frame, see if we should wait more or backup
         # TODO: remove a lot of duplicated code (but first get something to work at all...)
-        diff_ms = self.vid.frame_time - video_target_secs * 1000.0
+        diff_ms = vid_cap.frame_time - video_target_secs * 1000.0
         if diff_ms > 0.0:
+            ret = False
             if self.speed < -0.01:
                 # We are backing, should seek in the video and then show one frame
-                self.vid.seek_ms(video_target_secs * 1000)
-                ret, frame = self.vid.get_frame()
-                if ret:
-                    self.photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(frame))
-                    self.canvas.create_image(0, 0, image=self.photo, anchor=tkinter.NW)
-                self.frame_label["text"] = str(self.vid.frame_number)
+                vid_cap.seek_ms(video_target_secs * 1000)
+                ret, frame = vid_cap.get_frame(True)
+                self.force_update = False
+            elif self.force_update:
+                ret, frame = vid_cap.get_frame(False)
+                self.force_update = False
+            if ret:
+                self.photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(frame))
+                self.canvas.create_image(0, 0, image=self.photo, anchor=tkinter.NW)
+                self.frame_label["text"] = str(vid_cap.frame_number)
                 return self.delay
             # We are ahead with the video, wait for some more time before showing the next frame
             return min(int(diff_ms), 100)
@@ -236,17 +266,23 @@ class App:
         # if self.drop_a_frame:
         #     self.drop_a_frame = False
         #     self.vid.get_frame()
-        ret, frame = self.vid.get_frame()
+        #ret, frame = vid_cap.get_frame(not self.force_update)
+
+        ret, frame = vid_cap.get_frame(diff_ms < self.delay or self.force_update)
+        self.force_update = False
+        # if self.viewing_direction != self.main_direction:
+        #     print(self.viewing_direction)
+        # print(ret)
 
         if ret:
             self.photo = PIL.ImageTk.PhotoImage(image = PIL.Image.fromarray(frame))
             self.canvas.create_image(0, 0, image = self.photo, anchor = tkinter.NW)
 
-        self.frame_label["text"] = str(self.vid.frame_number)
+        self.frame_label["text"] = str(vid_cap.frame_number)
 
         # OK, this have to get better in some way... but it's a first try
         # Now we have presented a frame, it has the time self.vid.frame_time (millisecs)
-        diff_ms = self.vid.frame_time - video_target_secs*1000.0
+        diff_ms = vid_cap.frame_time - video_target_secs*1000.0
         #print("Diff: {0}".format(diff_ms))
         # if diff_ms is > 0 then we have presented the frame too early, so we need to wait
         # otherwise we should just present the next frame as soon as possible
@@ -256,7 +292,7 @@ class App:
         else:
             if diff_ms < -2000:
                 # Too far behind, try to seek in the video
-                self.vid.seek_ms(video_target_secs*1000 + 1000) #Add a bit of extra time, since it will take time to seek
+                vid_cap.seek_ms(video_target_secs*1000 + 1000) #Add a bit of extra time, since it will take time to seek
             elif diff_ms < -500:
                 self.drop_a_frame = True
 
@@ -268,101 +304,8 @@ class App:
 #https://stackoverflow.com/questions/11260042/reverse-video-playback-in-opencv
 #(https://www.life2coding.com/play-a-video-in-reverse-mode-using-python-opencv/)
 
-class MyVideoCapture:
-    def __init__(self):
-        self.frame_number = 0
-        self.frame_time = 0.0
-        self.vid = None
-        self.width = 0
-        self.height = 0
-        self.fps = 0
-        self.mutex = Lock()
 
-    def change_section(self, new_section, distance_in_new_section):
-        #print("1.0")
-        with self.mutex:
-            #print("1.1")
-            if self.vid is not None:
-                if self.vid.isOpened():
-                    self.vid.release()
-
-            #print("1.2")
-            section = track_information.get_section(new_section)
-            video_file = section.get_default_video().movie_file
-
-            # Open the video source
-            print("Changing video to: {}".format(video_file))
-            self.vid = cv2.VideoCapture(video_file)
-            #print("1.3")
-            if not self.vid.isOpened():
-                raise ValueError("Unable to open video source")
-
-            # Get video source width and height
-            self.width = self.vid.get(cv2.CAP_PROP_FRAME_WIDTH)
-            self.height = self.vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
-            self.fps = self.vid.get(cv2.CAP_PROP_FPS)
-            #print("{0}x{1} at {2} fps".format(self.width, self.height, self.fps))
-            #print(self.vid.get(cv2.CAP_PROP_FPS))
-            #print(self.vid.get(cv2.CAP_PROP_FRAME_COUNT))
-            #print(self.vid.get(cv2.CAP_PROP_POS_FRAMES))
-            #print(self.vid.get(cv2.CAP_PROP_POS_MSEC))
-            self.frame_number = 0
-            self.frame_time = 0.0
-
-            if distance_in_new_section > 0:
-                #print("1.4")
-                offset_frame = section.calculate_frame_from_distance(distance_in_new_section)
-                offset_ms = offset_frame / self.fps * 1000
-                #print("Start offset: {0}".format(offset_ms))
-                self._seek_ms(offset_ms)
-                #print("Back from seek")
-                self.frame_time = offset_ms
-                self.frame_number = offset_frame
-
-    # Mutex protected
-    def seek_ms(self, ms):
-        #print("2.0")
-        with self.mutex:
-            #print("2.1")
-            self._seek_ms(ms)
-            #print("2.2")
-
-    # NOT mutex protected
-    def _seek_ms(self, ms):
-        #print("3")
-        self.vid.set(cv2.CAP_PROP_POS_MSEC, ms)
-
-    def get_frame(self):
-        #print("4.0")
-        with self.mutex:
-            #print("4.1")
-            if self.vid is None:
-                return False, None
-            #print("4.2")
-            if self.vid.isOpened():
-                #print("4.3")
-                #print(self.vid.get(cv2.CAP_PROP_POS_FRAMES))
-                #print(self.vid.get(cv2.CAP_PROP_POS_MSEC))
-                ret, frame = self.vid.read()
-                #print("4.4")
-                self.frame_time = self.vid.get(cv2.CAP_PROP_POS_MSEC)
-                self.frame_number = self.vid.get(cv2.CAP_PROP_POS_FRAMES)
-                if ret:
-                    #print("4.5")
-                    # Return a boolean success flag and the current frame converted to BGR
-                    return ret, cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                else:
-                    #print("4.6")
-                    return ret, None
-            else:
-                #print("4.7")
-                return False, None
-
-    # Release the video source when the object is destroyed
-    def __del__(self):
-        if self.vid is not None:
-            if self.vid.isOpened():
-                self.vid.release()
+rally_configuration = ClientRallyConfig(args.rally_configuration, args.data_path)
 
 # Create a window and pass it to the Application object
-App(tkinter.Tk(), args.view_direction)
+App(tkinter.Tk(), args.view_direction, rally_configuration.track_information)

@@ -110,9 +110,12 @@ class ServerConnection(threading.Thread):
             except socket.timeout:
                 continue
             try:
-                data = self.connection.recv(size)
-                if not data:
-                    break
+                data = bytearray()
+                while len(data) < size:
+                    tmp = self.connection.recv(size)
+                    if not tmp:
+                        break
+                    data.extend(tmp)
                 # print('Received', repr(data))
                 loginresponse = serverprotocol_pb2.LoginResponse()
                 unpack_result = loginresponse.ParseFromString(data)

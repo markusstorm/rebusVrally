@@ -53,8 +53,8 @@ class LatLon:
 
 
 class Segment:
-    def __init__(self, segment_xml, previous_segment, section):
-        self.section = section
+    def __init__(self, segment_xml, default_video):
+        self.default_video = default_video
         self.start_latlon = LatLon(segment_xml, "start_")
         self.end_latlon = LatLon(segment_xml, "end_")
         self.speed = 0.0
@@ -64,25 +64,39 @@ class Segment:
             self.speed = float(segment_xml.attrib["speed"])
         self.start_frame = int(segment_xml.attrib["start_frame"])
         self.end_frame = int(segment_xml.attrib["end_frame"])
-        self.start_distance = 0.0  # TODO: take start_offset into account in some way...
-        if previous_segment is not None:
+        # Needs to be calculated when the segments have been sorted
+        self.start_distance = None
+        self.distance_per_frame = None
+        self.end_distance = None
+
+    def init_distances(self, previous_segment):
+        # All distances are related to the "default" video (should be FRONT)
+        if previous_segment is None:
+            self.start_distance = 0.0
+            # For the first segment, take into account that the video might have a start_offset
+            self.start_frame = max(self.start_frame, self.default_video.start_offset_frame)
+        else:
+            # Add an extra distance_per_frame to fill the gap onto this segment
             self.start_distance = previous_segment.end_distance + previous_segment.distance_per_frame
-        self.end_distance = self.start_distance + ((self.end_frame - self.start_frame) / section.default_video.fps) * self.speed
+
+        self.end_distance = self.start_distance + ((self.end_frame - self.start_frame) / self.default_video.fps) * self.speed
         self.distance_per_frame = (self.end_distance - self.start_distance) / (self.end_frame - self.start_frame)
 
+
     def calculate_distance(self, frame_number):
+        # All distances are related to the "default" video (should be FRONT)
         return self.start_distance + (frame_number - self.start_frame) * self.distance_per_frame
 
     def calculate_frame_from_distance(self, distance):
-        # TODO: take start offset into account
-        # dist_in_segment = distance - self.start_distance
-        dist_in_segment = distance
+        # All distances are related to the "default" video (should be FRONT)
+        # distance = 0.0 equals start_offset_frame in the default video
+        dist_in_segment = distance - self.start_distance
 
         # frames / fps = seconds
         # distance = seconds * speed = frames * speed / fps
         # -> frames = distance * fps / speed
-        return int(
-            dist_in_segment * self.section.default_video.fps / self.speed)  # TODO: take start offset into account + self.start_frame
+        segment_frame = int(dist_in_segment * self.default_video.fps / self.speed)
+        return self.start_frame + segment_frame
 
     def build_client_config_xml(self, xml_segments):
         xml_segment = ET.SubElement(xml_segments, "segment",
@@ -93,6 +107,74 @@ class Segment:
                                     speed_km=str(self.speed * 3.6),
                                     start_frame=str(self.start_frame),
                                     end_frame=str(self.end_frame))
+
+    @staticmethod
+    def sorter(segment):
+        #print("Sorter: {0}".format(segment.start_frame))
+        return segment.start_frame
+
+
+class Segments:
+    def __init__(self, segments_xml, default_video):
+        self.default_video = default_video
+        segments = []
+        for segment_xml in segments_xml.findall("segment"):
+            segment = Segment(segment_xml, default_video)
+            segments.append(segment)
+
+        if len(segments) == 0:
+            raise ValueError("There must be at least one segment for each section!")
+
+        self.segments = sorted(segments, key=Segment.sorter)
+        #print(segments, self.segments)
+        self.first_segment = self.segments[0]
+        self.last_segment = self.segments[-1]
+        prev_segment = None
+        for seg in self.segments:
+            seg.init_distances(prev_segment)
+            prev_segment = segment
+
+        # print("First segment: {0}({1}) -> {2}({3})".format(self.first_segment.start_distance, self.first_segment.start_frame, self.first_segment.end_distance, self.first_segment.end_frame))
+        # for seg in self.segments:
+        #     print("  {0}({1}) -> {2}({3})".format(seg.start_distance, seg.start_frame, seg.end_distance, seg.end_frame))
+
+    def calculate_default_video_distance(self, frame_number):
+        if frame_number <= self.first_segment.start_frame:
+            return self.first_segment.start_distance # Really should be 0
+        if frame_number >= self.last_segment.end_frame:
+            return self.last_segment.end_distance
+
+        for segment in self.segments:
+            # TODO: Now that segments is sorted, it should be ok to just check against the start frame
+            if segment.start_frame <= frame_number <= segment.end_frame:
+                return segment.calculate_distance(frame_number)
+        return 0.0
+
+    def calculate_default_video_frame_from_distance(self, distance):
+        if distance < self.first_segment.start_distance:
+            return self.first_segment.start_frame
+        if distance > self.last_segment.end_distance:
+            return self.last_segment.end_frame
+
+        for segment in self.segments:
+            if segment.start_distance <= distance <= segment.end_distance:
+                return segment.calculate_frame_from_distance(distance)
+        return 0
+
+    def calculate_default_video_time_from_distance(self, distance):
+        frame = self.calculate_default_video_frame_from_distance(distance)
+        return frame * self.default_video
+
+    def build_client_config_xml(self, xml_section):
+        xml_segments = ET.SubElement(xml_section, "segments")
+        for seg in self.segments:
+            seg.build_client_config_xml(xml_segments)
+
+    # def calculate_other_video_frame_from_distance(self, distance, video):
+    #     # The distance really relates to a time in any video, so calculate the time?
+    #     default_video_time = self.calculate_default_video_time_from_distance(distance)
+    #     hithit
+    #     default_video.fps
 
 
 class Video:
@@ -115,6 +197,7 @@ class Video:
         self.end_frame = None
         if "end_frame" in video_xml.attrib:
             self.end_frame = int(video_xml.attrib["end_frame"])
+        self.start_offset_time = self.start_offset_frame / self.fps
 
     def build_client_config_xml(self, xml_videos):
         xml_video = ET.SubElement(xml_videos, "video",
@@ -133,8 +216,8 @@ class Section:
         #    os.path.join(track_information.rally_config_object.replace_locations(section.attrib["file"])))
         self.turns = []
         self.rebuses = []
-        self.segments = []
-        self.videos = []
+        self.segments = None
+        self.videos = {}
 
         for turns in section.findall("turns"):
             for turn in turns.findall("turn"):
@@ -145,16 +228,15 @@ class Section:
                 self.rebuses.append(Rebus(rebus))
 
         for videos in section.findall("videos"):
-            for video in videos.findall("video"):
-                self.videos.append(Video(video, track_information))
+            for video_xml in videos.findall("video"):
+                video = Video(video_xml, track_information)
+                self.videos[video.direction] = video
         self.default_video = self._calculate_default_video()
 
-        prev_segment = None
-        for segments in section.findall("segments"):
-            for segment in segments.findall("segment"):
-                new_segment = Segment(segment, prev_segment, self)
-                self.segments.append(new_segment)
-                prev_segment = new_segment
+        for segments_xml in section.findall("segments"):
+            self.segments = Segments(segments_xml, self.default_video)
+
+        self.default_end_distance = self.calculate_default_video_distance_from_frame(self.default_video.end_frame)
 
     def get_correct_turn(self):
         for turn in self.turns:
@@ -162,22 +244,64 @@ class Section:
                 return turn
 
     def get_start_distance(self):
-        return self.calculate_section_distance(self.default_video.start_offset_frame)
-
-    def calculate_section_distance(self, frame_number):
-        for segment in self.segments:
-            if segment.start_frame <= frame_number <= segment.end_frame:
-                return segment.calculate_distance(frame_number)
+        # All sections start at distance 0.0 (which is the same as start_offset_frame)
         return 0.0
 
-    def calculate_frame_from_distance(self, distance):
-        for segment in self.segments:
-            if segment.start_distance <= distance <= segment.end_distance:
-                return segment.calculate_frame_from_distance(distance)
-        return 0
+    def get_default_end_distance(self):
+        """ Return the end distance (in the scope of the default video).
+         Should be the same for all videos, but they might be configured not exactly the same. """
+        return self.default_end_distance
 
-    def calculate_video_second_from_distance(self, distance):
-        return self.calculate_frame_from_distance(distance) / self.default_video.fps
+    def calculate_default_video_distance_from_frame(self, frame_number):
+        return self.segments.calculate_default_video_distance(frame_number)
+
+    def calculate_default_video_frame_from_distance(self, distance):
+        return self.segments.calculate_default_video_frame_from_distance(distance)
+
+    def calculate_other_video_frame_from_distance(self, distance, viewing_direction):
+        # The distance really relates to a time in any video, so calculate the time and then multiply with fps to get frame
+        video = self.get_video(viewing_direction)
+        if video is not None:
+            video_time = self.calculate_other_video_second_from_distance(distance, viewing_direction)
+            return video_time * video.fps
+
+        return 0.0
+
+    # def calculate_section_distance(self, frame_number):
+    #     for segment in self.segments:
+    #         if segment.start_frame <= frame_number <= segment.end_frame:
+    #             return segment.calculate_distance(frame_number)
+    #     return 0.0
+    #
+    # def calculate_frame_from_distance(self, distance, viewing_direction):
+    #     for segment in self.segments:
+    #         if segment.start_distance <= distance <= segment.end_distance:
+    #             return segment.calculate_frame_from_distance(distance)
+    #     return 0
+    #
+    # def _calculate_frame_from_distance(self, distance, viewing_direction):
+    #     for segment in self.segments:
+    #         if segment.start_distance <= distance <= segment.end_distance:
+    #             return segment.calculate_frame_from_distance(distance)
+    #     return 0
+
+    def calculate_default_video_second_from_distance(self, distance):
+        # All frames and times in video relates to the start of the actual video, NOT the start_offset
+        default_video_frame = self.segments.calculate_default_video_frame_from_distance(distance)
+        return default_video_frame / self.default_video.fps
+
+    def calculate_other_video_second_from_distance(self, distance, viewing_direction):
+        video = self.get_video(viewing_direction)
+        if video is not None:
+            default_video_time = self.calculate_default_video_second_from_distance(distance)
+            return default_video_time - self.default_video.start_offset_time + video.start_offset_time
+        return 0.0
+
+    # def calculate_video_second_from_distance(self, distance, viewing_direction):
+    #     video = self.get_video(viewing_direction)
+    #     if video is not None:
+    #         return self._calculate_frame_from_distance(distance, video) / video.fps
+    #     return 0.0
 
     def find_nearby_rebus(self, distance):
         frame = self.calculate_frame_from_distance(distance)
@@ -192,31 +316,28 @@ class Section:
         xml_section = ET.SubElement(rally_sections, "section",
                                     number=str(self.section_number))
         xml_videos = ET.SubElement(xml_section, "videos")
-        for video in self.videos:
+        for video in self.videos.values():
             video.build_client_config_xml(xml_videos)
-        xml_segments = ET.SubElement(xml_section, "segments")
-        for segment in self.segments:
-            segment.build_client_config_xml(xml_segments)
+        self.segments.build_client_config_xml(xml_section)
 
     def get_default_video(self):
         return self.default_video
 
     def get_video(self, direction):
-        for video in self.videos:
-            if video.direction == direction:
-                return video
+        if direction in self.videos:
+            return self.videos[direction]
         return None
 
     def _calculate_default_video(self):
         """ Return the front view, this is the default view to calculate distances from.
-            If there is no front view, then return the first video.
+            If there is no front view, then return the first video encountered.
         """
-        for video in self.videos:
-            if video.direction == Video.FRONT:
-                return video
-        if len(self.videos) > 0:
-            return self.videos[0]
+        if Video.FRONT in self.videos:
+            return self.videos[Video.FRONT]
+        for video in self.videos.values():
+            return video
         return None
+
 
 class TrackInformation:
     def __init__(self, rally_config_object, config_file=None, xml=None):
