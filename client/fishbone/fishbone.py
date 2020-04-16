@@ -93,6 +93,10 @@ class Rebus:
         if self.button is not None:
             self.remove_button()
 
+        if self.extra_label is not None:
+            self.extra_label.destroy()
+            self.extra_label = None
+
         if self.known_text == txt:
             return
 
