@@ -199,7 +199,7 @@ class MyVideoCapture:
 
             #print("1.2")
             section = track_information.get_section(new_section)
-            video_file = section.movie_file
+            video_file = section.get_default_video().movie_file
 
             # Open the video source
             print("Changing video to: {}".format(video_file))

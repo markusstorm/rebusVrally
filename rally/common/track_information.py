@@ -34,9 +34,9 @@ class Rebus:
     def is_close_to(self, frame):
         first_frame = self.frame_offset - self.find_frame_before
         last_frame = self.frame_offset + self.find_frame_after
-        #print("{0} < {1} < {2} -> {3}".format(first_frame, frame, last_frame, first_frame < frame < last_frame))
+        # print("{0} < {1} < {2} -> {3}".format(first_frame, frame, last_frame, first_frame < frame < last_frame))
         return first_frame < frame < last_frame
-        #if frame >= ()
+        # if frame >= ()
         # if self.frame_offset - self.find_frame_before <= int(frame) <= self.frame_offset + self.find_frame_after:
         #     return True
         # return False
@@ -46,10 +46,10 @@ class LatLon:
     def __init__(self, segment, prefix):
         self.lat = 0.0
         self.lon = 0.0
-        if prefix+"lat" in segment.attrib:
-            self.lat = float(segment.attrib[prefix+"lat"])
-        if prefix+"lon" in segment.attrib:
-            self.lon = float(segment.attrib[prefix+"lon"])
+        if prefix + "lat" in segment.attrib:
+            self.lat = float(segment.attrib[prefix + "lat"])
+        if prefix + "lon" in segment.attrib:
+            self.lon = float(segment.attrib[prefix + "lon"])
 
 
 class Segment:
@@ -64,10 +64,10 @@ class Segment:
             self.speed = float(segment_xml.attrib["speed"])
         self.start_frame = int(segment_xml.attrib["start_frame"])
         self.end_frame = int(segment_xml.attrib["end_frame"])
-        self.start_distance = 0.0 #TODO: take start_offset into account in some way...
+        self.start_distance = 0.0  # TODO: take start_offset into account in some way...
         if previous_segment is not None:
             self.start_distance = previous_segment.end_distance + previous_segment.distance_per_frame
-        self.end_distance = self.start_distance + ((self.end_frame - self.start_frame) / section.fps) * self.speed
+        self.end_distance = self.start_distance + ((self.end_frame - self.start_frame) / section.default_video.fps) * self.speed
         self.distance_per_frame = (self.end_distance - self.start_distance) / (self.end_frame - self.start_frame)
 
     def calculate_distance(self, frame_number):
@@ -75,13 +75,14 @@ class Segment:
 
     def calculate_frame_from_distance(self, distance):
         # TODO: take start offset into account
-        #dist_in_segment = distance - self.start_distance
+        # dist_in_segment = distance - self.start_distance
         dist_in_segment = distance
 
         # frames / fps = seconds
         # distance = seconds * speed = frames * speed / fps
         # -> frames = distance * fps / speed
-        return int(dist_in_segment * self.section.fps / self.speed) # TODO: take start offset into account + self.start_frame
+        return int(
+            dist_in_segment * self.section.default_video.fps / self.speed)  # TODO: take start offset into account + self.start_frame
 
     def build_client_config_xml(self, xml_segments):
         xml_segment = ET.SubElement(xml_segments, "segment",
@@ -89,33 +90,65 @@ class Segment:
                                     start_lon=str(self.start_latlon.lon),
                                     end_lat=str(self.end_latlon.lat),
                                     end_lon=str(self.end_latlon.lon),
-                                    speed_km=str(self.speed*3.6),
+                                    speed_km=str(self.speed * 3.6),
                                     start_frame=str(self.start_frame),
                                     end_frame=str(self.end_frame))
+
+
+class Video:
+    LEFT = 1
+    FRONT = 2
+    RIGHT = 3
+
+    direction_map_to_int = {"left": LEFT, "front": FRONT, "right": RIGHT}
+    direction_map_to_str = {LEFT: "left", FRONT: "front", RIGHT: "right"}
+
+    def __init__(self, video_xml, track_information):
+        self.org_file_str = video_xml.attrib["file"]
+        self.movie_file = os.path.abspath(
+            os.path.join(track_information.rally_config_object.replace_locations(video_xml.attrib["file"])))
+        self.direction = Video.direction_map_to_int[video_xml.attrib["view"]]
+        self.fps = float(video_xml.attrib["fps"])
+        self.start_offset_frame = 0
+        if "start_offset_frame" in video_xml.attrib:
+            self.start_offset_frame = int(video_xml.attrib["start_offset_frame"])
+        self.end_frame = None
+        if "end_frame" in video_xml.attrib:
+            self.end_frame = int(video_xml.attrib["end_frame"])
+
+    def build_client_config_xml(self, xml_videos):
+        xml_video = ET.SubElement(xml_videos, "video",
+                                  file=self.org_file_str,
+                                  fps=str(self.fps),
+                                  start_offset_frame=str(self.start_offset_frame),
+                                  end_frame=str(self.end_frame),
+                                  view=Video.direction_map_to_str[self.direction])
 
 
 class Section:
     def __init__(self, section, track_information):
         self.section_number = int(section.attrib["number"])
-        self.org_file_str = section.attrib["file"]
-        self.movie_file = os.path.abspath(os.path.join(track_information.rally_config_object.replace_locations(section.attrib["file"])))
-        self.fps = float(section.attrib["fps"])
-        self.start_offset_frame = 0
-        if "start_offset_frame" in section.attrib:
-            self.start_offset_frame = int(section.attrib["start_offset_frame"])
-        self.end_frame = None
-        if "end_frame" in section.attrib:
-            self.end_frame = int(section.attrib["end_frame"])
+        #self.org_file_str = section.attrib["file"]
+        #self.movie_file = os.path.abspath(
+        #    os.path.join(track_information.rally_config_object.replace_locations(section.attrib["file"])))
         self.turns = []
         self.rebuses = []
         self.segments = []
+        self.videos = []
 
         for turns in section.findall("turns"):
             for turn in turns.findall("turn"):
                 self.turns.append(Turn(turn))
+
         for rebuses in section.findall("rebuses"):
             for rebus in rebuses.findall("rebus"):
                 self.rebuses.append(Rebus(rebus))
+
+        for videos in section.findall("videos"):
+            for video in videos.findall("video"):
+                self.videos.append(Video(video, track_information))
+        self.default_video = self._calculate_default_video()
+
         prev_segment = None
         for segments in section.findall("segments"):
             for segment in segments.findall("segment"):
@@ -129,7 +162,7 @@ class Section:
                 return turn
 
     def get_start_distance(self):
-        return self.calculate_section_distance(self.start_offset_frame)
+        return self.calculate_section_distance(self.default_video.start_offset_frame)
 
     def calculate_section_distance(self, frame_number):
         for segment in self.segments:
@@ -143,28 +176,46 @@ class Section:
         return 0
 
     def calculate_video_second_from_distance(self, distance):
-        return self.calculate_frame_from_distance(distance) / self.fps
+        return self.calculate_frame_from_distance(distance) / self.default_video.fps
 
     def find_nearby_rebus(self, distance):
         frame = self.calculate_frame_from_distance(distance)
-        #print("Looking for rebus at frame {0} / distance {1}".format(frame, distance))
+        # print("Looking for rebus at frame {0} / distance {1}".format(frame, distance))
         for rebus in self.rebuses:
-            #print("  {0}".format(rebus.frame_offset))
+            # print("  {0}".format(rebus.frame_offset))
             if rebus.is_close_to(frame):
                 return rebus
         return None
 
     def build_client_config_xml(self, rally_sections):
+        # xml_section = ET.SubElement(rally_sections, "section",
+        #                             number=str(self.section_number),
+        #                             file=self.org_file_str,
+        #                             fps=str(self.fps),
+        #                             start_offset_frame=str(self.start_offset_frame),
+        #                             end_frame=str(self.end_frame))
         xml_section = ET.SubElement(rally_sections, "section",
-                                    number=str(self.section_number),
-                                    file=self.org_file_str,
-                                    fps=str(self.fps),
-                                    start_offset_frame=str(self.start_offset_frame),
-                                    end_frame=str(self.end_frame))
+                                    number=str(self.section_number))
+        xml_videos = ET.SubElement(xml_section, "videos")
+        for video in self.videos:
+            video.build_client_config_xml(xml_videos)
         xml_segments = ET.SubElement(xml_section, "segments")
         for segment in self.segments:
             segment.build_client_config_xml(xml_segments)
 
+    def get_default_video(self):
+        return self.default_video
+
+    def _calculate_default_video(self):
+        """ Return the front view, this is the default view to calculate distances from.
+            If there is no front view, then return the first video.
+        """
+        for video in self.videos:
+            if video.direction == Video.FRONT:
+                return video
+        if len(self.videos) > 0:
+            return self.videos[0]
+        return None
 
 class TrackInformation:
     def __init__(self, rally_config_object, config_file=None, xml=None):
@@ -186,7 +237,6 @@ class TrackInformation:
         except ET.ParseError as e:
             raise ValueError("ERROR! Error when reading sections configuration {0}: {1}".format(config_file, e))
 
-
     def get_section(self, section_number):
         if section_number in self.sections:
             return self.sections[section_number]
@@ -197,7 +247,7 @@ class TrackInformation:
         return [1, 2, 3, 4, 5, 6, 7, 8]
 
     def get_morning_section_numbers(self):
-        #TODO: from config!
+        # TODO: from config!
         return [1, 2, 3, 4]
 
     def get_afternoon_section_numbers(self):
@@ -221,5 +271,4 @@ class TrackInformation:
         for section in self.sections.values():
             section.build_client_config_xml(rally_sections)
 
-
-#t = TrackInformation()
+# t = TrackInformation()

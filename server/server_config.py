@@ -106,7 +106,6 @@ class ServerRallyConfig(BaseRallyConfig):
         BaseRallyConfig.__init__(self, config_file)
 
     def parse_xml(self, root):
-        print("ServerRallyConfig:parse_xml")
         BaseRallyConfig.parse_xml(self, root)
 
         for start_messages in root.findall("start_messages"):
