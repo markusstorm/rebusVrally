@@ -149,8 +149,10 @@ class SteeringWindow:
         else:
             if self.current_section != status_information.current_section:
                 # New section!
+                self.accumulated_movement = 0.0
                 self.indicator_light = SteeringWindow.NONE
                 self.current_section = status_information.current_section
+                self.update_turn_indicators()
 
     def send_to_client(self):
         if not self.connected:
@@ -220,6 +222,10 @@ class SteeringWindow:
             self.indicator_light = SteeringWindow.NONE
         else:
             self.indicator_light = which
+        self.update_turn_indicators()
+
+    def update_turn_indicators(self):
+        print("Turn indicator: {0}".format(self.indicator_light))
         self.turn_indicator_labels[SteeringWindow.LEFT]["image"] = \
             self.turn_indicator_images[SteeringWindow.LEFT][self.indicator_light == SteeringWindow.LEFT]
         self.turn_indicator_labels[SteeringWindow.RIGHT]["image"] = \

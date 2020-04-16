@@ -60,7 +60,7 @@ class MiniBus:
         turn = section.get_correct_turn()
         if turn is not None:
             turn_distance = section.calculate_default_video_distance_from_frame(turn.frame_offset)
-            if self.distance >= turn_distance:
+            if turn_distance <= self.distance <= turn_distance+100:
                 turn_matched = False
                 if turn.direction == Turn.STRAIGHT_AHEAD and self.indicator_light == clientprotocol_pb2.ClientPositionUpdate.NONE:
                     turn_matched = True
@@ -74,6 +74,7 @@ class MiniBus:
                     self.current_section = turn.next_section
                     next_section = self.track_information.get_section(turn.next_section)
                     self.distance = next_section.get_start_distance()
+                    self.force_update = True
                 else:
                     print("Not taking turn to next section because there is no indicator light")
 
