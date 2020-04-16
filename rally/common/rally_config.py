@@ -27,6 +27,10 @@ class BaseRallyConfig:
         except ET.ParseError as e:
             raise ValueError("ERROR! Error when reading configuration {0}: {1}".format(config_file, e))
 
+    @staticmethod
+    def xml_attribute_to_bool(value):
+        return value.strip().casefold() == "true".casefold()
+
     def parse_xml(self, root):
         if "id" in root.attrib:
             self.rally_id = root.attrib["id"].strip()
@@ -39,7 +43,7 @@ class BaseRallyConfig:
             raise ValueError("No title specified in {0}".format(self.config_file))
 
         if "has_difficulty" in root.attrib:
-            self.has_difficulty = root.attrib["has_difficulty"].strip().casefold() == "true".casefold()
+            self.has_difficulty = BaseRallyConfig.xml_attribute_to_bool(root.attrib["has_difficulty"])
 
         if "local" in root.attrib:
             self.is_local = root.attrib["local"].strip().casefold() == "true".casefold()

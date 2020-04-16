@@ -43,9 +43,9 @@
         <turns>
             <turn direction="left" frame_offset="5250" description="Left to next section" next_section="5" automatic="true"/>
         </turns>
-        <rebuses>
-            <rebus id="R2" number="2" frame_offset="3030" find_frames_before="100" find_frames_after="100"/>
-        </rebuses>
+        <rebus_places>
+            <rebus_place id="RK1" rebus_config_number="2" frame_offset="3030" find_frames_before="100" find_frames_after="100"/>
+        </rebus_places>
         <segments>
             <segment start_lat="0" start_lon="0" end_lat="0" end_lon="0" speed_km="50" start_frame="0" end_frame="55555555"/>
         </segments>
@@ -58,10 +58,10 @@
         <turns>
             <turn direction="left" frame_offset="11000" description="Left to next section" next_section="6" automatic="true"/>
         </turns>
-        <rebuses>
-            <rebus id="R3" number="3" frame_offset="1350" find_frames_before="100" find_frames_after="100"/>
-			<rebus id="R4" number="4" frame_offset="6120" find_frames_before="100" find_frames_after="100"/>
-        </rebuses>
+        <rebus_places>
+            <rebus_place id="RK2" rebus_config_number="3" frame_offset="1350" find_frames_before="100" find_frames_after="100"/>
+			<rebus_place id="RK3" rebus_config_number="4" frame_offset="6120" find_frames_before="100" find_frames_after="100"/>
+        </rebus_places>
         <segments>
             <segment start_lat="0" start_lon="0" end_lat="0" end_lon="0" speed_km="50" start_frame="0" end_frame="55555555"/>
         </segments>
@@ -71,15 +71,26 @@
 		<videos>
 			<video view="front" file="#DATA#/demo_rally/data/6.mp4" fps="30.002796" start_offset_frame="1400" end_frame="21000"/>
 		</videos>
+        <rebus_places>
+            <rebus_place id="RK4" rebus_config_number="9" frame_offset="2330" find_frames_before="100" find_frames_after="100" next_section="6"/>
+			<rebus_place id="RK5" rebus_config_number="6" frame_offset="8600" find_frames_before="100" find_frames_after="100"/>
+            <rebus_place id="RK6" rebus_config_number="7" frame_offset="10800" find_frames_before="100" find_frames_after="100"/>
+			<rebus_place id="RK7" rebus_config_number="8" frame_offset="11215" find_frames_before="100" find_frames_after="100"/>
+			<rebus_place id="RK8" rebus_config_number="10" frame_offset="16550" find_frames_before="100" find_frames_after="100" next_section="7"/>
+        </rebus_places>
+        <segments>
+            <segment start_lat="0" start_lon="0" end_lat="0" end_lon="0" speed_km="50" start_frame="0" end_frame="55555555"/>
+        </segments>
+    </section>
+
+    <!-- Goal section, just showing a looping video -->
+    <section number="7">
+		<videos>
+			<video view="front" file="#DATA#/demo_rally/data/goal.mp4" fps="30" start_offset_frame="0" end_frame="1799"/>
+		</videos>
         <turns>
-            <turn direction="straight" frame_offset="17100" description="Goal" next_section="100" automatic="true"/>
+            <turn direction="straight" frame_offset="1500" description="Loop" next_section="8" automatic="true"/>
         </turns>
-        <rebuses>
-            <rebus id="R5" number="5" frame_offset="2330" find_frames_before="100" find_frames_after="100"/>
-			<rebus id="R6" number="6" frame_offset="8600" find_frames_before="100" find_frames_after="100"/>
-            <rebus id="R7" number="7" frame_offset="10800" find_frames_before="100" find_frames_after="100"/>
-			<rebus id="R8" number="8" frame_offset="11215" find_frames_before="100" find_frames_after="100"/>
-        </rebuses>
         <segments>
             <segment start_lat="0" start_lon="0" end_lat="0" end_lon="0" speed_km="50" start_frame="0" end_frame="55555555"/>
         </segments>

@@ -76,6 +76,12 @@ class MainServer:
             return self.team_servers[team_name]
         return None
 
+    def find_team_server_from_id(self, team_id):
+        for team in self.team_servers.values():
+            if team.team_number == team_id:
+                return team
+        return None
+
     def create_team_server(self, team_name, team_number, difficulty):
         ts = TeamServer(team_name, team_number, self.rally_configuration, self, difficulty)
         self.team_servers[team_name] = ts
@@ -91,8 +97,10 @@ class MainServer:
         self.send_broadcast_message(message)
 
     def start_rally_for_team_server(self, team_server):
-        rebus_config = self.rally_configuration.get_start_rebus()
+        rebus_config = self.rally_configuration.get_start_rebus_config()
         team_server.give_rebus_data(rebus_config.section, RebusConfig.NORMAL, rebus_config.normal, None)
+        team_server.rally_is_started()
+        #team_server.set_rally_stage(clientprotocol_pb2.ServerPositionUpdate.RallyStage.MORNING)
 
     def start_rally(self):
         self.rally_is_started = True
@@ -101,8 +109,10 @@ class MainServer:
             self.start_rally_for_team_server(team_server)
 
     def start_afternoon_for_team_server(self, team_server):
-        rebus_config = self.rally_configuration.get_lunch_rebus()
+        rebus_config = self.rally_configuration.get_lunch_rebus_config()
         team_server.give_rebus_data(rebus_config.section, RebusConfig.NORMAL, rebus_config.normal, None)
+        # Can't really set the stage here... because then we could force a team to the afternoon if the are still working on the morning
+        #team_server.set_rally_stage(clientprotocol_pb2.ServerPositionUpdate.RallyStage.AFTERNOON)
 
     def start_afternoon(self):
         self.afternoon_is_started = True

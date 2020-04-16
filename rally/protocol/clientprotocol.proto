@@ -19,6 +19,7 @@ message ServerPositionUpdate {
   optional bool looking_for_rebus = 6;
   optional bool rally_started = 7;
   optional bool force_update = 8;
+  optional bool afternoon_started = 9;
 }
 
 message BusSeatAllocation {

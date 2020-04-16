@@ -85,11 +85,15 @@ class TeamServer:
         self.rally_stage = clientprotocol_pb2.ServerPositionUpdate.RallyStage.NOT_STARTED
         self.looking_for_rebus = False
         self.lock_time = None
+        self.start_time = datetime.datetime.now() # TODO: make sure to restore when reading from json
+        self.lunch_time = None
+        self.found_goal_time = None
+        self.goal_time = None
 
         #self.status_information = StatusInformation(rally_configuration.track_information)
         # TODO: use StatusInformation for seating and other position info?
 
-        self.rebus_statuses = RebusStatuses(rally_configuration.rebuses)
+        self.rebus_statuses = RebusStatuses(rally_configuration.rebus_configs)
 
         self.minibus = MiniBus(rally_configuration.track_information, self.difficulty)
         self.plate_answers = []
@@ -104,6 +108,10 @@ class TeamServer:
         json["rally-stage"] = self.rally_stage
         json["minibus"] = self.minibus.to_json()
         json["rebus-statuses"] = self.rebus_statuses.to_json()
+        json["start-time"] = self.start_time
+        json["lunch-time"] = self.lunch_time # can be None
+        json["found-goal-time"] = self.found_goal_time # can be None
+        json["goal-time"] = self.goal_time # can be None
         solution_json = {}
         for section in self.rebus_solutions:
             rebus_solution = self.rebus_solutions[section]
@@ -158,7 +166,7 @@ class TeamServer:
         section = client_message.section
         #TODO: validate section based on configuration
         if 0 < section < 9:
-            rc = self.rally_configuration.get_rebus(section)
+            rc = self.rally_configuration.get_rebus_config(section)
             if rc is not None:
                 if client_message.open_help:
                     self.log_action("{0} requested HELP for rebus {1} to be opened".format(client_message.user_id, section))
@@ -226,21 +234,46 @@ class TeamServer:
                 self.rebus_answers[section] = ""
                 self.changed = True
 
+    def handle_found_lunch(self, rebus_place, rc):
+        self.lunch_time = datetime.datetime.now()
+        self.rally_stage = clientprotocol_pb2.ServerPositionUpdate.RallyStage.AT_LUNCH
+        if self.minibus.current_section != rebus_place.next_section:
+            self.minibus.warp(rebus_place.next_section, 0)
+        for message in self.rally_configuration.lunch_messages:
+            self.send_messages(message)
+
+    def handle_found_goal(self, rebus_place, rc):
+        self.found_goal_time = datetime.datetime.now()
+        self.rally_stage = clientprotocol_pb2.ServerPositionUpdate.RallyStage.AT_END
+        if self.minibus.current_section != rebus_place.next_section:
+            self.minibus.warp(rebus_place.next_section, 0)
+        for message in self.rally_configuration.at_end_messages:
+            self.send_messages(message)
+
+    def end_rally(self):
+        self.goal_time = datetime.datetime.now()
+        self.rally_stage = clientprotocol_pb2.ServerPositionUpdate.RallyStage.ENDED
+        for message in self.rally_configuration.end_messages:
+            self.send_messages(message)
+
+    def rally_is_started(self):
+        pass
+
     def search_for_rebus_result(self, rebus):
         print("Team {0} rebus result arrived".format(self.teamname))
         self.looking_for_rebus = False
         if rebus is not None:
             print("Get rebus {0}".format(rebus.number))
-            rc = self.rally_configuration.get_rebus(rebus.number)
+            rc = self.rally_configuration.get_rebus_config(rebus.number)
             if rc is not None:
                 print("...and they found a rebus!")
                 self.send_messages("Hittade rebus {0}! Titta i rebus-arket!".format(rebus.number))
 
                 self.give_rebus_data(rc.section, RebusConfig.NORMAL, rc.normal, None)
             else:
-                self.send_messages("Hittade tyvärr ingen rebus här. Åk till någon annan plats och leta vidare!")
+                self.send_messages("Hittade tyvärr ingen rebuskontroll här. Åk till någon annan plats och leta vidare!")
         else:
-            self.send_messages("Hittade tyvärr ingen rebus här. Åk till någon annan plats och leta vidare!")
+            self.send_messages("Hittade tyvärr ingen rebuskontroll här. Åk till någon annan plats och leta vidare!")
 
     def search_for_rebus(self):
         if self.looking_for_rebus:
@@ -250,15 +283,34 @@ class TeamServer:
         self.looking_for_rebus = True
         section = self.rally_configuration.track_information.get_section(self.minibus.current_section)
         if section is not None:
-            rebus = section.find_nearby_rebus(self.minibus.distance)
-            if rebus is None:
-                print("Warning: no rebus at that place...")
+            rebus_place = section.find_nearby_rebus_place(self.minibus.distance)
             search_time = 15 + random.randrange(0, 45) # It can take up to 1 minute to find the rebus
             #DEBUG!
             print("TODO: remove debug time for searching for rebus!")
-            search_time = 15
+            search_time = 1
+
+            if rebus_place is None:
+                print("Warning: no rebus at that place...")
+            else:
+                rc = self.rally_configuration.get_rebus_config(rebus_place.number)
+                if rc is None:
+                    self.send_messages("Error in configuration, can't find rebus {0}!".format(rebus_place.number))
+                    return
+                elif rc.is_lunch:
+                    print("Lunch!")
+                    self.send_messages("Lunch!")
+                    self.handle_found_lunch(rebus_place, rc)
+                    self.looking_for_rebus = False
+                    return
+                elif rc.is_goal:
+                    print("Mål!")
+                    self.send_messages("Mål!")
+                    self.handle_found_goal(rebus_place, rc)
+                    self.looking_for_rebus = False
+                    return
+
             print("Team {0} looking for a rebus with timeout {1}".format(self.teamname, search_time))
-            self.main_server.scheduler.schedule_action(search_time, partial(self.search_for_rebus_result, rebus))
+            self.main_server.scheduler.schedule_action(search_time, partial(self.search_for_rebus_result, rebus_place))
             self.send_messages("Har skickat ut en spanare för att leta efter en rebus här, det kan ta upp till en minut...")
 
     def is_rebus_testing_locked(self):
@@ -273,7 +325,7 @@ class TeamServer:
             self.log_warning("Asking to test rebus solution at {0} but is locked from {1}+60 seconds".format(datetime.datetime.now(), self.lock_time))
             return
         self.lock_time = datetime.datetime.now()
-        rc = self.rally_configuration.get_rebus(solution_req.section)
+        rc = self.rally_configuration.get_rebus_config(solution_req.section)
         if rc is None:
             print("ERROR! No rebus for section {0}".format(solution_req.section))
             return
@@ -285,9 +337,22 @@ class TeamServer:
             rebus_solution = RebusSolution(rc)
             self.rebus_solutions[solution_req.section] = rebus_solution
 
-        rebus_solution.compare(solution_req)
-        self.log_action("Testing rebus {0} for the {1}th time".format(rebus_solution.rc.section, rebus_solution.test_count))
+        result = rebus_solution.compare(solution_req)
+        self.log_action("Testing rebus {0} for the {1}th time with result: {2}".format(rebus_solution.rc.section, rebus_solution.test_count, result))
         self.changed = True
+
+        if result:
+            # The correct solution was found, now the team can move on
+            if rc.is_start:
+                self.handle_solved_morning_rebus()
+            if rc.is_lunch:
+                self.handle_solved_lunch_rebus()
+
+    def handle_solved_morning_rebus(self):
+        self.rally_stage = clientprotocol_pb2.ServerPositionUpdate.RallyStage.MORNING
+
+    def handle_solved_lunch_rebus(self):
+        self.rally_stage = clientprotocol_pb2.ServerPositionUpdate.RallyStage.AFTERNOON
 
     def fill_plate_update(self, plate_up):
         for plate in self.plate_answers:
@@ -330,6 +395,7 @@ class TeamServer:
         pu.rally_stage = self.rally_stage
         pu.looking_for_rebus = self.looking_for_rebus
         pu.rally_started = self.main_server.rally_is_started
+        pu.afternoon_started = self.main_server.afternoon_is_started
 
         self.update_counter += 1
         send_more_updates = self.changed or self.update_counter > 10

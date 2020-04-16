@@ -81,7 +81,7 @@ class MainWindow:
 
         self.placing_button = Button(f_placing, command=self.on_select_placing, text="Aktivera vald plats i bussen")
         self.placing_button.grid(row=2, column=0)
-        self.rebus_button = Button(f_placing, command=self.on_search_for_rebus, text="Leta efter rebus här")
+        self.rebus_button = Button(f_placing, command=self.on_search_for_rebus, text="Leta efter rebuskontroll här")
         self.rebus_button.grid(row=3, column=0)
 
         seat1 = Label(background_label2, text="")
@@ -146,10 +146,10 @@ class MainWindow:
         else:
             self.placing_label["text"] = "Välj plats i bussen:"
         if self.server_connection.status_information.looking_for_rebus:
-            self.rebus_button["text"] = "Letar efter rebus"
+            self.rebus_button["text"] = "Letar efter rebuskontroll"
             self.rebus_button["state"] = "disabled"
         else:
-            self.rebus_button["text"] = "Leta efter rebus här"
+            self.rebus_button["text"] = "Leta efter rebuskontroll här"
             self.rebus_button["state"] = state
         self.combo_select_seating["state"] = state
 

@@ -20,10 +20,14 @@ class WebHandler(threading.Thread):
         self.flask_app.add_url_rule("/sendmessage", view_func=self.send_message, methods=['POST'])
         self.flask_app.add_url_rule("/startrally", view_func=self.start_rally, methods=['POST'])
         self.flask_app.add_url_rule("/startafternoon", view_func=self.start_afternoon, methods=['POST'])
+        self.flask_app.add_url_rule("/endrally/<team_id>", view_func=self.end_rally_for_team, methods=['POST'])
 
         self.flask_app.add_url_rule("/debug_restart", view_func=self.debug_restart, methods=['POST'])
 
-        self.flask_app.add_url_rule("/warp/<team>/<section>", view_func=self.warp_team, methods=['POST'])
+        self.flask_app.add_url_rule("/warp/<team_id>/<section>", view_func=self.warp_team, methods=['POST'])
+        self.flask_app.add_url_rule("/debug_solved_start_rebus/<team_id>", view_func=self.debug_solved_start_rebus, methods=['POST'])
+        self.flask_app.add_url_rule("/debug_solved_lunch_rebus/<team_id>", view_func=self.debug_solved_lunch_rebus, methods=['POST'])
+
 
     def run(self):
         self.flask_app.run(host=self.host, port=63352)
@@ -59,8 +63,8 @@ class WebHandler(threading.Thread):
     def debug_restart(self):
         return "NOT implemented"
 
-    def warp_team(self, team, section):
-        team_server = self.main_server.find_team_server(team)
+    def warp_team(self, team_id, section):
+        team_server = self.main_server.find_team_server_from_id(int(team_id))
         frame = 0
         if len(request.data) > 0:
             s = request.data.decode("utf-8")
@@ -68,4 +72,22 @@ class WebHandler(threading.Thread):
 
         if team_server is not None:
             team_server.minibus.warp(int(section), int(frame))
+        return ""
+
+    def end_rally_for_team(self, team_id):
+        team_server = self.main_server.find_team_server_from_id(int(team_id))
+        if team_server is not None:
+            team_server.end_rally()
+        return ""
+
+    def debug_solved_start_rebus(self, team_id):
+        team_server = self.main_server.find_team_server_from_id(int(team_id))
+        if team_server is not None:
+            team_server.handle_solved_morning_rebus()
+        return ""
+
+    def debug_solved_lunch_rebus(self, team_id):
+        team_server = self.main_server.find_team_server_from_id(int(team_id))
+        if team_server is not None:
+            team_server.handle_solved_lunch_rebus()
         return ""

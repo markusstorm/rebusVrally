@@ -44,6 +44,15 @@ class RebusConfig:
                 self.target_north = int(target.attrib["map_north"])
             if "zoomed_map_url" in target.attrib:
                 self.target_picture = target.attrib["zoomed_map_url"]
+        self.is_start = False
+        if "is_start" in rebus_xml.attrib:
+            self.is_start = BaseRallyConfig.xml_attribute_to_bool(rebus_xml.attrib["is_start"])
+        self.is_lunch = False
+        if "is_lunch" in rebus_xml.attrib:
+            self.is_lunch = BaseRallyConfig.xml_attribute_to_bool(rebus_xml.attrib["is_lunch"])
+        self.is_goal = False
+        if "is_goal" in rebus_xml.attrib:
+            self.is_goal = BaseRallyConfig.xml_attribute_to_bool(rebus_xml.attrib["is_goal"])
 
     @staticmethod
     def read_file(rebuses_file):
@@ -100,9 +109,12 @@ class AllowedTeam:
 
 class ServerRallyConfig(BaseRallyConfig):
     def __init__(self, config_file):
-        self.rebuses = []
+        self.rebus_configs = []
         self.allowed_teams = []
         self.start_messages = []
+        self.lunch_messages = []
+        self.at_end_messages = []
+        self.end_messages = []
         BaseRallyConfig.__init__(self, config_file)
 
     def parse_xml(self, root):
@@ -111,14 +123,22 @@ class ServerRallyConfig(BaseRallyConfig):
         print("Config: reading start_messages")
         for start_messages in root.findall("start_messages"):
             for message in start_messages.findall("message"):
-                # print("Start message: {0}".format(message.text))
                 self.start_messages.append(message.text)
+        for lunch_messages in root.findall("lunch_messages"):
+            for message in lunch_messages.findall("message"):
+                self.lunch_messages.append(message.text)
+        for at_end_messages in root.findall("at_end_messages"):
+            for message in at_end_messages.findall("message"):
+                self.at_end_messages.append(message.text)
+        for end_messages in root.findall("end_messages"):
+            for message in end_messages.findall("message"):
+                self.end_messages.append(message.text)
 
         print("Config: reading rebuses")
         for rebuses in root.findall("rebuses"):
             if "file" in rebuses.attrib:
                 rebuses_file = self.replace_locations(rebuses.attrib["file"])
-                self.rebuses = RebusConfig.read_file(rebuses_file)
+                self.rebus_configs = RebusConfig.read_file(rebuses_file)
 
         print("Config: reading teams")
         for teams in root.findall("teams"):
@@ -136,19 +156,29 @@ class ServerRallyConfig(BaseRallyConfig):
                 return team
         return None
 
-    def get_rebus(self, section):
-        for rebus in self.rebuses:
-            if rebus.section == section:
-                return rebus
+    def get_rebus_config(self, section):
+        for rebus_config in self.rebus_configs:
+            if rebus_config.section == section:
+                return rebus_config
         return None
 
-    def get_start_rebus(self):
-        # TODO: configure?
-        return self.get_rebus(1)
+    def get_start_rebus_config(self):
+        for rebus_config in self.rebus_configs:
+            if rebus_config.is_start:
+                return rebus_config
+        return None
 
-    def get_lunch_rebus(self):
-        # TODO: configure?
-        return self.get_rebus(5)
+    def get_lunch_rebus_config(self):
+        for rebus_config in self.rebus_configs:
+            if rebus_config.is_lunch:
+                return rebus_config
+        return None
+
+    def get_goal_rebus_config(self):
+        for rebus_config in self.rebus_configs:
+            if rebus_config.is_goal:
+                return rebus_config
+        return None
 
     def get_client_config_xml(self):
         root = ET.Element("rally", id=self.rally_id, title=self.title)

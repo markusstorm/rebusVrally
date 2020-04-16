@@ -48,6 +48,7 @@ class StatusInformation:
         self.distance = 0.0
         self.rally_stage = clientprotocol_pb2.ServerPositionUpdate.RallyStage.NOT_STARTED
         self.rally_is_started = False
+        self.afternoon_is_started = False
         self.current_section = 1
         if track_information is not None:
             self.current_section = track_information.start_section
@@ -86,6 +87,8 @@ class StatusInformation:
             self.looking_for_rebus = pos_update.looking_for_rebus
         if pos_update.HasField("rally_started"):
             self.rally_is_started = pos_update.rally_started
+        if pos_update.HasField("afternoon_started"):
+            self.afternoon_is_started = pos_update.afternoon_started
         self.force_update = False
         if pos_update.HasField("force_update"):
             self.force_update = pos_update.force_update

@@ -34,6 +34,7 @@ class MiniBus:
         return json
 
     def warp(self, section_number, frame):
+        print("Warping to section {0} frame {1}".format(section_number, frame))
         self.speed = 0
         self.stopped = True
         self.current_section = section_number

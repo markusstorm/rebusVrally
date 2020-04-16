@@ -1,5 +1,5 @@
 <rebuses>
-	<rebus section="1" is_first="true" map_east="26" map_north="80">
+	<rebus section="1" is_first="true" map_east="26" map_north="80" is_start="true">
 	  <normal text="https://www.youtube.com/watch?v=yif0c0bRA48"/>
 	  <help text="KÄRRA"/>
 	  <solution text="Myra"/>
@@ -27,7 +27,7 @@
 	  <target description="Korsningen" map_east="24" map_north="81" zoomed_map_url="https://drive.google.com/open?id=1wmlJm9wXVSljW043K1CUhs9zj_eUK_jP"/>
 	</rebus>
 
-	<rebus section="5" is_lunch="true" map_east="23" map_north="82">
+	<rebus section="5" map_east="23" map_north="82">
 	  <normal text="https://www.kulturkollo.se/2015/01/17/alskade-kulla-gulla/"/>
 	  <help text="LATTJOLA"/>
 	  <solution text="Kulla"/>
@@ -54,4 +54,19 @@
 	  <solution text="Snippen"/>
 	  <target description="Korsningen" map_east="26" map_north="78" zoomed_map_url="https://drive.google.com/open?id=1YjaB5KDMCoi5La4fRqHvbXmJOpRiPxOq"/>
 	</rebus>
+	
+	<rebus section="9" map_east="0" map_north="0" is_lunch="true">
+      <normal text=""/>
+      <help text=""/>
+      <solution text=""/>
+      <target description="" map_east="0" map_north="0" zoomed_map_url=""/>
+    </rebus>
+	
+    <rebus section="10" map_east="0" map_north="0" is_goal="true">
+      <normal text=""/>
+      <help text=""/>
+      <solution text=""/>
+      <target description="" map_east="0" map_north="0" zoomed_map_url=""/>
+    </rebus>
+	
 </rebuses>

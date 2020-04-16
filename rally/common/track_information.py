@@ -19,27 +19,26 @@ class Turn:
             self.next_section = int(turn.attrib["next_section"])
 
 
-class Rebus:
-    def __init__(self, rebus):
-        self.id = rebus.attrib["id"]
-        self.number = int(rebus.attrib["number"])
-        self.frame_offset = int(rebus.attrib["frame_offset"])
+class RebusPlace:
+    def __init__(self, rebus_xml):
+        self.id = rebus_xml.attrib["id"]
+        self.number = int(rebus_xml.attrib["rebus_config_number"])
+        self.frame_offset = int(rebus_xml.attrib["frame_offset"])
         self.find_frame_before = 50
-        if "find_frames_before" in rebus.attrib:
-            self.find_frame_before = int(rebus.attrib["find_frames_before"])
+        if "find_frames_before" in rebus_xml.attrib:
+            self.find_frame_before = int(rebus_xml.attrib["find_frames_before"])
         self.find_frame_after = 50
-        if "find_frames_after" in rebus.attrib:
-            self.find_frame_after = int(rebus.attrib["find_frames_after"])
+        if "find_frames_after" in rebus_xml.attrib:
+            self.find_frame_after = int(rebus_xml.attrib["find_frames_after"])
+        # Next section is for when the lunch or goal has been reached via a rebus control place
+        self.next_section = 0
+        if "next_section" in rebus_xml.attrib:
+            self.next_section = int(rebus_xml.attrib["next_section"])
 
     def is_close_to(self, frame):
         first_frame = self.frame_offset - self.find_frame_before
         last_frame = self.frame_offset + self.find_frame_after
-        # print("{0} < {1} < {2} -> {3}".format(first_frame, frame, last_frame, first_frame < frame < last_frame))
         return first_frame < frame < last_frame
-        # if frame >= ()
-        # if self.frame_offset - self.find_frame_before <= int(frame) <= self.frame_offset + self.find_frame_after:
-        #     return True
-        # return False
 
 
 class LatLon:
@@ -82,7 +81,6 @@ class Segment:
         self.end_distance = self.start_distance + ((self.end_frame - self.start_frame) / self.default_video.fps) * self.speed
         self.distance_per_frame = (self.end_distance - self.start_distance) / (self.end_frame - self.start_frame)
 
-
     def calculate_distance(self, frame_number):
         # All distances are related to the "default" video (should be FRONT)
         return self.start_distance + (frame_number - self.start_frame) * self.distance_per_frame
@@ -110,7 +108,6 @@ class Segment:
 
     @staticmethod
     def sorter(segment):
-        #print("Sorter: {0}".format(segment.start_frame))
         return segment.start_frame
 
 
@@ -126,17 +123,12 @@ class Segments:
             raise ValueError("There must be at least one segment for each section!")
 
         self.segments = sorted(segments, key=Segment.sorter)
-        #print(segments, self.segments)
         self.first_segment = self.segments[0]
         self.last_segment = self.segments[-1]
         prev_segment = None
         for seg in self.segments:
             seg.init_distances(prev_segment)
             prev_segment = segment
-
-        # print("First segment: {0}({1}) -> {2}({3})".format(self.first_segment.start_distance, self.first_segment.start_frame, self.first_segment.end_distance, self.first_segment.end_frame))
-        # for seg in self.segments:
-        #     print("  {0}({1}) -> {2}({3})".format(seg.start_distance, seg.start_frame, seg.end_distance, seg.end_frame))
 
     def calculate_default_video_distance(self, frame_number):
         if frame_number <= self.first_segment.start_frame:
@@ -215,7 +207,7 @@ class Section:
         #self.movie_file = os.path.abspath(
         #    os.path.join(track_information.rally_config_object.replace_locations(section.attrib["file"])))
         self.turns = []
-        self.rebuses = []
+        self.rebus_places = []
         self.segments = None
         self.videos = {}
 
@@ -223,9 +215,9 @@ class Section:
             for turn in turns.findall("turn"):
                 self.turns.append(Turn(turn))
 
-        for rebuses in section.findall("rebuses"):
-            for rebus in rebuses.findall("rebus"):
-                self.rebuses.append(Rebus(rebus))
+        for rebus_places in section.findall("rebus_places"):
+            for rebus_place_xml in rebus_places.findall("rebus_place"):
+                self.rebus_places.append(RebusPlace(rebus_place_xml))
 
         for videos in section.findall("videos"):
             for video_xml in videos.findall("video"):
@@ -303,13 +295,13 @@ class Section:
     #         return self._calculate_frame_from_distance(distance, video) / video.fps
     #     return 0.0
 
-    def find_nearby_rebus(self, distance):
+    def find_nearby_rebus_place(self, distance):
         frame = self.calculate_default_video_frame_from_distance(distance)
         # print("Looking for rebus at frame {0} / distance {1}".format(frame, distance))
-        for rebus in self.rebuses:
+        for rebus_place in self.rebus_places:
             # print("  {0}".format(rebus.frame_offset))
-            if rebus.is_close_to(frame):
-                return rebus
+            if rebus_place.is_close_to(frame):
+                return rebus_place
         return None
 
     def build_client_config_xml(self, rally_sections):

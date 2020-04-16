@@ -26,6 +26,8 @@ class SteeringWindow:
         self.looking_for_rebus = False
         self.prev_sample = None
         self.rally_is_started = False
+        self.afternoon_is_started = False
+        self.rally_stage = clientprotocol_pb2.ServerPositionUpdate.RallyStage.NOT_STARTED
         self.current_gas = 0.0
         self.current_brake = 0.0
         self.backup_timeout = None
@@ -53,6 +55,24 @@ class SteeringWindow:
 
         self.sub_client_communicator = SubClientCommunicator(args, pos_receiver=self.on_pos_update)
         self.sub_client_communicator.start()
+
+    def is_locked(self):
+        if not self.connected:
+            return True, "Programmet har inte fått kontakt med servern än, det kan ta upp till 10 sekunder"
+        if not self.rally_is_started:
+            return True, "Rallyt har inte startat än"
+        if self.rally_stage == clientprotocol_pb2.ServerPositionUpdate.RallyStage.NOT_STARTED:
+            return True, "Lös första rebusen innan ni åker iväg"
+        if self.rally_stage == clientprotocol_pb2.ServerPositionUpdate.RallyStage.AT_LUNCH:
+            if not self.afternoon_is_started:
+                return True, "Eftermiddagen har inte startat än"
+            return True, "Lös lunchrebusen innan ni åker iväg"
+        if self.rally_stage == clientprotocol_pb2.ServerPositionUpdate.RallyStage.AFTERNOON:
+            if not self.afternoon_is_started:
+                return True, "Eftermiddagen har inte startat än"
+        if self.rally_stage == clientprotocol_pb2.ServerPositionUpdate.RallyStage.AT_END or self.rally_stage == clientprotocol_pb2.ServerPositionUpdate.RallyStage.ENDED:
+            return True, "Ni har redan gått i mål!"
+        return False, None
 
     def layout(self):
         self.window = Tk()
@@ -143,6 +163,9 @@ class SteeringWindow:
                     self.looking_for_rebus_label.place_forget()
 
         self.rally_is_started = status_information.rally_is_started
+        self.afternoon_is_started = status_information.afternoon_is_started
+        self.rally_stage = status_information.rally_stage
+
         if not self.connected:
             self.current_section = status_information.current_section
             self.connected = True
@@ -179,23 +202,24 @@ class SteeringWindow:
 
     def gas_pedal(self, event, button):
         if button:
-            if self.rally_is_started:
+            locked, message = self.is_locked()
+            if not locked:
                 #percent = (1.0 - (event.y - 535) / (790 - 535))
                 percent = (1.0 - event.y / 161)
             else:
                 percent = 0
-                self.show_drive_error()
+                self.show_drive_error(message)
         else:
             percent = 0
         self.current_gas = percent
 
-    def show_drive_error(self):
+    def show_drive_error(self, message):
         if self.showing_message:
             return
         self.window.lower()
         self.showing_message = True
         messagebox.showerror("Kan inte köra",
-                             "Antingen har rallyt inte startat än eller så måste du bara vänta in första positionsuppdateringen från servern, det tar upp till 10 sekunder",
+                             message,
                              parent=self.window)
         self.showing_message = False
 
@@ -244,8 +268,9 @@ class SteeringWindow:
             self.backup(300)
 
     def backup(self, amount):
-        if not self.rally_is_started:
-            self.show_drive_error()
+        locked, message = self.is_locked()
+        if locked:
+            self.show_drive_error(message)
             return
 
         now = datetime.datetime.now()
