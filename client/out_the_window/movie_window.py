@@ -1,5 +1,6 @@
 import datetime
 import tkinter
+from functools import partial
 from threading import Lock
 
 import cv2
@@ -11,6 +12,7 @@ from client.common.client_config import ClientRallyConfig
 from rally.common.subclient_communicator import SubClientCommunicator
 
 #https://stackoverflow.com/questions/56534609/hardware-accelerated-decoding-with-opencv-and-python-on-windows-msmt-intelmfx
+from rally.common.track_information import Video
 
 direction_translator = {"front": "framåt", "left": "till vänster", "right": "till höger"}
 
@@ -21,8 +23,25 @@ parser.add_argument("-u", "--user_id", type=int, help="User ID", required=True)
 parser.add_argument("-r", "--rally_configuration", type=str, help="Path to the rally configuration to use", required=True)
 parser.add_argument("-d", "--data_path", type=str, help="Path to root of where rally data is stored", required=True)
 parser.add_argument("-v", "--view_direction", type=str, help="View direction (left, front, right)", required=True)
+parser.add_argument("-m", "--disallow_moving_direction", action="append", help="Disallow video to be shown for specified view (left, front, right) when the bus is moving", required=False)
+parser.add_argument("-s", "--disallow_stopped_direction", action="append", help="Disallow video to be shown for specified view (left, front, right) when the bus is stopped", required=False)
 args = parser.parse_args()
 print(args)
+
+
+def remove_from_list(input, disallow):
+    if disallow is None:
+        return input
+    for val in disallow:
+        direction = val.casefold()
+        if direction in Video.direction_map_to_int:
+            input[Video.direction_map_to_int[direction]] = False
+    return input
+
+
+allowed_when_stopped = remove_from_list({Video.LEFT: True, Video.FRONT: True, Video.RIGHT: True}, args.disallow_stopped_direction)
+allowed_when_moving = remove_from_list({Video.LEFT: True, Video.FRONT: True, Video.RIGHT: True}, args.disallow_moving_direction)
+
 
 rally_configuration = ClientRallyConfig(args.rally_configuration, args.data_path)
 track_information = rally_configuration.track_information
@@ -30,16 +49,25 @@ track_information = rally_configuration.track_information
 #Blur: https://www.geeksforgeeks.org/opencv-motion-blur-in-python/
 
 class App:
-    def __init__(self, window, window_title):
+    def __init__(self, window, direction_str):
+
+        window_title = "Utsikt {0}".format(direction_translator[direction_str])
+        self.main_direction = Video.direction_map_to_int[direction_str]
+        self.viewing_direction = self.main_direction
+        print("Main direction is: {0}".format(Video.direction_map_to_str[self.main_direction]))
+
         self.connected = False
         self.reconfiguring = False
         self.speed = 0.0
+        self.stopped = True
         self.distance = 0.0
         self.current_section = track_information.start_section
         self.pos_time = None
         self.delay = 15 #TODO: set based on FPS
         self.drop_a_frame = False
         self.first_display = True
+        self.buttons = {}
+        self.button_states = {Video.LEFT: False, Video.FRONT: False, Video.RIGHT: False}
 
         self.sub_client_communicator = SubClientCommunicator(args, pos_receiver=self.on_pos_updates)
         self.sub_client_communicator.start()
@@ -65,15 +93,71 @@ class App:
         if self.canvas is None:
             # Create a canvas that can fit the above video source size
             self.canvas = tkinter.Canvas(self.window, width = self.vid.width, height = self.vid.height)
-            self.canvas.pack()
+            self.canvas.grid(row=0, column=0, columnspan=3, sticky=tkinter.W)
+
+            self.buttons[Video.LEFT] = tkinter.Button(self.window, text="Titta åt vänster")
+            self.buttons[Video.LEFT].bind("<ButtonPress-1>", partial(self.video_button_on, Video.LEFT))
+            self.buttons[Video.LEFT].bind("<ButtonRelease-1>", partial(self.video_button_off, Video.LEFT))
+            self.buttons[Video.LEFT].bind("<Leave>", partial(self.video_button_off, Video.LEFT))
+            self.buttons[Video.LEFT].grid(row=1, column=0, sticky=tkinter.W)
+
+            self.buttons[Video.FRONT] = tkinter.Button(self.window, text="Titta framåt")
+            self.buttons[Video.FRONT].bind("<ButtonPress-1>", partial(self.video_button_on, Video.FRONT))
+            self.buttons[Video.FRONT].bind("<ButtonRelease-1>", partial(self.video_button_off, Video.FRONT))
+            self.buttons[Video.FRONT].bind("<Leave>", partial(self.video_button_off, Video.FRONT))
+            self.buttons[Video.FRONT].grid(row=1, column=1)
+
+            self.buttons[Video.RIGHT] = tkinter.Button(self.window, text="Titta åt höger")
+            self.buttons[Video.RIGHT].bind("<ButtonPress-1>", partial(self.video_button_on, Video.RIGHT))
+            self.buttons[Video.RIGHT].bind("<ButtonRelease-1>", partial(self.video_button_off, Video.RIGHT))
+            self.buttons[Video.RIGHT].bind("<Leave>", partial(self.video_button_off, Video.RIGHT))
+            self.buttons[Video.RIGHT].grid(row=1, column=2, sticky=tkinter.E)
+
+            self.update_view_buttons()
+
+            # TODO: remove frame counter or make configurable
             self.frame_label = tkinter.Label(self.window, text="FRAME COUNT")
             self.frame_label.place(x=0, y=0)
+
         self.reconfiguring = False
+
+    def video_button_on(self, direction, event):
+        self.button_states[direction] = True
+        self.update_view()
+
+    def video_button_off(self, direction, event):
+        self.button_states[direction] = False
+        self.update_view()
+
+    def update_view(self):
+        direction = self.main_direction
+        # Choose the first pressed button to override the default view direction, there really should only be one pressed button...
+        for key in self.button_states:
+            if self.button_states[key]:
+                direction = key
+                break
+
+        if self.viewing_direction != direction:
+            self.viewing_direction = direction
+            # TODO: change video!
+
+    def update_view_buttons(self):
+        global allowed_when_stopped, allowed_when_moving
+        for key in self.buttons:
+            state = "normal"
+            if self.stopped:
+                if not allowed_when_stopped[key]:
+                    state = "disabled"
+            else:
+                if not allowed_when_moving[key]:
+                    state = "disabled"
+            self.buttons[key].config(state=state)
 
     def on_pos_updates(self, status_information):
         #print("pos")
         self.pos_time = datetime.datetime.now()
         self.speed = status_information.speed
+        self.stopped = status_information.stopped
         self.distance = status_information.distance
         #print(self.current_section, status_information.current_section)
         if not self.connected:
@@ -84,6 +168,7 @@ class App:
             if self.current_section != status_information.current_section:
                 self.current_section = status_information.current_section
                 self.change_video()
+        self.update_view_buttons()
 
     def update(self):
         delay = self._update()
@@ -276,4 +361,4 @@ class MyVideoCapture:
                 self.vid.release()
 
 # Create a window and pass it to the Application object
-App(tkinter.Tk(), "Utsikt {0}".format(direction_translator[args.view_direction]))
+App(tkinter.Tk(), args.view_direction)
