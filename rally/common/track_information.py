@@ -188,12 +188,6 @@ class Section:
         return None
 
     def build_client_config_xml(self, rally_sections):
-        # xml_section = ET.SubElement(rally_sections, "section",
-        #                             number=str(self.section_number),
-        #                             file=self.org_file_str,
-        #                             fps=str(self.fps),
-        #                             start_offset_frame=str(self.start_offset_frame),
-        #                             end_frame=str(self.end_frame))
         xml_section = ET.SubElement(rally_sections, "section",
                                     number=str(self.section_number))
         xml_videos = ET.SubElement(xml_section, "videos")
@@ -205,6 +199,12 @@ class Section:
 
     def get_default_video(self):
         return self.default_video
+
+    def get_video(self, direction):
+        for video in self.videos:
+            if video.direction == direction:
+                return video
+        return None
 
     def _calculate_default_video(self):
         """ Return the front view, this is the default view to calculate distances from.

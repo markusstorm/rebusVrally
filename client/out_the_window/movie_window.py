@@ -46,6 +46,7 @@ allowed_when_moving = remove_from_list({Video.LEFT: True, Video.FRONT: True, Vid
 rally_configuration = ClientRallyConfig(args.rally_configuration, args.data_path)
 track_information = rally_configuration.track_information
 
+
 #Blur: https://www.geeksforgeeks.org/opencv-motion-blur-in-python/
 
 class App:
@@ -143,15 +144,18 @@ class App:
 
     def update_view_buttons(self):
         global allowed_when_stopped, allowed_when_moving
-        for key in self.buttons:
+        section = track_information.get_section(self.current_section)
+        for direction in self.buttons:
             state = "normal"
             if self.stopped:
-                if not allowed_when_stopped[key]:
+                if not allowed_when_stopped[direction]:
                     state = "disabled"
             else:
-                if not allowed_when_moving[key]:
+                if not allowed_when_moving[direction]:
                     state = "disabled"
-            self.buttons[key].config(state=state)
+            if section.get_video(direction) is None:
+                state = "disabled"
+            self.buttons[direction].config(state=state)
 
     def on_pos_updates(self, status_information):
         #print("pos")
