@@ -144,15 +144,12 @@ class SteeringWindow:
 
         self.rally_is_started = status_information.rally_is_started
         if not self.connected:
-            #self.distance = status_information.distance
             self.current_section = status_information.current_section
             self.connected = True
         else:
             if self.current_section != status_information.current_section:
                 # New section!
-                # speed = 0.0
                 self.indicator_light = SteeringWindow.NONE
-                #self.distance = status_information.distance
                 self.current_section = status_information.current_section
 
     def send_to_client(self):

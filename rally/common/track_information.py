@@ -304,7 +304,7 @@ class Section:
     #     return 0.0
 
     def find_nearby_rebus(self, distance):
-        frame = self.calculate_frame_from_distance(distance)
+        frame = self.calculate_default_video_frame_from_distance(distance)
         # print("Looking for rebus at frame {0} / distance {1}".format(frame, distance))
         for rebus in self.rebuses:
             # print("  {0}".format(rebus.frame_offset))

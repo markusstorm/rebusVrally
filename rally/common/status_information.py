@@ -55,6 +55,7 @@ class StatusInformation:
         for i in range(0, 10):
             self.seating.append(Player("", 0))
         self.rebus_statuses = RebusStatuses(None)
+        self.force_update = False
 
         self.plate_answers = []
         self.plate_answers_seq = 0
@@ -85,6 +86,9 @@ class StatusInformation:
             self.looking_for_rebus = pos_update.looking_for_rebus
         if pos_update.HasField("rally_started"):
             self.rally_is_started = pos_update.rally_started
+        self.force_update = False
+        if pos_update.HasField("force_update"):
+            self.force_update = pos_update.force_update
 
     def update_status(self, status_update):
         # TODO: complete this code

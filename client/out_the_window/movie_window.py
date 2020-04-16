@@ -181,11 +181,14 @@ class App:
         self.speed = status_information.speed
         self.stopped = status_information.stopped
         self.distance = status_information.distance
+        if status_information.force_update:
+            self.force_update = True
         #print(self.current_section, status_information.current_section)
         if not self.connected:
             self.current_section = status_information.current_section
             self.change_video()
             self.connected = True
+            self.force_update = True
         else:
             if self.current_section != status_information.current_section:
                 self.current_section = status_information.current_section
@@ -245,6 +248,7 @@ class App:
         # TODO: remove a lot of duplicated code (but first get something to work at all...)
         diff_ms = vid_cap.frame_time - video_target_secs * 1000.0
         if diff_ms > 0.0:
+            # Ok, so video is ahead of time
             ret = False
             if self.speed < -0.01:
                 # We are backing, should seek in the video and then show one frame
@@ -252,6 +256,8 @@ class App:
                 ret, frame = vid_cap.get_frame(True)
                 self.force_update = False
             elif self.force_update:
+                # Video is ahead of time and we have a forced update, then also seek
+                vid_cap.seek_ms(video_target_secs * 1000)
                 ret, frame = vid_cap.get_frame(False)
                 self.force_update = False
             if ret:

@@ -12,6 +12,7 @@ class MiniBus:
         self.current_section = track_information.start_section
         self.distance = track_information.get_section(self.current_section).get_start_distance()
         self.indicator_light = clientprotocol_pb2.ClientPositionUpdate.NONE
+        self.force_update = False
 
         self.seating = []
         for i in range(0, 10):
@@ -37,7 +38,8 @@ class MiniBus:
         self.stopped = True
         self.current_section = section_number
         section = self.track_information.get_section(self.current_section)
-        self.distance = section.calculate_section_distance(frame)
+        self.distance = section.calculate_default_video_distance_from_frame(frame)
+        self.force_update = True
 
     def update_pos_from_driver(self, pos_update):
         section = self.track_information.get_section(self.current_section)
@@ -80,6 +82,9 @@ class MiniBus:
         pu.speed = self.speed
         pu.current_section = self.current_section
         pu.distance = self.distance
+        if self.force_update:
+            pu.force_update = True
+        self.force_update = False
 
     def fill_seating_update(self, bus_seating):
         for i in range(1, 10):

@@ -18,6 +18,7 @@ message ServerPositionUpdate {
   optional RallyStage rally_stage = 5 [default = NOT_STARTED];
   optional bool looking_for_rebus = 6;
   optional bool rally_started = 7;
+  optional bool force_update = 8;
 }
 
 message BusSeatAllocation {
