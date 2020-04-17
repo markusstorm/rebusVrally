@@ -129,6 +129,12 @@ class TeamServer:
             if rebus_solution is not None:
                 solution_json[section] = rebus_solution.to_json()
         json["rebus-solutions"] = solution_json
+        if verbose:
+            if len(self.clients) > 0:
+                connected = []
+                for client in self.clients:
+                    connected.append({"id": client.user_id, "name": client.username})
+                json["connected-users"] = connected
         return json
 
     def backup_status_to_disk(self):

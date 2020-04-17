@@ -149,6 +149,12 @@ class MainServer:
             bc_message.date_time = message.date_time.strftime("%Y-%m-%d, %H:%M:%S")
             client.send(server_to_client)
 
+    def get_all_teams_json(self):
+        json = {}
+        for team_server in self.team_servers.values():
+            json[team_server.team_number] = team_server.to_json()
+        return json
+
     def get_team_json(self, team_number):
         for team_server in self.team_servers.values():
             if team_server.team_number == team_number:

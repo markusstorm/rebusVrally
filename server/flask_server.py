@@ -36,7 +36,7 @@ class WebHandler(threading.Thread):
         return self.flask_app.send_static_file('index.html')
 
     def get_teams(self):
-        return "All teams and current login status"
+        return jsonify(self.main_server.get_all_teams_json())
 
     def get_team_status(self, id):
         int_id = 0

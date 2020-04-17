@@ -31,7 +31,7 @@ class MiniBus:
                 player = self.seating[i]
                 if player is not None:
                     # Skip user id when reading back
-                    seating[i] = {"name": player.name}
+                    seating[i] = {"name": player.name, "id": player.user_id}
             return json
 
     def warp(self, section_number, frame):
