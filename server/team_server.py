@@ -76,13 +76,15 @@ class TeamServer:
     """ Keeps track of the progress of each team """
 
     def __init__(self, teamname, team_number, rally_configuration, main_server, difficulty, backup_path):
+        self.terminate = False
         self.main_server = main_server
         self.rally_configuration = rally_configuration
         self.teamname = teamname
         self.team_number = team_number
         self.difficulty = difficulty
         self.backup_path = os.path.join(backup_path, str(team_number))
-        os.mkdir(self.backup_path)
+        if not os.path.exists(self.backup_path):
+            os.mkdir(self.backup_path)
         self.clients = []
         self.changed = True
         self.update_counter = 0
@@ -105,6 +107,15 @@ class TeamServer:
         self.photo_answers = []
         self.rebus_answers = {}
         self.rebus_solutions = {}
+
+    def stop(self):
+        self.terminate = True
+        for client in self.clients:
+            client.stop()
+        self.clients.clear()
+        self.main_server = None
+        self.rally_configuration = None
+
 
     @staticmethod
     def date_to_json(date):
@@ -410,6 +421,8 @@ class TeamServer:
             rs.rebus_solutions.extend([obj])
 
     def send_updates_to_clients(self):
+        if self.terminate:
+            return
         # print("Send updates to clients")
         # Always send position update
         server_to_client = clientprotocol_pb2.ServerToClient()

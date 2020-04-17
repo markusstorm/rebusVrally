@@ -160,3 +160,9 @@ class MainServer:
             if team_server.team_number == team_number:
                 return team_server.to_json()
         return None
+
+    def terminate_team(self, team_id):
+        team_server = self.find_team_server_from_id(team_id)
+        if team_server is not None:
+            self.team_servers.pop(team_server.teamname, None)
+            team_server.stop()

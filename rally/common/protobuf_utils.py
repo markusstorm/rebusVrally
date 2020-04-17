@@ -11,18 +11,18 @@ def protobuf_send(connection, message):
         size = len(data)
         connection.sendall(size.to_bytes(4, "big") + data)
         #connection.sendall(data)
-        return True
-    except:
-        return False
+        return True, None
+    except Exception as e:
+        return False, e
 
 def protobuf_sendto(socket, dest_port, message):
-    # try:
-    data = message.SerializeToString()
-    size = len(data)
-    socket.sendto(size.to_bytes(4, "big") + data, ("127.0.0.1", dest_port))
-    return True
-    # except:
-    #     return False
+    try:
+        data = message.SerializeToString()
+        size = len(data)
+        socket.sendto(size.to_bytes(4, "big") + data, ("127.0.0.1", dest_port))
+        return True, None
+    except Exception as e:
+        return False, e
 
 
 # def protobuf_unpack(buffer, target_proto):

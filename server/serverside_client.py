@@ -1,4 +1,7 @@
 import datetime
+import socket
+
+import google
 
 from rally.protocol import clientprotocol_pb2
 import rally.common.protobuf_utils as protobuf_utils
@@ -19,6 +22,10 @@ class ServerSideClient:
         self.connection = connection
         team_server.addClient(self)
         self.counter = 1
+        self.terminate = False
+
+    def stop(self):
+        self.terminate = True
 
     def send(self, server_to_client):
         server_to_client.counter = self.counter
@@ -32,6 +39,28 @@ class ServerSideClient:
     def _remove_client(self):
         self.team_server.remove_client(self.user_id)
 
+    def _receive_data(self, size):
+        while not self.terminate:
+            try:
+                data = bytearray()
+                while len(data) < size:
+                    tmp = self.connection.recv(size-len(data))
+                    if not tmp:
+                        print("No data received for {0} in team {1} -> lost the connection".format(self.username, self.team_server.teamname))
+                        # Lost the connection
+                        return False, None
+                    data.extend(tmp)
+                return True, bytes(data)
+            except socket.timeout:
+                continue
+            except (ConnectionResetError, ConnectionAbortedError):
+                print("{0} in team {1} lost the connection".format(self.username, self.team_server.teamname))
+                return False, None
+            except Exception as e:
+                print("ERROR! Unknown exception when receiving data: {0}".format(e))
+                return False, e
+        return False, None
+
     def run(self):
         self.main_server.send_all_messages_to_client(self)
 
@@ -42,34 +71,23 @@ class ServerSideClient:
             welcome_message.message = txt
             welcome_message.date_time = datetime.datetime.now().strftime("%Y-%m-%d, %H:%M:%S")
             self.send(server_to_client)
-        while True:
-            size = -1
-            try:
-                size_bytes = self.connection.recv(4)
-                if not size_bytes:
-                    print("{0} disconnected from {1}".format(self.username, self.team_server.teamname))
-                    break
-                size = int.from_bytes(size_bytes[0:4], "big")
-            except (ConnectionResetError, ConnectionAbortedError):
-                print("{0} disconnected from {1}".format(self.username, self.team_server.teamname))
-                # self._remove_client()
+
+        while not self.terminate:
+            success, size_bytes = self._receive_data(4)
+            if not success:
                 break
-            # except:
-            #     print("Unknown communications error ->")
-            #     print("  {0} disconnected from {1}".format(self.username, self.team_server.teamname))
-            #     break
+            size = int.from_bytes(size_bytes[0:4], "big")
+
             if size <= 0:
                 print("Error in communications, size: {0}".format(size))
-                # self._remove_client()
+                break
+
+            success, data = self._receive_data(size)
+            if not success:
+                print("{0} disconnected from {1}".format(self.username, self.team_server.teamname))
                 break
 
             try:
-                data = self.connection.recv(size)
-                if not data:
-                    print("{0} disconnected from {1}".format(self.username, self.team_server.teamname))
-                    break
-
-                print(data)
                 client_to_server = clientprotocol_pb2.ClientToServer()
                 unpack_result = client_to_server.ParseFromString(data)
                 if unpack_result > 0:
@@ -89,13 +107,15 @@ class ServerSideClient:
                         self.team_server.search_for_rebus()
                     if client_to_server.HasField("test_rebus_solution"):
                         self.team_server.test_rebus_solution(client_to_server.test_rebus_solution)
-
-
-            except (ConnectionResetError, ConnectionAbortedError):
-                print("{0} disconnected from {1}".format(self.username, self.team_server.teamname))
+            except google.protobuf.message.DecodeError as e:
+                print("Incorrect message from {0} disconnected from {1}: {2}".format(self.username, self.team_server.teamname, e))
                 break
-            # except:
-            #     print("Unknown communications error ->")
-            #     print("  {0} disconnected from {1}".format(self.username, self.team_server.teamname))
-            #     break
+            except Exception as e:
+                print("Unknown error in communication from {0} disconnected from {1}: {2}".format(self.username, self.team_server.teamname, e))
+                break
+
+        self.terminate = True # We exited the loop, so might as well set terminate to true
         self._remove_client()
+        self.connection = None
+        self.main_server = None
+

@@ -1,3 +1,4 @@
+import socket
 import threading
 
 from rally.common.rally_version import RallyVersion
@@ -14,37 +15,48 @@ class IncomingConnectionHandler(threading.Thread):
         self.connection = connection
         self.addr = addr
         self.main_server = main_server
+        self.connection.settimeout(1)
+        self.terminate = False
+
+    def stop(self):
+        #TODO: call
+        print("IncomingConnectionHandler.stop()")
+        self.terminate = True
+
+    def _receive_data(self, size):
+        while not self.terminate:
+            try:
+                data = bytearray()
+                while len(data) < size:
+                    tmp = self.connection.recv(size-len(data))
+                    if not tmp:
+                        print("No data received for {0} in team {1} -> lost the connection".format(self.username, self.team_server.teamname))
+                        # Lost the connection
+                        return False, None
+                    data.extend(tmp)
+                return True, bytes(data)
+            except socket.timeout:
+                continue
+            except (ConnectionResetError, ConnectionAbortedError):
+                print("{0} in team {1} lost the connection".format(self.username, self.team_server.teamname))
+                return False, None
+            except Exception as e:
+                print("ERROR! Unknown exception when receiving data: {0}".format(e))
+                return False, None
+        return False, None
 
     def run(self):
         with self.connection:
-            # print('Connected by', addr)
-            # while True:
-            size = 0
-            try:
-                size_bytes = self.connection.recv(4)
-                if not size_bytes:
-                    return
-                size = int.from_bytes(size_bytes[0:4], "big")
-            except (ConnectionResetError, ConnectionAbortedError):
-                print("Unidentified connection was closed")
+            success, size_bytes = self._receive_data(4)
+            if not success:
+                print("Unidentified connection from {0} was unsuccessful and will be closed".format(self.addr))
                 return
-            # except:
-            #     print("Unknown communications error ->")
-            #     print("  Unidentified connection was closed")
-            #     return
+            size = int.from_bytes(size_bytes[0:4], "big")
 
-            try:
-                data = self.connection.recv(size)
-                if not data:
-                    return
-            except (ConnectionResetError, ConnectionAbortedError):
-                print("Unidentified connection was closed")
+            success, data = self._receive_data(size)
+            if not success:
+                print("Unidentified connection from {0} didn't send expected data and will be closed".format(self.addr))
                 return
-            # except:
-            #     print("Unknown communications error ->")
-            #     print("  Unidentified connection was closed")
-            #     return
-            # print(data)
 
             login_result = False
             error_message = "Unknown error"
@@ -53,7 +65,6 @@ class IncomingConnectionHandler(threading.Thread):
                 loginrequest = serverprotocol_pb2.LoginRequest()
 
                 unpack_result = loginrequest.ParseFromString(data)
-                # unpack_result, data = protobuf_utils.protobuf_unpack(data, loginrequest)
 
                 if unpack_result > 0:
                     if (not loginrequest.HasField("name") or
@@ -90,20 +101,30 @@ class IncomingConnectionHandler(threading.Thread):
                             error_message = "Unknown team"
             except google.protobuf.message.DecodeError as e:
                 error_message = "Protocol error"
+                # Allow this error to be sent back to the client
+            except Exception as e:
+                print("Unknown error when accepting a connection: {0}".format(e))
+                return
 
-            loginresponse = serverprotocol_pb2.LoginResponse()
-            loginresponse.success = login_result
-            if client is not None:
-                loginresponse.user_id = client.user_id
-                loginresponse.configuration = self.main_server.rally_configuration.get_client_config_xml()
-            loginresponse.message = error_message
-            #try:
-            protobuf_utils.protobuf_send(self.connection, loginresponse)
+            try:
+                loginresponse = serverprotocol_pb2.LoginResponse()
+                loginresponse.success = login_result
+                if client is not None:
+                    loginresponse.user_id = client.user_id
+                    loginresponse.configuration = self.main_server.rally_configuration.get_client_config_xml()
+                loginresponse.message = error_message
+
+                send_success = protobuf_utils.protobuf_send(self.connection, loginresponse)
+                if not send_success:
+                    print("Unable to send login response to client, closing connection")
+                    return
+            except Exception as e:
+                print("Unknown exception when sending login response to client, closing connection. {0}".format(e))
+                return
+
             if not loginresponse.success:
                 print("Incorrect login attempt, closing connection")
-                self.connection.close()
                 return
-            #except:
-            #    pass
+
             if client is not None:
                 client.run()

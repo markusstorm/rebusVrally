@@ -71,4 +71,4 @@ class SubClientCommunicator(threading.Thread):
         self.terminate = True
 
     def send(self, client_to_server):
-        protobuf_utils.protobuf_sendto(self.udp_sock, self.client_port, client_to_server)
+        return protobuf_utils.protobuf_sendto(self.udp_sock, self.client_port, client_to_server)

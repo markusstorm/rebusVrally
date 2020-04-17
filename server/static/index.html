@@ -57,6 +57,14 @@
             xhttp.send("Do it!");
         }
 
+        function on_terminate_team() {
+            var team = document.getElementById("debug_team").value;
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "/terminate/" + team, true);
+            xhttp.setRequestHeader("Content-type", "text/plain");
+            xhttp.send("Do it!");
+        }
+
         var team_status_interval = null;
         function body_loaded() {
             team_status_interval = setInterval(on_update_team_status_interval, 1000);
@@ -230,6 +238,7 @@ Team <input type="text" id="debug_team" name="debug_team" value="1"/><br>
 Warp team to section <input type="text" id="warp_section" name="warp_section" value="1"/> frame <input type="text" id="warp_frame" name="warp_frame" value=""/> <input type="button" onclick="on_warp()" value="Warp"/><br>
 <input type="button" onclick="on_solve_morning_rebus()" value="Solve morning rebus"/><br>
 <input type="button" onclick="on_solve_afternoon_rebus()" value="Solve afternoon rebus"/><br>
+<input type="button" onclick="on_terminate_team()" value="Terminate team"/><br>
 <!--
 <input type="button" onclick="on_debug_restart()" value="Reset bus position"/><br>
 -->

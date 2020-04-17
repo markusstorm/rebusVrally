@@ -2,12 +2,18 @@ import threading
 
 from flask import Flask, request, jsonify
 
+import logging
 
 class WebHandler(threading.Thread):
     def __init__(self, main_server, host):
         threading.Thread.__init__(self)
         self.host = host
         self.main_server = main_server
+
+        # Turn off INFO logging from Flask
+        log = logging.getLogger('werkzeug')
+        log.setLevel(logging.ERROR)
+
         self.flask_app = Flask("rally_server")
 
         self.flask_app.add_url_rule("/", view_func=self.root)
@@ -25,6 +31,7 @@ class WebHandler(threading.Thread):
         self.flask_app.add_url_rule("/debug_restart", view_func=self.debug_restart, methods=['POST'])
 
         self.flask_app.add_url_rule("/warp/<team_id>/<section>", view_func=self.warp_team, methods=['POST'])
+        self.flask_app.add_url_rule("/terminate/<team_id>", view_func=self.terminate_team, methods=['POST'])
         self.flask_app.add_url_rule("/debug_solved_start_rebus/<team_id>", view_func=self.debug_solved_start_rebus, methods=['POST'])
         self.flask_app.add_url_rule("/debug_solved_lunch_rebus/<team_id>", view_func=self.debug_solved_lunch_rebus, methods=['POST'])
 
@@ -78,6 +85,10 @@ class WebHandler(threading.Thread):
         team_server = self.main_server.find_team_server_from_id(int(team_id))
         if team_server is not None:
             team_server.end_rally()
+        return ""
+
+    def terminate_team(self, team_id):
+        self.main_server.terminate_team(int(team_id))
         return ""
 
     def debug_solved_start_rebus(self, team_id):
