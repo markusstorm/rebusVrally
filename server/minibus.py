@@ -18,20 +18,21 @@ class MiniBus:
         for i in range(0, 10):
             self.seating.append(None)
 
-    def to_json(self):
+    def to_json(self, verbose):
         json = {}
-        json["speed"] = self.speed #TODO: when reading back, set speed to 0
         json["current_section"] = self.current_section
-        json["distance"] = self.distance
-        # Skip seating when reading back, people will have to reconnect
-        seating = {}
-        json["seating"] = seating
-        for i in range(1, 10):
-            player = self.seating[i]
-            if player is not None:
-                # Skip user id when reading back
-                seating[i] = {"name": player.name}
-        return json
+        if verbose:
+            json["speed"] = self.speed #TODO: when reading back, set speed to 0
+            json["distance"] = self.distance
+            # Skip seating when reading back, people will have to reconnect
+            seating = {}
+            json["seating"] = seating
+            for i in range(1, 10):
+                player = self.seating[i]
+                if player is not None:
+                    # Skip user id when reading back
+                    seating[i] = {"name": player.name}
+            return json
 
     def warp(self, section_number, frame):
         print("Warping to section {0} frame {1}".format(section_number, frame))

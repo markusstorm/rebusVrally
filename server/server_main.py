@@ -1,4 +1,6 @@
 import argparse
+import datetime
+import os
 import socket
 import sys
 import threading
@@ -21,6 +23,7 @@ parser = argparse.ArgumentParser(description='Rebus server')
 parser.add_argument("-r", "--rally_configuration", type=str, help="Path to the rally configuration to use", required=False)
 parser.add_argument("-l", "--start_locally", action='store_true', help="Start the server on 127.0.0.1", required=False, default=False)
 parser.add_argument("-i", "--rally_id", type=str, help="ID of the rally configuration to use", required=False)
+parser.add_argument("-b", "--backup_path", type=str, help="Folder to store team status backups in", required=False)
 args = parser.parse_args()
 
 config_finder = ServerConfigFinder(args.rally_configuration)
@@ -83,8 +86,26 @@ class ConnectionListener(threading.Thread):
                 connection_handler = IncomingConnectionHandler(conn, addr, self.main_server)
                 connection_handler.start()
 
+backup_path = args.backup_path
+if backup_path is not None:
+    if not os.path.isdir(backup_path):
+        print("Invalid backup path!")
+        sys.exit(1)
+else:
+    backup_path = os.path.join(os.getcwd(), "backup")
+    if not os.path.exists(backup_path):
+        os.mkdir(backup_path)
+if not os.path.exists(backup_path):
+    print("Unable to create the backup directory")
+    sys.exit(1)
+dated_backup_path = os.path.join(backup_path, datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
+os.mkdir(dated_backup_path)
+if not os.path.exists(dated_backup_path):
+    print("Unable to create the session backup directory")
+    sys.exit(1)
+print("Using {0} as backup dir".format(dated_backup_path))
 
-main_server = MainServer(configuration, HOST)
+main_server = MainServer(configuration, HOST, dated_backup_path)
 normal = ConnectionListener(NORMAL_PORT, main_server)
 normal.start()
 if not args.start_locally:

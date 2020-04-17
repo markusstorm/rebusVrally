@@ -24,10 +24,13 @@ class ScheduledAction:
 
 
 class ClientUpdateScheduler(threading.Thread):
+    BACKUP_INTERVAL = 60
+
     def __init__(self, main_server):
         threading.Thread.__init__(self)
         self.main_server = main_server
         self.actions = []
+        self.backup_counter = 0
 
     def run(self):
         while True:
@@ -45,6 +48,12 @@ class ClientUpdateScheduler(threading.Thread):
             for team_server in self.main_server.team_servers.values():
                 team_server.send_updates_to_clients()
 
+            self.backup_counter += 1
+            if self.backup_counter >= ClientUpdateScheduler.BACKUP_INTERVAL:
+                self.backup_counter = 0
+                for team_server in self.main_server.team_servers.values():
+                    team_server.backup_status_to_disk()
+
     def schedule_action(self, seconds_from_now, action):
         self.actions.append(ScheduledAction(seconds_from_now, action))
 
@@ -56,7 +65,8 @@ class BroadcastMessage:
 
 
 class MainServer:
-    def __init__(self, rally_configuration, host):
+    def __init__(self, rally_configuration, host, backup_path):
+        self.backup_path = backup_path
         self.host = host
         self.team_servers = {}
         self.messages = []
@@ -83,7 +93,7 @@ class MainServer:
         return None
 
     def create_team_server(self, team_name, team_number, difficulty):
-        ts = TeamServer(team_name, team_number, self.rally_configuration, self, difficulty)
+        ts = TeamServer(team_name, team_number, self.rally_configuration, self, difficulty, self.backup_path)
         self.team_servers[team_name] = ts
         if self.rally_is_started:
             self.start_rally_for_team_server(ts)

@@ -1,4 +1,6 @@
 import datetime
+import json
+import os
 import random
 from functools import partial
 
@@ -73,12 +75,14 @@ class RebusSolution:
 class TeamServer:
     """ Keeps track of the progress of each team """
 
-    def __init__(self, teamname, team_number, rally_configuration, main_server, difficulty):
+    def __init__(self, teamname, team_number, rally_configuration, main_server, difficulty, backup_path):
         self.main_server = main_server
         self.rally_configuration = rally_configuration
         self.teamname = teamname
         self.team_number = team_number
         self.difficulty = difficulty
+        self.backup_path = os.path.join(backup_path, str(team_number))
+        os.mkdir(self.backup_path)
         self.clients = []
         self.changed = True
         self.update_counter = 0
@@ -89,6 +93,7 @@ class TeamServer:
         self.lunch_time = None
         self.found_goal_time = None
         self.goal_time = None
+        self.latest_backup_contents = ""
 
         #self.status_information = StatusInformation(rally_configuration.track_information)
         # TODO: use StatusInformation for seating and other position info?
@@ -101,17 +106,23 @@ class TeamServer:
         self.rebus_answers = {}
         self.rebus_solutions = {}
 
-    def to_json(self):
+    @staticmethod
+    def date_to_json(date):
+        if date is None:
+            return None
+        return date.strftime("%Y-%m-%d %H:%M:%S")
+
+    def to_json(self, verbose=True):
         json = {}
         json["team-name"] = self.teamname
         json["team-number"] = self.team_number
         json["rally-stage"] = self.rally_stage
-        json["minibus"] = self.minibus.to_json()
+        json["minibus"] = self.minibus.to_json(verbose)
         json["rebus-statuses"] = self.rebus_statuses.to_json()
-        json["start-time"] = self.start_time
-        json["lunch-time"] = self.lunch_time # can be None
-        json["found-goal-time"] = self.found_goal_time # can be None
-        json["goal-time"] = self.goal_time # can be None
+        json["start-time"] = TeamServer.date_to_json(self.start_time)
+        json["lunch-time"] = TeamServer.date_to_json(self.lunch_time) # can be None
+        json["found-goal-time"] = TeamServer.date_to_json(self.found_goal_time) # can be None
+        json["goal-time"] = TeamServer.date_to_json(self.goal_time) # can be None
         solution_json = {}
         for section in self.rebus_solutions:
             rebus_solution = self.rebus_solutions[section]
@@ -119,6 +130,15 @@ class TeamServer:
                 solution_json[section] = rebus_solution.to_json()
         json["rebus-solutions"] = solution_json
         return json
+
+    def backup_status_to_disk(self):
+        print("backup_status_to_disk")
+        json_str = json.dumps(self.to_json(False))
+        if json_str != self.latest_backup_contents:
+            self.latest_backup_contents = json_str
+            new_backup_file = os.path.join(self.backup_path, datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
+            with open(new_backup_file, "w") as f:
+                f.write(json_str)
 
     def addClient(self, client):
         self.clients.append(client)
