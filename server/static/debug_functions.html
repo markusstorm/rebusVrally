@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Debug functions</title>
+    <script language="JavaScript">
+        function on_warp() {
+            var team = document.getElementById("debug_team").value;
+            var section = document.getElementById("warp_section").value;
+            var frame = document.getElementById("warp_frame").value;
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "/warp/" + team + "/" + section, true);
+            xhttp.setRequestHeader("Content-type", "text/plain");
+            xhttp.send(frame);
+        }
+
+        function on_solve_morning_rebus() {
+            var team = document.getElementById("debug_team").value;
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "/debug_solved_start_rebus/" + team, true);
+            xhttp.setRequestHeader("Content-type", "text/plain");
+            xhttp.send("Do it!");
+        }
+
+        function on_solve_afternoon_rebus() {
+            var team = document.getElementById("debug_team").value;
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "/debug_solved_lunch_rebus/" + team, true);
+            xhttp.setRequestHeader("Content-type", "text/plain");
+            xhttp.send("Do it!");
+        }
+
+        function on_terminate_team() {
+            var team = document.getElementById("debug_team").value;
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "/terminate/" + team, true);
+            xhttp.setRequestHeader("Content-type", "text/plain");
+            xhttp.send("Do it!");
+        }
+
+        function on_backup_team() {
+            var team = document.getElementById("debug_team").value;
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "/force_backup/" + team, true);
+            xhttp.setRequestHeader("Content-type", "text/plain");
+            xhttp.send("Do it!");
+        }
+    </script>
+</head>
+<body>
+<h3>Functions tied to a specific team</h3>
+Team <input type="text" id="debug_team" name="debug_team" value="1"/><br>
+<br>
+Warp team to section <input type="text" id="warp_section" name="warp_section" value="1"/> frame <input type="text" id="warp_frame" name="warp_frame" value=""/> <input type="button" onclick="on_warp()" value="Warp"/><br>
+Mark the first rebus as solved <input type="button" onclick="on_solve_morning_rebus()" value="Solve morning rebus"/><br>
+Mark the lunch rebus as solved <input type="button" onclick="on_solve_afternoon_rebus()" value="Solve afternoon rebus"/><br>
+Force a backup of the current status <input type="button" onclick="on_backup_team()" value="Force backup"/><br>
+Terminate the team server <input type="button" onclick="on_terminate_team()" value="Terminate team"/><br>
+</body>
+</html>

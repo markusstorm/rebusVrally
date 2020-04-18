@@ -20,6 +20,7 @@ track_information = rally_configuration.track_information
 window = None
 fully_started = False
 latest_status_information = None
+terminate = False
 my_answers = {}
 current_text = ""
 
@@ -78,6 +79,9 @@ def update_solution_text(cb_changed):
 
 
 def on_status_updates(status_information):
+    if terminate:
+        return
+
     global latest_status_information
     latest_status_information = status_information
     update_solution_text(False)
@@ -192,3 +196,5 @@ answer_text.grid(row=6, column=0)
 
 fully_started = True
 window.mainloop()
+terminate = True
+sub_client_communicator.stop()

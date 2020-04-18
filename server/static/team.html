@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="/static/json_functions.js"></script>
+    <script src="/static/team_overview.js"></script>
+    <script language="JavaScript">
+        var team_number = 0;
+        var team_status_interval = null;
+        function body_loaded() {
+            const urlParams = new URLSearchParams(window.location.search);
+            team_number_s = urlParams.get('team_number')
+            if (team_number_s != undefined && team_number_s.length > 0) {
+                team_number = parseInt(team_number_s);
+                team_status_interval = setInterval(on_update_team_status_interval, 1000);
+            }
+            if (team_number == 0) {
+                document.getElementById("team_status").innerHTML = "No team selected!";
+            } else {
+                document.getElementById("title").innerHTML = "<h1>Team " + team_number + "</h1>";
+            }
+        }
+
+        const team_update_http_request = new XMLHttpRequest();
+        function on_team_update_receive_data(e) {
+            if (team_update_http_request.readyState == 4 && team_update_http_request.status == 200) {
+                update_page_from_json(team_update_http_request.responseText)
+            } else {
+                //TODO: error handling
+            }
+        }
+
+        team_update_http_request.onreadystatechange = on_team_update_receive_data;
+        function on_update_team_status_interval() {
+            const team_update_url = "/teams/" + team_number;
+            team_update_http_request.open("GET", team_update_url);
+            team_update_http_request.send()
+        }
+
+        function update_page_from_json(json_text) {
+            console.log(json_text);
+            var json_obj = JSON.parse(json_text);
+            if (json_obj == null) {
+                //Probably not logged in yet
+                document.getElementById("team_status").innerHTML = "Not logged in yet";
+                document.getElementById("fishbone").innerHTML = "";
+            } else {
+                my_build_team_info(json_obj);
+                build_fishbone(json_obj);
+            }
+        }
+
+        function my_build_team_info(json_obj) {
+            var s = build_team_info(json_obj);
+            document.getElementById("team_status").innerHTML = s;
+
+            var team_name = get_value(json_obj, "team-name");
+            document.getElementById("title").innerHTML = "<h1>Team " + team_number + " - " + team_name + "</h1>";
+        }
+
+        function build_fishbone(json_obj) {
+            var s = "<table border='1'>";
+            s += "<tr><td>Rebus</td><td>Normal</td><td>Help</td><td>Solution opened</td><td>Solved</td><td>Test count</td></tr>";
+            //TODO: this should be from configuration in some way?
+            for (var rebus_number = 1; rebus_number < 9; rebus_number++) {
+                var rn_s = rebus_number.toString();
+                var normal = "";
+                var help = "";
+                var solution = "";
+                var solved = false;
+                var test_count = 0;
+                if (has_value(json_obj, "rebus-solutions")) {
+                    rebus_solutions = json_obj["rebus-solutions"];
+                    if (has_value(rebus_solutions, rn_s)) {
+                        rebus_solution = rebus_solutions[rn_s];
+                        test_count = parseInt(get_value(rebus_solution, "test_count", "0"));
+                        solved = get_value(rebus_solution, "solved", false);
+                    }
+                }
+                if (has_value(json_obj, "rebus-statuses")) {
+                    rebus_statuses = json_obj["rebus-statuses"];
+                    for (index in rebus_statuses) {
+                        rebus_status = rebus_statuses[index];
+                        status_rebus_number = parseInt(get_value(rebus_status, "rebus-number", "0"));
+                        if (status_rebus_number == rebus_number) {
+                            var given = get_value(rebus_status, "given_rebuses", null);
+                            normal = get_value(given, "Normal", "");
+                            help = get_value(given, "Help", "");
+                            solution = get_value(given, "Solution", "");
+                        }
+                    }
+                }
+                s += "<tr>";
+                s += "<td>R" + rn_s + "</td>";
+                s += "<td>" + normal + "</td>";
+                s += "<td>" + help + "</td>";
+                s += "<td>" + solution + "</td>";
+                s += "<td>" + solved + "</td>";
+                s += "<td>" + test_count + "</td>";
+                s += "</tr>\n";
+            }
+            s += "</table>";
+            document.getElementById("fishbone").innerHTML = s;
+        }
+    </script>
+</head>
+<body onload="body_loaded()">
+<div id="title"></div>
+<div id="team_status">Waiting for data...</div>
+<div id="fishbone"></div>
+</body>
+</html>

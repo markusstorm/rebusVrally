@@ -115,15 +115,19 @@ class Rebus:
 
 class RebusWindow:
     def __init__(self):
+        self.terminate = False
         self.all_rebuses = []
-
-        self.sub_client_communicator = SubClientCommunicator(args, status_receiver=self.on_status_updates)
-        self.sub_client_communicator.start()
 
         self.window = Tk()
         self.window.title("Rebusar och fiskben")
         self.layout()
+
+        self.sub_client_communicator = SubClientCommunicator(args, status_receiver=self.on_status_updates)
+        self.sub_client_communicator.start()
+
         self.window.mainloop()
+        self.terminate = True
+        self.sub_client_communicator.stop()
 
     def layout(self):
         messages_text = Text(self.window, height=5, width=80)
@@ -160,6 +164,8 @@ class RebusWindow:
         return None
 
     def on_status_updates(self, status_information):
+        if self.terminate:
+            return
         for rebus_status in status_information.rebus_statuses.rebus_statuses.values():
             #print("{0}".format(rebus_status))
             for rebus_type in Rebus.rebus_types:
@@ -168,6 +174,8 @@ class RebusWindow:
                     continue
                 if extra is not None:
                     txt = "{0}\n{1}".format(txt, extra)
+                if rebus_type == Rebus.SOLUTION:
+                    txt = "{0}\n{1}".format(txt, "\nSkriv in detta i GUI:t 'Testa rebuslösning'\n för att få reda på vart ni ska åka!")
                 rebus = self.get_rebus(rebus_status.section, rebus_type)
                 if rebus is not None:
                     rebus.set_text(txt)

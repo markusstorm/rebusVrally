@@ -66,6 +66,12 @@ class SubClientCommunicator(threading.Thread):
                                 self.status_receiver(self.status_information)
             except socket.timeout:
                 continue
+            except (ConnectionResetError, ConnectionAbortedError):
+                print("Subclient: Lost connection to a the rally client")
+                continue
+            except Exception as e:
+                print("Subclient communications error: {0}".format(e))
+                continue
 
     def stop(self):
         self.terminate = True

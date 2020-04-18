@@ -17,7 +17,7 @@ class RebusStatus:
                self.given_extra_texts[RebusConfig.SOLUTION] is None
 
     def to_json(self):
-        json = {"section": self.section}
+        json = {"rebus-number": self.section}
         given = {}
         for key in self.given_rebus_texts:
             if self.given_rebus_texts[key] is not None:
@@ -32,8 +32,8 @@ class RebusStatus:
 
     @staticmethod
     def from_json(_json):
-        if "section" in _json:
-            section = _json["section"]
+        if "rebus-number" in _json:
+            section = _json["rebus-number"]
             rs = RebusStatus(section)
             if "given_rebuses" in _json:
                 given_json = _json["given_rebuses"]

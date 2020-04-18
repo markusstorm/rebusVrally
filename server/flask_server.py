@@ -18,6 +18,7 @@ class WebHandler(threading.Thread):
 
         self.flask_app.add_url_rule("/", view_func=self.root)
         self.flask_app.add_url_rule("/index.html", view_func=self.root)
+        self.flask_app.add_url_rule("/static/<file>", view_func=self.static_file)
 
         self.flask_app.add_url_rule("/teams", view_func=self.get_teams)
 
@@ -36,12 +37,14 @@ class WebHandler(threading.Thread):
         self.flask_app.add_url_rule("/debug_solved_start_rebus/<team_id>", view_func=self.debug_solved_start_rebus, methods=['POST'])
         self.flask_app.add_url_rule("/debug_solved_lunch_rebus/<team_id>", view_func=self.debug_solved_lunch_rebus, methods=['POST'])
 
-
     def run(self):
         self.flask_app.run(host=self.host, port=63352)
 
     def root(self):
         return self.flask_app.send_static_file('index.html')
+
+    def static_file(self, file):
+        return self.flask_app.send_static_file(file)
 
     def get_teams(self):
         return jsonify(self.main_server.get_all_teams_json())

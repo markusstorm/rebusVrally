@@ -50,6 +50,12 @@ class SubProcessCommunicator(threading.Thread):
                         self.server_connection.send_message_to_server(client_to_server)
             except socket.timeout:
                 continue
+            except (ConnectionResetError, ConnectionAbortedError):
+                print("Lost connection to a sub process")
+                continue
+            except Exception as e:
+                print("Sub process communications error: {0}".format(e))
+                continue
 
     def send_to_sub_clients(self, server_to_client):
         packed = server_to_client.SerializeToString()

@@ -20,24 +20,26 @@ class RebusSolution:
         self.target_north = 0
         self.target_picture = ""
         self.test_count = 0
+        self.solved = False
         self.description = ""
 
     def to_json(self):
         _json = {}
-        _json["rc-section"] = self.rc.section
+        _json["rebus_number"] = self.rc.section
         _json["target_description"] = self.target_description
         _json["target_east"] = self.target_east
         _json["target_north"] = self.target_north
         _json["target_picture"] = self.target_picture
         _json["test_count"] = self.test_count
+        _json["solved"] = self.solved
         _json["description"] = self.description
         return _json
         # TODO: when reading back: find the correct rc object, do NOT create a new one!
 
     @staticmethod
     def from_json(_json, rally_configuration):
-        if "rc-section" in _json:
-            section_number = _json["rc-section"]
+        if "rebus_number" in _json:
+            section_number = _json["rebus_number"]
             rc = rally_configuration.get_rebus_config(section_number)
             if rc is None:
                 print("Error: unable to find a RebusConfiguration matching the identifier {0}, not restoring".format(section_number))
@@ -56,6 +58,8 @@ class RebusSolution:
             rs.target_picture = _json["target_picture"]
         if "test_count" in _json:
             rs.test_count = _json["test_count"]
+        if "solved" in _json:
+            rs.solved = _json["solved"]
         if "description" in _json:
             rs.description = _json["description"]
         return rs
@@ -84,6 +88,7 @@ class RebusSolution:
         self.target_east = self.rc.target_east
         self.target_north = self.rc.target_north
         self.target_picture = self.rc.target_picture
+        self.solved = True
         return True
 
     def pack(self):

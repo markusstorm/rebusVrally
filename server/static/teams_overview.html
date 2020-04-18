@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Team overviews</title>
+    <script src="/static/json_functions.js"></script>
+    <script src="/static/team_overview.js"></script>
+    <script language="JavaScript">
+        var team_status_interval = null;
+        function body_loaded() {
+            team_status_interval = setInterval(on_update_team_status_interval, 1000);
+        }
+
+        const team_update_http_request = new XMLHttpRequest();
+        function on_team_update_receive_data(e) {
+            if (team_update_http_request.readyState == 4 && team_update_http_request.status == 200) {
+                build_teams_info(team_update_http_request.responseText)
+            } else {
+                //TODO: error handling
+            }
+        }
+
+        team_update_http_request.onreadystatechange = on_team_update_receive_data;
+        const team_update_url = "/teams";
+        function on_update_team_status_interval() {
+            team_update_http_request.open("GET", team_update_url);
+            team_update_http_request.send()
+        }
+
+        function build_teams_info(json_text) {
+            console.log(json_text);
+            var json_obj = JSON.parse(json_text);
+            var s = "<table><tr>";
+
+            var col_count = 0;
+            var count = 0;
+            for (team_number in json_obj) {
+                col_count++;
+                count++;
+                if (col_count == 5) {
+                    col_count = 0;
+                    s += "</tr><tr>";
+                }
+                s += "<td>";
+                var team_json = json_obj[team_number];
+                s += "<h3><a href='/static/team.html?team_number=" + team_number + "'>" + get_value(team_json, "team-number") + ": " + get_value(team_json, "team-name") + "</a></h3>\n";
+                s += build_team_info(team_json);
+                s += "</td>\n";
+            }
+            s += "</tr></table>";
+            if (count == 0) {
+                s = "No teams logged in yet";
+            }
+            document.getElementById("team_statuses").innerHTML = s;
+        }
+    </script>
+</head>
+<body onload="body_loaded()">
+<h1>Team overviews</h1>
+<div id="team_statuses">Waiting for data...</div>
+</body>
+</html>
