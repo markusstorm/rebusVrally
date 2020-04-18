@@ -71,18 +71,18 @@ class SubProcesses:
         user_id = self.subprocess_communicator.server_connection.status_information.user_id
         self.process_templates = [
             ProcessTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 1, "Steering wheel", "../steering/steering.py", [1]),
-            VideoProcessTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 2, "Front video", "../out_the_window/movie_window.py", [1, 2, 3], "front"),
+            VideoProcessTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 2, "Front video", "../out_the_window/movie_window.py", [1, 2, 3, 5, 8], "front"),
             VideoProcessTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 3, "Left video", "../out_the_window/movie_window.py", [4, 7], "left"),
-            VideoProcessTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 4, "Right video", "../out_the_window/movie_window.py", [3, 6, 9], "right"),
-            #PhotoSheetTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 5, "Photo sheet front", "../photo_sheet/photosheet.py", [1, 2, 3], 1),
-            #PhotoSheetTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 6, "Photo sheet middle1", "../photo_sheet/photosheet.py", [4, 5, 6], 2),
-            #PhotoSheetTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 7, "Photo sheet middle2", "../photo_sheet/photosheet.py", [4, 5, 6], 3),
-            #PhotoSheetTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 8, "Photo sheet back1", "../photo_sheet/photosheet.py", [7, 8, 9], 4),
-            #PhotoSheetTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 9, "Photo sheet back2", "../photo_sheet/photosheet.py", [7, 8, 9], 5),
+            VideoProcessTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 4, "Right video", "../out_the_window/movie_window.py", [6, 9], "right"),
             ProcessTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 10, "Rebus list", "../fishbone/fishbone.py", [5]),
-            #ProcessTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 11, "Photo Answers", "../photo_report/photo_report.py", [5]),
             ProcessTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 13, "Solve Rebus", "../solve_rebus/solve_rebus.py", [5])
-            #ProcessTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 12, "Rebus Answers", "../rebus_answers/rebus_answers.py", [5])
+            #ProcessTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 11, "Photo Answers", "../photo_report/photo_report.py", [5]),
+            #ProcessTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 12, "Rebus Answers", "../rebus_answers/rebus_answers.py", [5]),
+            # PhotoSheetTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 5, "Photo sheet front", "../photo_sheet/photosheet.py", [1, 2, 3], 1),
+            # PhotoSheetTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 6, "Photo sheet middle1", "../photo_sheet/photosheet.py", [4, 5, 6], 2),
+            # PhotoSheetTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 7, "Photo sheet middle2", "../photo_sheet/photosheet.py", [4, 5, 6], 3),
+            # PhotoSheetTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 8, "Photo sheet back1", "../photo_sheet/photosheet.py", [7, 8, 9], 4),
+            # PhotoSheetTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 9, "Photo sheet back2", "../photo_sheet/photosheet.py", [7, 8, 9], 5),
         ]
 
     def start_processes(self, seat_index):
