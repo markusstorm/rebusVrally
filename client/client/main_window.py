@@ -53,7 +53,8 @@ class MainWindow:
 
     def run(self):
         self.main_window.mainloop()
-        self.main_window.destroy()
+        if self.main_window is not None:
+            self.main_window.destroy()
 
     def layout(self):
         self.main_window = Toplevel()
@@ -172,7 +173,12 @@ class MainWindow:
         self.server_connection.stop()
         if self.main_window is not None:
             self.main_window.quit()
+        self.main_window = None
 
     def on_lost_connection(self):
-        messagebox.showerror("Lost connection to server", "Lost connection to server", parent=self.main_window)
+        if self.main_window is not None:
+            try:
+                messagebox.showerror("Lost connection to server", "Lost connection to server", parent=self.main_window)
+            except:
+                pass
         self.close_main_window()

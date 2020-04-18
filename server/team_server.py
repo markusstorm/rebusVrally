@@ -2,6 +2,7 @@ import datetime
 import json
 import os
 import random
+import re
 from functools import partial
 
 from rally.common.rebuses import RebusStatuses
@@ -22,16 +23,42 @@ class RebusSolution:
         self.description = ""
 
     def to_json(self):
-        json = {}
-        json["rc-section"] = self.rc.section
-        json["target_description"] = self.target_description
-        json["target_east"] = self.target_east
-        json["target_north"] = self.target_north
-        json["target_picture"] = self.target_picture
-        json["test_count"] = self.test_count
-        json["description"] = self.description
-        return json
+        _json = {}
+        _json["rc-section"] = self.rc.section
+        _json["target_description"] = self.target_description
+        _json["target_east"] = self.target_east
+        _json["target_north"] = self.target_north
+        _json["target_picture"] = self.target_picture
+        _json["test_count"] = self.test_count
+        _json["description"] = self.description
+        return _json
         # TODO: when reading back: find the correct rc object, do NOT create a new one!
+
+    @staticmethod
+    def from_json(_json, rally_configuration):
+        if "rc-section" in _json:
+            section_number = _json["rc-section"]
+            rc = rally_configuration.get_rebus_config(section_number)
+            if rc is None:
+                print("Error: unable to find a RebusConfiguration matching the identifier {0}, not restoring".format(section_number))
+                return None
+            rs = RebusSolution(rc)
+        else:
+            print("Error: unable to find a RebusConfiguration identifier in JSON for RebusSolution, not restoring")
+            return None
+        if "target_description" in _json:
+            rs.target_description = _json["target_description"]
+        if "target_east" in _json:
+            rs.target_east = _json["target_east"]
+        if "target_north" in _json:
+            rs.target_north = _json["target_north"]
+        if "target_picture" in _json:
+            rs.target_picture = _json["target_picture"]
+        if "test_count" in _json:
+            rs.test_count = _json["test_count"]
+        if "description" in _json:
+            rs.description = _json["description"]
+        return rs
 
     def compare(self, solution_req):
         self.test_count += 1
@@ -75,6 +102,8 @@ class RebusSolution:
 class TeamServer:
     """ Keeps track of the progress of each team """
 
+    FILE_VERSION = 1
+
     def __init__(self, teamname, team_number, rally_configuration, main_server, difficulty, backup_path):
         self.terminate = False
         self.main_server = main_server
@@ -100,13 +129,38 @@ class TeamServer:
         #self.status_information = StatusInformation(rally_configuration.track_information)
         # TODO: use StatusInformation for seating and other position info?
 
-        self.rebus_statuses = RebusStatuses(rally_configuration.rebus_configs)
+        self.rebus_statuses = RebusStatuses()
 
         self.minibus = MiniBus(rally_configuration.track_information, self.difficulty)
         self.plate_answers = []
         self.photo_answers = []
         self.rebus_answers = {}
         self.rebus_solutions = {}
+
+        self.try_to_restore_from_backup()
+
+    def try_to_restore_from_backup(self):
+        files = sorted([f for f in os.listdir(self.backup_path) if re.match(r'.*\.srb$', f)])
+        if len(files) > 0:
+            restore_file = os.path.abspath(os.path.join(self.backup_path, files[-1]))
+            print("Trying to restore team server state from {0}".format(restore_file))
+            try:
+                with open(restore_file, 'r') as f:
+                    try:
+                        content = f.read()
+                    except IOError as e:
+                        print("Unable to read the old team server state: {0}".format(e))
+                        return
+
+                    try:
+                        _json = json.loads(content)
+                    except Exception as e:
+                        print("Unable to convert the old state to json: {0}".format(e))
+                        return
+                    self.restore_from_json(_json)
+            except IOError as e:
+                print("Unable to read the old team server state: {0}".format(e))
+                return
 
     def stop(self):
         self.terminate = True
@@ -123,37 +177,77 @@ class TeamServer:
             return None
         return date.strftime("%Y-%m-%d %H:%M:%S")
 
+    @staticmethod
+    def date_from_json(_json, key):
+        if key not in _json:
+            return None
+        try:
+            s = _json[key]
+            if s is not None and len(s) > 0:
+                return datetime.datetime.strptime(_json[key], "%Y-%m-%d %H:%M:%S")
+        except ValueError as e:
+            print("Unable to restore date '{0}' from backup. Error: {1}".format(_json[key], e))
+        return None
+
     def to_json(self, verbose=True):
-        json = {}
-        json["team-name"] = self.teamname
-        json["team-number"] = self.team_number
-        json["rally-stage"] = self.rally_stage
-        json["minibus"] = self.minibus.to_json(verbose)
-        json["rebus-statuses"] = self.rebus_statuses.to_json()
-        json["start-time"] = TeamServer.date_to_json(self.start_time)
-        json["lunch-time"] = TeamServer.date_to_json(self.lunch_time) # can be None
-        json["found-goal-time"] = TeamServer.date_to_json(self.found_goal_time) # can be None
-        json["goal-time"] = TeamServer.date_to_json(self.goal_time) # can be None
+        _json = {}
+        _json["version"] = TeamServer.FILE_VERSION
+        _json["team-name"] = self.teamname
+        _json["team-number"] = self.team_number
+        _json["rally-stage"] = self.rally_stage
+        _json["minibus"] = self.minibus.to_json(verbose)
+        _json["rebus-statuses"] = self.rebus_statuses.to_json()
+        _json["start-time"] = TeamServer.date_to_json(self.start_time)
+        _json["lunch-time"] = TeamServer.date_to_json(self.lunch_time) # can be None
+        _json["found-goal-time"] = TeamServer.date_to_json(self.found_goal_time) # can be None
+        _json["goal-time"] = TeamServer.date_to_json(self.goal_time) # can be None
         solution_json = {}
         for section in self.rebus_solutions:
             rebus_solution = self.rebus_solutions[section]
             if rebus_solution is not None:
-                solution_json[section] = rebus_solution.to_json()
-        json["rebus-solutions"] = solution_json
+                solution_json[str(section)] = rebus_solution.to_json()
+        _json["rebus-solutions"] = solution_json
         if verbose:
             if len(self.clients) > 0:
                 connected = []
                 for client in self.clients:
                     connected.append({"id": client.user_id, "name": client.username})
-                json["connected-users"] = connected
-        return json
+                _json["connected-users"] = connected
+        return _json
 
-    def backup_status_to_disk(self):
-        print("backup_status_to_disk")
+    def restore_from_json(self, _json):
+        if "version" not in _json:
+            print("No version information, can't restore the state")
+        version = _json["version"]
+        if version != TeamServer.FILE_VERSION:
+            print("Incorrect version of the backup file {0} != {1}".format(version, TeamServer.FILE_VERSION))
+
+        # No need to restore team name, number and stuff that should already be correct
+        if "rally-stage" in _json:
+            self.rally_stage = _json["rally-stage"]
+        if "minibus" in _json:
+            self.minibus.restore_from_json(_json["minibus"])
+        if "rebus-statuses" in _json:
+            self.rebus_statuses.restore_from_json(_json["rebus-statuses"])
+        self.start_time = TeamServer.date_from_json(_json, "start-time")
+        self.lunch_time = TeamServer.date_from_json(_json, "lunch-time")
+        self.found_goal_time = TeamServer.date_from_json(_json, "found-goal-time")
+        self.goal_time = TeamServer.date_from_json(_json, "goal-time")
+
+        if "rebus-solutions" in _json:
+            rebus_solutions = _json["rebus-solutions"]
+            for section_str in rebus_solutions:
+                rebus_solution = RebusSolution.from_json(rebus_solutions[section_str], self.rally_configuration)
+                self.rebus_solutions[int(section_str)] = rebus_solution
+        # Write the new status to disk to make it possible to easily check that the status was re-created to the same state
+        self.backup_status_to_disk()
+
+    def backup_status_to_disk(self, force=False):
         json_str = json.dumps(self.to_json(False))
-        if json_str != self.latest_backup_contents:
+        if json_str != self.latest_backup_contents or force:
             self.latest_backup_contents = json_str
-            new_backup_file = os.path.join(self.backup_path, datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
+            filename = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".srb"
+            new_backup_file = os.path.join(self.backup_path, filename)
             with open(new_backup_file, "w") as f:
                 f.write(json_str)
 
@@ -333,7 +427,7 @@ class TeamServer:
                 if rc is None:
                     self.send_messages("Error in configuration, can't find rebus {0}!".format(rebus_place.number))
                     return
-                elif rc.is_lunch:
+                elif rc.found_lunch:
                     print("Lunch!")
                     self.send_messages("Lunch!")
                     self.handle_found_lunch(rebus_place, rc)

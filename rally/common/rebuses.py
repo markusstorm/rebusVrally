@@ -17,10 +17,34 @@ class RebusStatus:
                self.given_extra_texts[RebusConfig.SOLUTION] is None
 
     def to_json(self):
-        json = {"section": self.section,
-                "given_rebuses": self.given_rebus_texts,
-                "given_extra": self.given_extra_texts}
+        json = {"section": self.section}
+        given = {}
+        for key in self.given_rebus_texts:
+            if self.given_rebus_texts[key] is not None:
+                given[RebusConfig.enum_to_string_map[key]] = self.given_rebus_texts[key]
+        json["given_rebuses"] = given
+        extra = {}
+        for key in self.given_extra_texts:
+            if self.given_extra_texts[key] is not None:
+                extra[RebusConfig.enum_to_string_map[key]] = self.given_extra_texts[key]
+        json["given_extra"] = extra
         return json
+
+    @staticmethod
+    def from_json(_json):
+        if "section" in _json:
+            section = _json["section"]
+            rs = RebusStatus(section)
+            if "given_rebuses" in _json:
+                given_json = _json["given_rebuses"]
+                for key in given_json:
+                    rs.given_rebus_texts[RebusConfig.string_to_enum_map[key]] = given_json[key]
+            if "given_extra" in _json:
+                given_json = _json["given_extra"]
+                for key in given_json:
+                    rs.given_extra_texts[RebusConfig.string_to_enum_map[key]] = given_json[key]
+            return rs
+        return None
 
     def get_text(self, rebus_type):
         return self.given_rebus_texts[rebus_type], self.given_extra_texts[rebus_type]
@@ -61,34 +85,35 @@ class RebusStatus:
 
 
 class RebusStatuses:
-    def __init__(self, rebus_configs):
-        self.rebus_status = []
-        if rebus_configs is not None:
-            for rc in rebus_configs:
-                self.rebus_status.append(RebusStatus(rc.section))
+    def __init__(self):
+        self.rebus_statuses = {}
 
     def to_json(self):
         json = []
-        for rs in self.rebus_status:
+        for rebus_number in self.rebus_statuses:
+            rs = self.rebus_statuses[rebus_number]
             if not rs.is_empty():
                 json.append(rs.to_json())
         return json
 
-    def find_rebus_section(self, section):
-        for rs in self.rebus_status:
-            if rs.section == section:
-                return rs
-        return None
+    def restore_from_json(self, _json):
+        self.rebus_statuses = {}
+        for rs_json in _json:
+            rs = RebusStatus.from_json(rs_json)
+            if rs is not None:
+                self.rebus_statuses[rs.section] = rs
 
-    def give_rebus(self, section, rebus_type, txt, extra):
-        rs = self.find_rebus_section(section)
+    def get_rebus_number(self, rebus_number):
+        if rebus_number in self.rebus_statuses:
+            return self.rebus_statuses[rebus_number]
+        rs = RebusStatus(rebus_number)
+        self.rebus_statuses[rebus_number] = rs
+        return rs
+
+    def give_rebus(self, rebus_number, rebus_type, txt, extra):
+        rs = self.get_rebus_number(rebus_number)
         rs.give_rebus(rebus_type, txt, extra)
 
     def fill_rebus_list(self, rebus_list):
-        for rs in self.rebus_status:
+        for rs in self.rebus_statuses.values():
             rs.fill_rebus_list(rebus_list)
-
-    def create_rebus(self, section):
-        rs = RebusStatus(section)
-        self.rebus_status.append(rs)
-        return rs

@@ -55,7 +55,7 @@ class StatusInformation:
         self.seating = []
         for i in range(0, 10):
             self.seating.append(Player("", 0))
-        self.rebus_statuses = RebusStatuses(None)
+        self.rebus_statuses = RebusStatuses()
         self.force_update = False
 
         self.plate_answers = []
@@ -132,9 +132,7 @@ class StatusInformation:
 
     def update_rebus_list(self, rebus_list):
         for rebus in rebus_list.rebuses:
-            rs = self.rebus_statuses.find_rebus_section(rebus.section)
-            if rs is None:
-                rs = self.rebus_statuses.create_rebus(rebus.section)
+            rs = self.rebus_statuses.get_rebus_number(rebus.section)
             txt = None
             if rebus.HasField("rebus_text"):
                 txt = rebus.rebus_text

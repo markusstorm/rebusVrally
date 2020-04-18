@@ -160,7 +160,7 @@ class RebusWindow:
         return None
 
     def on_status_updates(self, status_information):
-        for rebus_status in status_information.rebus_statuses.rebus_status:
+        for rebus_status in status_information.rebus_statuses.rebus_statuses.values():
             #print("{0}".format(rebus_status))
             for rebus_type in Rebus.rebus_types:
                 txt, extra = rebus_status.get_text(rebus_type)

@@ -32,6 +32,7 @@ class WebHandler(threading.Thread):
 
         self.flask_app.add_url_rule("/warp/<team_id>/<section>", view_func=self.warp_team, methods=['POST'])
         self.flask_app.add_url_rule("/terminate/<team_id>", view_func=self.terminate_team, methods=['POST'])
+        self.flask_app.add_url_rule("/force_backup/<team_id>", view_func=self.force_backup_team, methods=['POST'])
         self.flask_app.add_url_rule("/debug_solved_start_rebus/<team_id>", view_func=self.debug_solved_start_rebus, methods=['POST'])
         self.flask_app.add_url_rule("/debug_solved_lunch_rebus/<team_id>", view_func=self.debug_solved_lunch_rebus, methods=['POST'])
 
@@ -89,6 +90,10 @@ class WebHandler(threading.Thread):
 
     def terminate_team(self, team_id):
         self.main_server.terminate_team(int(team_id))
+        return ""
+
+    def force_backup_team(self, team_id):
+        self.main_server.force_backup_team(int(team_id))
         return ""
 
     def debug_solved_start_rebus(self, team_id):

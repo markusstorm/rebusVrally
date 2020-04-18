@@ -9,6 +9,9 @@ class RebusConfig:
     HELP = 1
     SOLUTION = 2
 
+    enum_to_string_map = {NORMAL: "Normal", HELP: "Help", SOLUTION: "Solution"}
+    string_to_enum_map = {"Normal": NORMAL, "Help": HELP, "Solution": SOLUTION}
+
     def __init__(self, rebus_xml):
         self.section = 0
         self.normal = None
@@ -50,6 +53,9 @@ class RebusConfig:
         self.is_lunch = False
         if "is_lunch" in rebus_xml.attrib:
             self.is_lunch = BaseRallyConfig.xml_attribute_to_bool(rebus_xml.attrib["is_lunch"])
+        self.found_lunch = False
+        if "found_lunch" in rebus_xml.attrib:
+            self.found_lunch = BaseRallyConfig.xml_attribute_to_bool(rebus_xml.attrib["found_lunch"])
         self.is_goal = False
         if "is_goal" in rebus_xml.attrib:
             self.is_goal = BaseRallyConfig.xml_attribute_to_bool(rebus_xml.attrib["is_goal"])

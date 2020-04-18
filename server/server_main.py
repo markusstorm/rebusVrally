@@ -95,17 +95,18 @@ else:
     backup_path = os.path.join(os.getcwd(), "backup")
     if not os.path.exists(backup_path):
         os.mkdir(backup_path)
-if not os.path.exists(backup_path):
-    print("Unable to create the backup directory")
-    sys.exit(1)
-dated_backup_path = os.path.join(backup_path, datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
-os.mkdir(dated_backup_path)
-if not os.path.exists(dated_backup_path):
-    print("Unable to create the session backup directory")
-    sys.exit(1)
-print("Using {0} as backup dir".format(dated_backup_path))
+    if not os.path.exists(backup_path):
+        print("Unable to create the backup directory")
+        sys.exit(1)
+    backup_path = os.path.join(backup_path, datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
+    if not os.path.exists(backup_path):
+        os.mkdir(backup_path)
+    if not os.path.exists(backup_path):
+        print("Unable to create the session backup directory")
+        sys.exit(1)
+print("Using {0} as backup dir".format(backup_path))
 
-main_server = MainServer(configuration, HOST, dated_backup_path)
+main_server = MainServer(configuration, HOST, backup_path)
 normal = ConnectionListener(NORMAL_PORT, main_server)
 normal.start()
 if not args.start_locally:
