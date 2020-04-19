@@ -130,6 +130,7 @@ class TeamServer:
         self.found_goal_time = None
         self.goal_time = None
         self.latest_backup_contents = ""
+        self.latest_action = datetime.datetime.now()
 
         #self.status_information = StatusInformation(rally_configuration.track_information)
         # TODO: use StatusInformation for seating and other position info?
@@ -213,6 +214,7 @@ class TeamServer:
                 solution_json[str(section)] = rebus_solution.to_json()
         _json["rebus-solutions"] = solution_json
         if verbose:
+            _json["watchdog"] = TeamServer.date_to_json(self.latest_action)
             if len(self.clients) > 0:
                 connected = []
                 for client in self.clients:
@@ -284,10 +286,12 @@ class TeamServer:
             client.send(server_to_client)
 
     def select_seat(self, select_seat_message):
+        self.latest_action = datetime.datetime.now()
         if self.minibus.select_seat(select_seat_message, self):
             self.changed = True
 
     def update_pos_from_driver(self, pos_update):
+        self.latest_action = datetime.datetime.now()
         self.minibus.update_pos_from_driver(pos_update)
 
     def give_rebus_data(self, section, rebus_type, txt, extra):
@@ -299,6 +303,7 @@ class TeamServer:
         print("LOG ACTION " + datetime.datetime.now().strftime("%Y-%m-%d, %H:%M:%S") + ": " + message)
 
     def open_rebus_solution(self, client_message):
+        self.latest_action = datetime.datetime.now()
         section = client_message.section
         #TODO: validate section based on configuration
         if 0 < section < 9:
@@ -313,6 +318,7 @@ class TeamServer:
                     self.give_rebus_data(section, RebusConfig.SOLUTION, rc.solution, extra)
 
     def set_photo_answer(self, answer_message):
+        self.latest_action = datetime.datetime.now()
         section = answer_message.section
         index = answer_message.index
         # TODO: validate section based on configuration
@@ -336,6 +342,7 @@ class TeamServer:
                         break
 
     def set_plate_answer(self, answer_message):
+        self.latest_action = datetime.datetime.now()
         section = answer_message.section
         index = answer_message.index
         # TODO: validate section based on configuration
@@ -359,6 +366,7 @@ class TeamServer:
                         break
 
     def set_rebus_answer(self, answer_message):
+        self.latest_action = datetime.datetime.now()
         section = answer_message.section
         # TODO: validate section based on configuration
         if 0 < section < 9:
@@ -371,6 +379,7 @@ class TeamServer:
                 self.changed = True
 
     def handle_found_lunch(self, rebus_place, rc):
+        self.latest_action = datetime.datetime.now()
         self.lunch_time = datetime.datetime.now()
         self.rally_stage = clientprotocol_pb2.ServerPositionUpdate.RallyStage.AT_LUNCH
         if self.minibus.current_section != rebus_place.next_section:
@@ -379,6 +388,7 @@ class TeamServer:
             self.send_messages(message)
 
     def handle_found_goal(self, rebus_place, rc):
+        self.latest_action = datetime.datetime.now()
         self.found_goal_time = datetime.datetime.now()
         self.rally_stage = clientprotocol_pb2.ServerPositionUpdate.RallyStage.AT_END
         if self.minibus.current_section != rebus_place.next_section:
@@ -387,6 +397,7 @@ class TeamServer:
             self.send_messages(message)
 
     def end_rally(self):
+        self.latest_action = datetime.datetime.now()
         self.goal_time = datetime.datetime.now()
         self.rally_stage = clientprotocol_pb2.ServerPositionUpdate.RallyStage.ENDED
         for message in self.rally_configuration.end_messages:
@@ -412,6 +423,7 @@ class TeamServer:
             self.send_messages("Hittade tyvärr ingen rebuskontroll här. Åk till någon annan plats och leta vidare!")
 
     def search_for_rebus(self):
+        self.latest_action = datetime.datetime.now()
         if self.looking_for_rebus:
             return
         if abs(self.minibus.speed) > 0.001:
@@ -456,6 +468,7 @@ class TeamServer:
         return int(diff.total_seconds()) < 60
 
     def test_rebus_solution(self, solution_req):
+        self.latest_action = datetime.datetime.now()
         ok_to_continue = not self.is_rebus_testing_locked()
         if not ok_to_continue:
             self.log_warning("Asking to test rebus solution at {0} but is locked from {1}+60 seconds".format(datetime.datetime.now(), self.lock_time))

@@ -87,6 +87,6 @@ function build_team_info(team_json) {
     s += "Lunch time: " + get_json_date_value(team_json, "lunch-time") + "<br>\n";
     s += "Arrived at goal: " + get_json_date_value(team_json, "found-goal-time") + "<br>\n";
     s += "Ended: " + get_json_date_value(team_json, "goal-time") + "<br>\n";
-
+    s += "Latest update: " + get_json_date_value(team_json, "watchdog") + "<br>\n";
     return s;
 }
