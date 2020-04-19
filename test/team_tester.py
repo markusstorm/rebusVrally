@@ -12,6 +12,7 @@ from client.client.server_connection import ServerConnection
 from rally.common.rally_version import RallyVersion
 from rally.protocol import serverprotocol_pb2, clientprotocol_pb2
 from server.server_config_finder import ServerConfigFinder
+from test.status_receiver import StatusReceiver
 
 
 class OneUser(threading.Thread):
@@ -26,6 +27,7 @@ class OneUser(threading.Thread):
         self.terminate = False
         self.user_id = None
         self.client_to_server_counter = 0
+        self.status_receiver = None
 
     def stop(self):
         self.terminate = True
@@ -40,14 +42,23 @@ class OneUser(threading.Thread):
                 print("Unable to log in {0} to the server: {1}".format(self.username, message))
                 return False, 1
 
+            self.status_receiver = StatusReceiver(self.connection, self.on_position_update)
+            self.status_receiver.start()
+
             # Select seat
             self.select_seat()
             # TODO: perform more actions
 
+            self.perform_user_role()
 
-
-            while True:
+            while not self.terminate:
                 sleep(1)
+
+    def perform_user_role(self):
+        pass
+
+    def on_position_update(self, status_information):
+        pass
 
     def select_seat(self):
         client_to_server = clientprotocol_pb2.ClientToServer()
@@ -135,15 +146,54 @@ class OneUser(threading.Thread):
         return False, None
 
 
+class Driver(OneUser):
+    def __init__(self, server_configuration, i, teamname, username, password):
+        self.status_information = None
+        OneUser.__init__(self, server_configuration, i, teamname, username, password)
+
+    def perform_user_role(self):
+        self.perform_driving()
+
+    def perform_driving(self):
+        while not self.terminate and self.status_information is None:
+            sleep(1)
+
+        while not self.terminate:
+            sleep(1)
+
+            indicator = clientprotocol_pb2.ClientPositionUpdate.NONE
+            track_information = self.server_configuration.track_information
+            section_obj = track_information.get_section(self.status_information.current_section)
+            if section_obj is not None:
+                turn = section_obj.get_correct_turn()
+                if turn is not None:
+                    indicator = turn.direction
+
+            speed = 50.0 / 3.6
+            delta_distance = speed * 1.0
+            client_to_server = clientprotocol_pb2.ClientToServer()
+            client_to_server.pos_update.SetInParent()
+            client_to_server.pos_update.speed = speed
+            client_to_server.pos_update.delta_distance = delta_distance
+            client_to_server.pos_update.current_section = 0 # TODO: is this used? Should it be removed?
+            client_to_server.pos_update.indicator = indicator
+            self.send_message_to_server(client_to_server)
+
+    def on_position_update(self, status_information):
+        self.status_information = status_information
+        print(status_information.distance)
+
+
 class Team:
     def __init__(self, server_configuration, number_of_users, teamname, password):
         self.server_configuration = server_configuration
         self.number_of_users = number_of_users
         self.teamname = teamname
+        self.password = password
         self.users = {}
         for i in range(1, number_of_users+1):
             username = "User{0}".format(i)
-            self.users[username] = OneUser(server_configuration, i, teamname, username, password)
+            self.users[username] = self.create_user(i, username)
 
     def run(self):
         for user in self.users.values():
@@ -154,6 +204,12 @@ class Team:
         # TODO: define for how long the test shall continue
         while True:
             sleep(1)
+
+    def create_user(self, seat_index, username):
+        if seat_index == 1: # Driver
+            return Driver(self.server_configuration, seat_index, self.teamname, username, self.password)
+        else:
+            return OneUser(self.server_configuration, seat_index, self.teamname, username, self.password)
 
 
 parser = argparse.ArgumentParser(description='Rebus test client. Simulates a team with some members')

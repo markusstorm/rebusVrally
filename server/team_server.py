@@ -10,6 +10,7 @@ from rally.common.status_information import Plate, Photo
 from rally.protocol import clientprotocol_pb2
 from server.minibus import MiniBus
 from server.server_config import RebusConfig
+from server.team_logger import TeamLogger, TeamActionLogger
 
 
 class RebusSolution:
@@ -119,6 +120,11 @@ class TeamServer:
         self.backup_path = os.path.join(backup_path, str(team_number))
         if not os.path.exists(self.backup_path):
             os.mkdir(self.backup_path)
+        self.logger = TeamLogger(team_number, self.backup_path)
+        self.logger.info("Starting server for {0} / {1}".format(team_number, teamname))
+        self.logger.info("Difficulty is set to: {0}".format(difficulty))
+        self.action_logger = TeamActionLogger(team_number, self.backup_path)
+        self.action_logger.info("Starting server for {0} / {1}".format(team_number, teamname))
         self.clients = []
         self.changed = True
         self.update_counter = 0
@@ -298,10 +304,6 @@ class TeamServer:
         self.rebus_statuses.give_rebus(section, rebus_type, txt, extra)
         self.changed = True
 
-    def log_action(self, message):
-        # TODO: to more permanent storage
-        print("LOG ACTION " + datetime.datetime.now().strftime("%Y-%m-%d, %H:%M:%S") + ": " + message)
-
     def open_rebus_solution(self, client_message):
         self.latest_action = datetime.datetime.now()
         section = client_message.section
@@ -310,10 +312,10 @@ class TeamServer:
             rc = self.rally_configuration.get_rebus_config(section)
             if rc is not None:
                 if client_message.open_help:
-                    self.log_action("{0} requested HELP for rebus {1} to be opened".format(client_message.user_id, section))
+                    self.action_logger.log_penalty(25, "{0} requested HELP for rebus {1} to be opened".format(client_message.user_id, section))
                     self.give_rebus_data(section, RebusConfig.HELP, rc.help, None)
                 elif client_message.open_solution:
-                    self.log_action("{0} requested SOLUTION for rebus {1} to be opened".format(client_message.user_id, section))
+                    self.action_logger.log_penalty(45, "{0} requested SOLUTION for rebus {1} to be opened".format(client_message.user_id, section))
                     extra = "{0} öst, {1} nord".format(rc.east, rc.north)
                     self.give_rebus_data(section, RebusConfig.SOLUTION, rc.solution, extra)
 
@@ -487,7 +489,7 @@ class TeamServer:
             self.rebus_solutions[solution_req.section] = rebus_solution
 
         result = rebus_solution.compare(solution_req)
-        self.log_action("Testing rebus {0} for the {1}th time with result: {2}".format(rebus_solution.rc.section, rebus_solution.test_count, result))
+        self.action_logger.info("Testing rebus {0} for the {1}th time with result: {2}".format(rebus_solution.rc.section, rebus_solution.test_count, result))
         self.changed = True
 
         if result:

@@ -198,7 +198,6 @@ class ServerRallyConfig(BaseRallyConfig):
 
         tree = ET.ElementTree(root)
         xmlstr = ET.tostring(tree.getroot(), method='xml')
-        print(xmlstr)
         return xmlstr
 
 

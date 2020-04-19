@@ -1,4 +1,3 @@
-import os
 import socket
 import tempfile
 import threading
@@ -7,13 +6,9 @@ import time
 import google
 
 import rally.common.protobuf_utils as protobuf_utils
-from client.client.subprocess_communicator import SubProcessCommunicator
 from rally.common.rally_version import RallyVersion
 from rally.common.status_information import StatusInformation
 from rally.protocol import serverprotocol_pb2, clientprotocol_pb2
-
-#HOST = '127.0.0.1'  # The server's hostname or IP address
-
 
 
 class ServerConnection(threading.Thread):
@@ -182,8 +177,6 @@ class ServerConnection(threading.Thread):
                 server_to_client = clientprotocol_pb2.ServerToClient()
                 unpack_result = server_to_client.ParseFromString(data)
                 if unpack_result > 0:
-                    data = data[unpack_result:]
-                    # print(server_to_client)
                     if server_to_client.HasField("broadcast_message"):
                         bc_message = server_to_client.broadcast_message
                         if self.message_receiver is not None:
