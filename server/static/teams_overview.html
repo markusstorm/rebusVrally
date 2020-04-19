@@ -6,8 +6,15 @@
     <script src="/static/json_functions.js"></script>
     <script src="/static/team_overview.js"></script>
     <script language="JavaScript">
+        var number_of_teams_per_row = 5;
+
         var team_status_interval = null;
         function body_loaded() {
+            const urlParams = new URLSearchParams(window.location.search);
+            teams_per_row_s = urlParams.get('row')
+            if (teams_per_row_s != undefined && teams_per_row_s.length > 0) {
+                number_of_teams_per_row = parseInt(teams_per_row_s);
+            }
             team_status_interval = setInterval(on_update_team_status_interval, 1000);
         }
 
@@ -35,9 +42,8 @@
             var col_count = 0;
             var count = 0;
             for (team_number in json_obj) {
-                col_count++;
                 count++;
-                if (col_count == 5) {
+                if (col_count == number_of_teams_per_row) {
                     col_count = 0;
                     s += "</tr><tr>";
                 }
@@ -46,6 +52,8 @@
                 s += "<h3><a href='/static/team.html?team_number=" + team_number + "'>" + get_value(team_json, "team-number") + ": " + get_value(team_json, "team-name") + "</a></h3>\n";
                 s += build_team_info(team_json);
                 s += "</td>\n";
+
+                col_count++;
             }
             s += "</tr></table>";
             if (count == 0) {

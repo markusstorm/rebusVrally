@@ -1,0 +1,62 @@
+<teams>
+  <team name="Lag1" number="1" password="1234">
+    <answer_document url=""/>
+  </team>
+  <team name="Lag2" number="2" password="2345">
+    <answer_document url=""/>
+  </team>
+  <team name="Lag3" number="3" password="3456">
+    <answer_document url=""/>
+  </team>
+  <team name="Lag4" number="4" password="4567">
+    <answer_document url=""/>
+  </team>
+  <team name="Lag5" number="5" password="5678">
+    <answer_document url=""/>
+  </team>
+  <team name="Lag6" number="6" password="6789">
+    <answer_document url=""/>
+  </team>
+  <team name="Lag7" number="7" password="7890">
+    <answer_document url=""/>
+  </team>
+  <team name="Lag8" number="8" password="8901">
+    <answer_document url=""/>
+  </team>
+  <team name="Lag9" number="9" password="9012">
+    <answer_document url=""/>
+  </team>
+  <team name="Lag10" number="10" password="0123">
+    <answer_document url=""/>
+  </team>
+  <team name="Lag11" number="11" password="abcd">
+    <answer_document url=""/>
+  </team>
+  <team name="Lag12" number="12" password="bcde">
+    <answer_document url=""/>
+  </team>
+  <team name="Lag13" number="13" password="cdef">
+    <answer_document url=""/>
+  </team>
+  <team name="Lag14" number="14" password="defg">
+    <answer_document url=""/>
+  </team>
+  <team name="Lag15" number="15" password="efgh">
+    <answer_document url=""/>
+  </team>
+  <team name="Lag16" number="16" password="fghi">
+    <answer_document url=""/>
+  </team>
+  <team name="Lag17" number="17" password="ghij">
+    <answer_document url=""/>
+  </team>
+  <team name="Lag18" number="18" password="hijk">
+    <answer_document url=""/>
+  </team>
+  <team name="Lag19" number="19" password="ijkl">
+    <answer_document url=""/>
+  </team>
+  <team name="Lag20" number="20" password="jklm">
+    <answer_document url=""/>
+  </team>
+</teams>

@@ -13,10 +13,12 @@ from rally.common.status_information import StatusInformation
 from rally.protocol import serverprotocol_pb2, clientprotocol_pb2
 
 #HOST = '127.0.0.1'  # The server's hostname or IP address
-SERVER_PORT = 63332  # The port used by the server
+
 
 
 class ServerConnection(threading.Thread):
+    SERVER_PORT = 63332  # The port used by the server
+
     def __init__(self, server, team_name, password, username, report_login_result, report_lost_connection, difficulty):
         threading.Thread.__init__(self)
         self.connection = None
@@ -92,7 +94,7 @@ class ServerConnection(threading.Thread):
 
     def login_phase(self):
         try:
-            self.connection.connect((self.server, SERVER_PORT))
+            self.connection.connect((self.server, ServerConnection.SERVER_PORT))
         except ConnectionRefusedError as e:
             print("Connection error {0}".format(e))
             # TODO: tell the user that we can't contact the server

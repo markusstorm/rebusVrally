@@ -162,6 +162,12 @@ class ServerRallyConfig(BaseRallyConfig):
                 return team
         return None
 
+    def find_team_from_id(self, team_id):
+        for team in self.allowed_teams:
+            if team.team_number == team_id:
+                return team
+        return None
+
     def get_rebus_config(self, section):
         for rebus_config in self.rebus_configs:
             if rebus_config.section == section:

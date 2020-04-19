@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Team</title>
     <script src="/static/json_functions.js"></script>
     <script src="/static/team_overview.js"></script>
     <script language="JavaScript">
@@ -19,6 +19,7 @@
                 document.getElementById("team_status").innerHTML = "No team selected!";
             } else {
                 document.getElementById("title").innerHTML = "<h1>Team " + team_number + "</h1>";
+                document.title = "Team " + team_number;
             }
         }
 
@@ -57,6 +58,7 @@
 
             var team_name = get_value(json_obj, "team-name");
             document.getElementById("title").innerHTML = "<h1>Team " + team_number + " - " + team_name + "</h1>";
+            document.title = "Team " + team_number + " - " + team_name;
         }
 
         function build_fishbone(json_obj) {

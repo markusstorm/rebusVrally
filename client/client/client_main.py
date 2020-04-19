@@ -1,14 +1,13 @@
 from tkinter import *
 
+from client.client.external_processes import SubProcessesBase
 from client.client.login_window import LoginWindow
 from client.client.main_window import MainWindow
 
 if __name__ == '__main__':
-    running_as_exe = False
-    if len(sys.argv) > 0:
-        if ".exe".casefold() in sys.argv[0].casefold():
-            print("Running the program as an executable, this will affect how the sub clients are started")
-            running_as_exe = True
+    running_as_exe = SubProcessesBase.detect_if_running_as_exe(sys.argv)
+    if running_as_exe:
+        print("Running the program as an executable, this will affect how the sub clients are started")
 
     root = Tk()
     root.withdraw()
