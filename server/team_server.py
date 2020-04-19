@@ -262,7 +262,7 @@ class TeamServer:
             filename = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".srb"
             new_backup_file = os.path.join(self.backup_path, filename)
             with open(new_backup_file, "w") as f:
-                f.write(json_str)
+                f.write(json_str.replace(",", ",\n"))
 
     def addClient(self, client):
         self.clients.append(client)
@@ -415,7 +415,8 @@ class TeamServer:
             print("Get rebus {0}".format(rebus.number))
             rc = self.rally_configuration.get_rebus_config(rebus.number)
             if rc is not None:
-                print("...and they found a rebus!")
+                print("Team {0} found rebus {1}!".format(self.teamname, rebus.number))
+                self.logger.info("Found rebus {0}".format(rebus.number))
                 self.send_messages("Hittade rebus {0}! Titta i rebus-arket!".format(rebus.number))
 
                 self.give_rebus_data(rc.section, RebusConfig.NORMAL, rc.normal, None)
@@ -473,7 +474,7 @@ class TeamServer:
         self.latest_action = datetime.datetime.now()
         ok_to_continue = not self.is_rebus_testing_locked()
         if not ok_to_continue:
-            self.log_warning("Asking to test rebus solution at {0} but is locked from {1}+60 seconds".format(datetime.datetime.now(), self.lock_time))
+            self.action_logger.log_warning("Asking to test rebus solution at {0} but is locked from {1}+60 seconds".format(datetime.datetime.now(), self.lock_time))
             return
         self.lock_time = datetime.datetime.now()
         rc = self.rally_configuration.get_rebus_config(solution_req.section)
@@ -489,7 +490,8 @@ class TeamServer:
             self.rebus_solutions[solution_req.section] = rebus_solution
 
         result = rebus_solution.compare(solution_req)
-        self.action_logger.info("Testing rebus {0} for the {1}th time with result: {2}".format(rebus_solution.rc.section, rebus_solution.test_count, result))
+        self.action_logger.info("Testing rebus {0} for the {1} time with result: {2}".format(rebus_solution.rc.section, rebus_solution.test_count, result))
+        print("Team {0} tested rebus {1} for the {2} time with result: {3}".format(self.teamname, rebus_solution.rc.section, rebus_solution.test_count, result))
         self.changed = True
 
         if result:

@@ -23,7 +23,7 @@ class MiniBus:
         json["current_section"] = self.current_section
         json["distance"] = self.distance
         if verbose:
-            json["speed"] = self.speed #TODO: when reading back, set speed to 0
+            json["speed"] = self.speed
             # Skip seating when reading back, people will have to reconnect
             seating = {}
             json["seating"] = seating

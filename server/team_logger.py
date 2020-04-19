@@ -28,14 +28,17 @@ class TeamLoggerBase:
 class TeamLogger(TeamLoggerBase):
     def __init__(self, team_id, log_path):
         self.team_id = team_id
-        logger_id = "{0}.log"
+        logger_id = "{0}.log".format(team_id)
         TeamLoggerBase.__init__(self, logger_id, log_path, "team_log.txt")
 
 
 class TeamActionLogger(TeamLoggerBase):
     def __init__(self, team_id, log_path):
-        logger_id = "{0}.actions"
+        logger_id = "{0}.actions".format(team_id)
         TeamLoggerBase.__init__(self, logger_id, log_path, "team_actions.txt")
 
     def log_penalty(self, number_of_points, message):
-        self.warning("PENALTY ({0}): {1}".format(message, number_of_points))
+        self.info("PENALTY ({0}): {1}".format(message, number_of_points))
+
+    def log_warning(self, message):
+        self.warning(message)

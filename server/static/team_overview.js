@@ -24,10 +24,10 @@ function build_team_info(team_json) {
             position += "<tr><td>Section " + minibus["current_section"] + "</td></tr>";
         }
         if (has_value(minibus, "distance")) {
-            position += "<tr><td>Distance " + minibus["distance"] + "</td></tr>";
+            position += "<tr><td>Distance " + minibus["distance"].toFixed(2) + "</td></tr>";
         }
         if (has_value(minibus, "speed")) {
-            position += "<tr><td>Speed " + minibus["speed"] + "</td></tr>";
+            position += "<tr><td>Speed " + minibus["speed"].toFixed(2) + "</td></tr>";
         }
         if (has_value(minibus, "seating")) {
             var all_user_ids = new Set();
