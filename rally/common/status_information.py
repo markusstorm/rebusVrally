@@ -46,7 +46,7 @@ class StatusInformation:
         self.looking_for_rebus = False
         self.rebus_solutions_locked = False
         self.distance = 0.0
-        self.rally_stage = clientprotocol_pb2.ServerPositionUpdate.RallyStage.NOT_STARTED
+        self.rally_stage = clientprotocol_pb2.ServerPositionUpdate.NOT_STARTED
         self.rally_is_started = False
         self.afternoon_is_started = False
         self.current_section = 1

@@ -128,7 +128,7 @@ class TeamServer:
         self.clients = []
         self.changed = True
         self.update_counter = 0
-        self.rally_stage = clientprotocol_pb2.ServerPositionUpdate.RallyStage.NOT_STARTED
+        self.rally_stage = clientprotocol_pb2.ServerPositionUpdate.NOT_STARTED
         self.looking_for_rebus = False
         self.lock_time = None
         self.start_time = datetime.datetime.now() # TODO: make sure to restore when reading from json
@@ -383,7 +383,7 @@ class TeamServer:
     def handle_found_lunch(self, rebus_place, rc):
         self.latest_action = datetime.datetime.now()
         self.lunch_time = datetime.datetime.now()
-        self.rally_stage = clientprotocol_pb2.ServerPositionUpdate.RallyStage.AT_LUNCH
+        self.rally_stage = clientprotocol_pb2.ServerPositionUpdate.AT_LUNCH
         if self.minibus.current_section != rebus_place.next_section:
             self.minibus.warp(rebus_place.next_section, 0)
         for message in self.rally_configuration.lunch_messages:
@@ -392,7 +392,7 @@ class TeamServer:
     def handle_found_goal(self, rebus_place, rc):
         self.latest_action = datetime.datetime.now()
         self.found_goal_time = datetime.datetime.now()
-        self.rally_stage = clientprotocol_pb2.ServerPositionUpdate.RallyStage.AT_END
+        self.rally_stage = clientprotocol_pb2.ServerPositionUpdate.AT_END
         if self.minibus.current_section != rebus_place.next_section:
             self.minibus.warp(rebus_place.next_section, 0)
         for message in self.rally_configuration.at_end_messages:
@@ -401,7 +401,7 @@ class TeamServer:
     def end_rally(self):
         self.latest_action = datetime.datetime.now()
         self.goal_time = datetime.datetime.now()
-        self.rally_stage = clientprotocol_pb2.ServerPositionUpdate.RallyStage.ENDED
+        self.rally_stage = clientprotocol_pb2.ServerPositionUpdate.ENDED
         for message in self.rally_configuration.end_messages:
             self.send_messages(message)
 
@@ -502,10 +502,10 @@ class TeamServer:
                 self.handle_solved_lunch_rebus()
 
     def handle_solved_morning_rebus(self):
-        self.rally_stage = clientprotocol_pb2.ServerPositionUpdate.RallyStage.MORNING
+        self.rally_stage = clientprotocol_pb2.ServerPositionUpdate.MORNING
 
     def handle_solved_lunch_rebus(self):
-        self.rally_stage = clientprotocol_pb2.ServerPositionUpdate.RallyStage.AFTERNOON
+        self.rally_stage = clientprotocol_pb2.ServerPositionUpdate.AFTERNOON
 
     def fill_plate_update(self, plate_up):
         for plate in self.plate_answers:

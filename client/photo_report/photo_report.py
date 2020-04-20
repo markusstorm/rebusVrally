@@ -101,12 +101,12 @@ def on_status_updates(status_information):
     if status_information.rally_stage != current_rally_stage:
         current_rally_stage = status_information.rally_stage
 
-        if current_rally_stage == clientprotocol_pb2.ServerPositionUpdate.RallyStage.ENDED:
+        if current_rally_stage == clientprotocol_pb2.ServerPositionUpdate.ENDED:
             disable_all_entries()
-        elif current_rally_stage == clientprotocol_pb2.ServerPositionUpdate.RallyStage.NOT_STARTED or \
-             current_rally_stage == clientprotocol_pb2.ServerPositionUpdate.RallyStage.MORNING:
+        elif current_rally_stage == clientprotocol_pb2.ServerPositionUpdate.NOT_STARTED or \
+             current_rally_stage == clientprotocol_pb2.ServerPositionUpdate.MORNING:
             enable_all_entries()
-        elif current_rally_stage != clientprotocol_pb2.ServerPositionUpdate.RallyStage.ENDED:
+        elif current_rally_stage != clientprotocol_pb2.ServerPositionUpdate.ENDED:
             disable_all_entries()
             enable_afternoon_entries()
 

@@ -27,7 +27,7 @@ class SteeringWindow:
         self.prev_sample = None
         self.rally_is_started = False
         self.afternoon_is_started = False
-        self.rally_stage = clientprotocol_pb2.ServerPositionUpdate.RallyStage.NOT_STARTED
+        self.rally_stage = clientprotocol_pb2.ServerPositionUpdate.NOT_STARTED
         self.current_gas = 0.0
         self.current_brake = 0.0
         self.backup_timeout = None
@@ -61,16 +61,16 @@ class SteeringWindow:
             return True, "Programmet har inte fått kontakt med servern än, det kan ta upp till 10 sekunder"
         if not self.rally_is_started:
             return True, "Rallyt har inte startat än"
-        if self.rally_stage == clientprotocol_pb2.ServerPositionUpdate.RallyStage.NOT_STARTED:
+        if self.rally_stage == clientprotocol_pb2.ServerPositionUpdate.NOT_STARTED:
             return True, "Lös första rebusen innan ni åker iväg"
-        if self.rally_stage == clientprotocol_pb2.ServerPositionUpdate.RallyStage.AT_LUNCH:
+        if self.rally_stage == clientprotocol_pb2.ServerPositionUpdate.AT_LUNCH:
             if not self.afternoon_is_started:
                 return True, "Eftermiddagen har inte startat än"
             return True, "Lös lunchrebusen innan ni åker iväg"
-        if self.rally_stage == clientprotocol_pb2.ServerPositionUpdate.RallyStage.AFTERNOON:
+        if self.rally_stage == clientprotocol_pb2.ServerPositionUpdate.AFTERNOON:
             if not self.afternoon_is_started:
                 return True, "Eftermiddagen har inte startat än"
-        if self.rally_stage == clientprotocol_pb2.ServerPositionUpdate.RallyStage.AT_END or self.rally_stage == clientprotocol_pb2.ServerPositionUpdate.RallyStage.ENDED:
+        if self.rally_stage == clientprotocol_pb2.ServerPositionUpdate.AT_END or self.rally_stage == clientprotocol_pb2.ServerPositionUpdate.ENDED:
             return True, "Ni har redan gått i mål!"
         return False, None
 
