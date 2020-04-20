@@ -5,7 +5,7 @@
 			<video view="front" file="#DATA#/demo_rally/data/1.mp4" fps="30.008598" start_offset_frame="200" end_frame="6900"/>
 		</videos>
         <turns>
-            <turn direction="right" frame_offset="2130" description="Right to next section" next_section="2" automatic="true"/>
+            <turn direction="right" frame_offset="2130" description="Right to next section" next_section="2" automatic="false"/>
 			<turn direction="missed" frame_offset="6800" description="Missed the correct turn" next_section="0"/>
         </turns>
         <segments>
@@ -18,7 +18,8 @@
 			<video view="front" file="#DATA#/demo_rally/data/2.mp4" fps="30.009656" start_offset_frame="700" end_frame="6200"/>
 		</videos>
         <turns>
-            <turn direction="right" frame_offset="5250" description="Right to next section" next_section="3" automatic="true"/>
+            <turn direction="right" frame_offset="5250" description="Right to next section" next_section="3" automatic="false"/>
+			<turn direction="missed" frame_offset="6100" description="Missed the correct turn" next_section="0"/>
         </turns>
         <segments>
             <segment start_lat="0" start_lon="0" end_lat="0" end_lon="0" speed_km="50" start_frame="0" end_frame="55555555"/>
@@ -30,7 +31,8 @@
 			<video view="front" file="#DATA#/demo_rally/data/3.mp4" fps="30.018246" start_offset_frame="350" end_frame="3280"/>
 		</videos>
         <turns>
-            <turn direction="left" frame_offset="1015" description="Left to next section" next_section="4" automatic="true"/>
+            <turn direction="left" frame_offset="1015" description="Left to next section" next_section="4" automatic="false"/>
+			<turn direction="missed" frame_offset="3180" description="Missed the correct turn" next_section="0"/>
         </turns>
         <segments>
             <segment start_lat="0" start_lon="0" end_lat="0" end_lon="0" speed_km="50" start_frame="0" end_frame="55555555"/>
@@ -42,7 +44,8 @@
 			<video view="front" file="#DATA#/demo_rally/data/4.mp4" fps="30.008404" start_offset_frame="1000" end_frame="7100"/>
 		</videos>
         <turns>
-            <turn direction="left" frame_offset="5250" description="Left to next section" next_section="5" automatic="true"/>
+            <turn direction="left" frame_offset="5250" description="Left to next section" next_section="5" automatic="false"/>
+			<turn direction="missed" frame_offset="7000" description="Missed the correct turn" next_section="0"/>
         </turns>
         <rebus_places>
             <rebus_place id="RK1" rebus_config_number="2" frame_offset="3030" find_frames_before="100" find_frames_after="100"/>
@@ -57,7 +60,8 @@
 			<video view="front" file="#DATA#/demo_rally/data/5.mp4" fps="30.003562" start_offset_frame="150" end_frame="16800"/>
 		</videos>
         <turns>
-            <turn direction="left" frame_offset="11000" description="Left to next section" next_section="6" automatic="true"/>
+            <turn direction="left" frame_offset="11000" description="Left to next section" next_section="6" automatic="false"/>
+			<turn direction="missed" frame_offset="16700" description="Missed the correct turn" next_section="0"/>
         </turns>
         <rebus_places>
             <rebus_place id="RK2" rebus_config_number="3" frame_offset="1350" find_frames_before="100" find_frames_after="100"/>
@@ -72,6 +76,9 @@
 		<videos>
 			<video view="front" file="#DATA#/demo_rally/data/6.mp4" fps="30.002796" start_offset_frame="1400" end_frame="21000"/>
 		</videos>
+        <turns>
+			<turn direction="missed" frame_offset="20900" description="Missed the correct turn" next_section="0"/>
+        </turns>
         <rebus_places>
             <rebus_place id="RK4" rebus_config_number="9" frame_offset="2330" find_frames_before="100" find_frames_after="100" next_section="6"/>
 			<rebus_place id="RK5" rebus_config_number="6" frame_offset="8600" find_frames_before="100" find_frames_after="100"/>

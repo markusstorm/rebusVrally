@@ -177,6 +177,8 @@ class LoginWindow:
         if config != None:
             self.current_login_configuration = config
 
+        self.difficulty_combobox["values"] = self.current_login_configuration.get_difficulties()
+
         self.handle_local_server()
 
         # Get settings from the rally configuration
