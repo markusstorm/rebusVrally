@@ -143,7 +143,7 @@ class TeamServer:
 
         self.rebus_statuses = RebusStatuses()
 
-        self.minibus = MiniBus(rally_configuration.track_information, self.difficulty)
+        self.minibus = MiniBus(rally_configuration.track_information, self.difficulty, self)
         self.plate_answers = []
         self.photo_answers = []
         self.rebus_answers = {}

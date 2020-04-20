@@ -32,14 +32,14 @@ class SteeringWindow:
         self.current_brake = 0.0
         self.backup_timeout = None
         self.backing = False
+        self.driven_too_far = False
         self.stopped = True
         self.indicator_light = SteeringWindow.NONE
         self.showing_message = False
 
         self.window = None
         self.speed_variable = None
-        self.looking_for_rebus_label = None
-        self.backing_label = None
+        self.notice_label = None
         self.speed_indicator_image = None
         self.speed_indicator_label = None
         self.turn_indicator_images = {}
@@ -134,8 +134,7 @@ class SteeringWindow:
         self.backup_label.grid(row=3, column=0)
         self.backup_label.bind("<Button-1>", self.backup_clicked)
 
-        self.looking_for_rebus_label = Label(self.window, text="Letar efter rebus!", font=("Arial Bold", 30), background="blue")
-        self.backing_label = Label(self.window, text="Backar...", font=("Arial Bold", 30), background="blue")
+        self.notice_label = Label(self.window, text="", font=("Arial Bold", 30), background="blue")
 
     def run(self):
         self.window.after(1, self.update_speed)
@@ -144,23 +143,11 @@ class SteeringWindow:
         self.sub_client_communicator.stop()
 
     def on_pos_update(self, status_information):
-        #print(self.speed, status_information.speed, self.distance, status_information.distance)
-        if self.backing:
-            self.backing_label.place(x=140, y=250)
-        else:
-            if self.backing_label is not None:
-                self.backing_label.place_forget()
-
         self.stopped = status_information.stopped or status_information.looking_for_rebus
-        #if self.stopped:
         self.distance = status_information.distance
+
         if status_information.looking_for_rebus != self.looking_for_rebus:
             self.looking_for_rebus = status_information.looking_for_rebus
-            if self.looking_for_rebus:
-                self.looking_for_rebus_label.place(x=80, y=250)
-            else:
-                if self.looking_for_rebus_label is not None:
-                    self.looking_for_rebus_label.place_forget()
 
         self.rally_is_started = status_information.rally_is_started
         self.afternoon_is_started = status_information.afternoon_is_started
@@ -176,6 +163,26 @@ class SteeringWindow:
                 self.indicator_light = SteeringWindow.NONE
                 self.current_section = status_information.current_section
                 self.update_turn_indicators()
+
+        section = self.track_information.get_section(self.current_section)
+        self.driven_too_far = section.missed_all_turns(self.distance)
+
+        notice = None
+        if self.looking_for_rebus:
+            notice = "Letar efter rebus!"
+            pos = [80, 250]
+        elif self.backing:
+            notice = "Backar..."
+            pos = [140, 250]
+        elif self.driven_too_far:
+            notice = "Ni har tyvärr kört fel.\nBacka och leta\nupp rätt väg."
+            pos = [50, 200]
+        if notice is not None:
+            self.notice_label["text"] = notice
+            self.notice_label.place(x=pos[0], y=pos[1])
+        else:
+            if self.notice_label is not None:
+                self.notice_label.place_forget()
 
     def send_to_client(self):
         if not self.connected:
@@ -332,8 +339,8 @@ class SteeringWindow:
                 self.backup_timeout = None
 
         # section = self.track_information.get_section(self.current_section)
-        # if interpolated_distance > section.get_default_end_distance():
-        #     interpolated_distance = section.get_default_end_distance()
+        # if section.missed_all_turns(interpolated_distance):
+        #     self.driven_too_far = True
 
         if self.backing:
             if self.backup_timeout is not None:
@@ -359,8 +366,7 @@ class SteeringWindow:
         drag_force = self.speed * self.speed * drag_constant
         drag_acc = drag_force  # / car_mass
 
-        delta = (
-                            acc - drag_acc) * 0.1 / 8  # 0.1sec, but the acceleration was too quick for some reason, so divide by 10
+        delta = (acc - drag_acc) * 0.1 / 8  # 0.1sec, but the acceleration was too quick for some reason, so divide by 10
         self.speed += delta
 
         # generellt motstånd

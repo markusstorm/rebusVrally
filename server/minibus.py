@@ -4,7 +4,8 @@ from rally.protocol import clientprotocol_pb2, serverprotocol_pb2
 
 
 class MiniBus:
-    def __init__(self, track_information, difficulty):
+    def __init__(self, track_information, difficulty, teamserver):
+        self.teamserver = teamserver
         self.track_information = track_information
         self.difficulty = difficulty
         self.stopped = True
@@ -13,6 +14,7 @@ class MiniBus:
         self.distance = track_information.get_section(self.current_section).get_start_distance()
         self.indicator_light = clientprotocol_pb2.ClientPositionUpdate.NONE
         self.force_update = False
+        self.incorrect_turns = {}
 
         self.seating = []
         for i in range(0, 10):
@@ -22,6 +24,7 @@ class MiniBus:
         json = {}
         json["current_section"] = self.current_section
         json["distance"] = self.distance
+        json["incorrect_turns"] = self.incorrect_turns
         if verbose:
             json["speed"] = self.speed
             # Skip seating when reading back, people will have to reconnect
@@ -39,6 +42,8 @@ class MiniBus:
             self.current_section = _json["current_section"]
         if "distance" in _json:
             self.distance = _json["distance"]
+        if "incorrect_turns" in _json:
+            self.incorrect_turns = _json["incorrect_turns"]
 
     def warp(self, section_number, frame):
         print("Warping to section {0} frame {1}".format(section_number, frame))
@@ -62,13 +67,14 @@ class MiniBus:
                 self.distance = section.get_default_end_distance()
         if pos_update.HasField("indicator"):
             self.indicator_light = pos_update.indicator
-        # TODO: this just moves the car into the next section automatically, require the user to turn instead
-        # TODO: use self.indicator_light instead
-        #section = self.track_information.get_section(self.current_section)
+
         turn = section.get_correct_turn()
+        turning_handled = False
         if turn is not None:
             turn_distance = section.calculate_default_video_distance_from_frame(turn.frame_offset)
-            if turn_distance <= self.distance <= turn_distance+100:
+            if turn_distance <= self.distance <= turn_distance+100: # TODO: possibly less than 100 meters
+                # TODO: Handle when the driver is signalling a turn but it is a wrong turn (TURN_WRONG)
+                turning_handled = True
                 turn_matched = False
                 if turn.direction == Turn.STRAIGHT_AHEAD and self.indicator_light == clientprotocol_pb2.ClientPositionUpdate.NONE:
                     turn_matched = True
@@ -84,7 +90,22 @@ class MiniBus:
                     self.distance = next_section.get_start_distance()
                     self.force_update = True
                 else:
+                    # TODO: less logging from this
                     print("Not taking turn to next section because there is no indicator light")
+        if not turning_handled:
+            # The above code didn't find a normal turn to handle, so check if the driver has gone too far
+            if section.missed_all_turns(self.distance):
+                # The team has missed the exit and has ended up at the end of the video
+                self.mark_missed_turn(section.section_number, section.get_last_turn())
+                # No need to do anything else here, the steering GUI will also tell the driver that he's gone too far
+
+    def mark_missed_turn(self, section_number, turn):
+        # Type is TURN_WRONG or TURN_MISSED
+        turn_type_str = Turn.direction_translation_to_string[turn.direction]
+        turn_id = "{0}-{1}".format(section_number, turn.frame_offset)
+        if turn_id not in self.incorrect_turns:
+            self.teamserver.action_logger.log_penalty(5, "{0} turn {1} in section {2}".format(turn_type_str, turn_id, section_number))
+        self.incorrect_turns[turn_id] = turn_type_str
 
     def fill_pos_update(self, pu):
         pu.stopped = self.stopped

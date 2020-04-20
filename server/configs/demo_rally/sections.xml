@@ -6,6 +6,7 @@
 		</videos>
         <turns>
             <turn direction="right" frame_offset="2130" description="Right to next section" next_section="2" automatic="true"/>
+			<turn direction="missed" frame_offset="6800" description="Missed the correct turn" next_section="0"/>
         </turns>
         <segments>
             <segment start_lat="0" start_lon="0" end_lat="0" end_lon="0" speed_km="50" start_frame="0" end_frame="55555555"/>

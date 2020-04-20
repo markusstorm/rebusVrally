@@ -1,15 +1,21 @@
 import os
+import sys
 import xml.etree.ElementTree as ET
 
 
 class Turn:
+    TURN_MISSED = -1
+    TURN_WRONG = 0
     TURN_LEFT = 1
     TURN_RIGHT = 2
     STRAIGHT_AHEAD = 3
+    direction_translation_to_enum = {"missed": TURN_MISSED, "wrong": TURN_WRONG, "left": TURN_LEFT,
+                             "right": TURN_RIGHT, "straight": STRAIGHT_AHEAD}
+    direction_translation_to_string = {TURN_MISSED: "missed", TURN_WRONG: "wrong", TURN_LEFT: "left",
+                             TURN_RIGHT: "right", STRAIGHT_AHEAD: "straight"}
 
     def __init__(self, turn):
-        direction_translation = {"left": Turn.TURN_LEFT, "right": Turn.TURN_RIGHT, "straight": Turn.STRAIGHT_AHEAD}
-        self.direction = direction_translation[turn.attrib["direction"]]
+        self.direction = Turn.direction_translation_to_enum[turn.attrib["direction"]]
         self.frame_offset = int(turn.attrib["frame_offset"])
         self.description = None
         if "description" in turn.attrib:
@@ -232,8 +238,37 @@ class Section:
 
     def get_correct_turn(self):
         for turn in self.turns:
-            if turn.next_section is not None:
+            if turn.next_section is not None and turn.next_section > 0 and turn.direction != Turn.TURN_WRONG and turn.direction != Turn.TURN_MISSED:
                 return turn
+
+    def get_closest_turn(self, frame):
+        best_match = None
+        best_diff = sys.maxsize
+        for turn in self.turns:
+            diff = abs(turn.frame_offset - frame)
+            if diff < best_diff:
+                best_diff = diff
+                best_match = turn
+        return best_match
+
+    def get_last_turn(self):
+        highest_frame = 0
+        latest_turn = None
+        for turn in self.turns:
+            if turn.frame_offset > highest_frame:
+                highest_frame = turn.frame_offset
+                latest_turn = turn
+        return latest_turn
+
+    def missed_all_turns(self, distance):
+        """ Returns True if the driver has passed the last turn and it is a "MISSED" turn. """
+        last_turn = self.get_last_turn()
+        if last_turn is not None:
+            if last_turn.direction == Turn.TURN_MISSED:
+                last_turn_distance = self.calculate_default_video_distance_from_frame(last_turn.frame_offset)
+                if distance >= last_turn_distance:
+                    return True
+        return False
 
     def get_start_distance(self):
         # All sections start at distance 0.0 (which is the same as start_offset_frame)
@@ -310,6 +345,11 @@ class Section:
         xml_videos = ET.SubElement(xml_section, "videos")
         for video in self.videos.values():
             video.build_client_config_xml(xml_videos)
+        xml_turns = ET.SubElement(xml_section, "turns")
+        for turn in self.turns:
+            # Only send incorrect turns to the client, it's the only thing used at the moment, and don't show too much about the rally to any nosy user
+            if turn.direction == Turn.TURN_MISSED:
+                ET.SubElement(xml_turns, "turn", direction=Turn.direction_translation_to_string[turn.direction], frame_offset=str(turn.frame_offset), description="", next_section=str(turn.next_section))
         self.segments.build_client_config_xml(xml_section)
 
     def get_default_video(self):
