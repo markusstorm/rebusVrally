@@ -229,6 +229,11 @@ class RebusSolver(OneUser):
                 self.solve_rebus()
 
     def look_for_rebus(self):
+        if self.team.which_rebus == 5 or self.team.which_rebus == 9:
+            print("Workaround for lunch")
+            self.team.which_rebus = 5
+            self.team.phase = Team.SOLVING_REBUS
+            return
         client_to_server = clientprotocol_pb2.ClientToServer()
         client_to_server.search_for_rebus.SetInParent()
         client_to_server.search_for_rebus.dummy = 0;
@@ -366,8 +371,8 @@ class Team:
             sys.exit(1)
 
         while True:
-            sleep(1)
-            print("Team phase: {0}".format(self.phase))
+            sleep(10)
+            print("{1}: Team phase: {0}".format(self.phase, args.team_id))
 
     def create_user(self, seat_index, username):
         if seat_index == 1: # Driver

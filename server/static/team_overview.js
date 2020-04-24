@@ -88,5 +88,58 @@ function build_team_info(team_json) {
     s += "Arrived at goal: " + get_json_date_value(team_json, "found-goal-time") + "<br>\n";
     s += "Ended: " + get_json_date_value(team_json, "goal-time") + "<br>\n";
     s += "Latest update: " + get_json_date_value(team_json, "watchdog") + "<br>\n";
+
+    // Rebus overview
+    s += "<table border='1'><tr>";
+    for (var rebus_number = 1; rebus_number < 9; rebus_number++) {
+        var rn_s = rebus_number.toString();
+        var normal = "";
+        var help = "";
+        var solution = "";
+        var solved = false;
+        var test_count = 0;
+        if (has_value(team_json, "rebus-solutions")) {
+            rebus_solutions = team_json["rebus-solutions"];
+            if (has_value(rebus_solutions, rn_s)) {
+                rebus_solution = rebus_solutions[rn_s];
+                test_count = parseInt(get_value(rebus_solution, "test_count", "0"));
+                solved = get_value(rebus_solution, "solved", false);
+            }
+        }
+        if (has_value(team_json, "rebus-statuses")) {
+            rebus_statuses = team_json["rebus-statuses"];
+            for (index in rebus_statuses) {
+                rebus_status = rebus_statuses[index];
+                status_rebus_number = parseInt(get_value(rebus_status, "rebus-number", "0"));
+                if (status_rebus_number == rebus_number) {
+                    var given = get_value(rebus_status, "given_rebuses", null);
+                    normal = get_value(given, "Normal", "");
+                    help = get_value(given, "Help", "");
+                    solution = get_value(given, "Solution", "");
+                }
+            }
+        }
+
+        var status = "";
+        var color = "";
+        if (normal.length > 0) {
+            status = "N";
+            color = solved ? "green" : "cyan";
+        }
+        if (help.length > 0) {
+            status = "H";
+            color = solved ? "yellow" : "orange";
+        }
+        if (solution.length > 0) {
+            status = "S";
+            color = solved ? "red" : "magenta";
+        }
+        if (status.length > 0) {
+            status += test_count;
+        }
+        s += "<td style='background-color: " + color + "'>" + status + "</td>";
+    }
+    s += "</tr></table>";
+
     return s;
 }

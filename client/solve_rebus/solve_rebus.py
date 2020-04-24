@@ -85,7 +85,15 @@ def on_status_updates(status_information):
     global latest_status_information
     latest_status_information = status_information
     update_solution_text(False)
-    if status_information.rebus_solutions_locked:
+
+    already_solved = False
+    rebus_number = int(combo_select_rebus_number.get())
+    if rebus_number in latest_status_information.rebus_solutions:
+        solution = latest_status_information.rebus_solutions[rebus_number]
+        if solution.target_east > 0 and solution.target_north > 0:
+            already_solved = True
+
+    if status_information.rebus_solutions_locked or already_solved:
         test_solution_button["state"] = "disabled"
     else:
         test_solution_button["state"] = "normal"

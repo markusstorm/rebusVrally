@@ -495,6 +495,7 @@ class TeamServer:
         self.changed = True
 
         if result:
+            self.lock_time = None
             # The correct solution was found, now the team can move on
             if rc.is_start:
                 self.handle_solved_morning_rebus()
