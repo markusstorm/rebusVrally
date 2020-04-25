@@ -87,6 +87,9 @@ class SubProcessesBase:
         self.started_processes = []
         self.process_templates = []
 
+    def __del__(self):
+        self.stop_processes()
+
     def start_processes(self):
         for template in self.process_templates:
             self.start_process(template)

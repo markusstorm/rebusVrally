@@ -54,6 +54,11 @@ class LoginWindow:
 
         self.layout()
 
+    def __del__(self):
+        if self.local_server_process is not None:
+            self.local_server_process.terminate()
+            self.local_server_process = None
+
     def run(self):
         self.login_window.mainloop()
         self.login_window.destroy()

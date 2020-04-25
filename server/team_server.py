@@ -436,9 +436,8 @@ class TeamServer:
         if section is not None:
             rebus_place = section.find_nearby_rebus_place(self.minibus.distance)
             search_time = 15 + random.randrange(0, 45) # It can take up to 1 minute to find the rebus
-            #DEBUG!
-            print("TODO: remove debug time for searching for rebus!")
-            search_time = 1
+            #print("TODO: remove debug time for searching for rebus!")
+            #search_time = 1
 
             if rebus_place is None:
                 print("Warning: no rebus at that place...")
@@ -490,7 +489,7 @@ class TeamServer:
             self.rebus_solutions[solution_req.section] = rebus_solution
 
         result = rebus_solution.compare(solution_req)
-        self.action_logger.info("Testing rebus {0} for the {1} time with result: {2}".format(rebus_solution.rc.section, rebus_solution.test_count, result))
+        self.action_logger.info("Testing rebus {0} with proposed solution '{3}' at E{4}N{5} for the {1} time with result: {2}".format(rebus_solution.rc.section, rebus_solution.test_count, result, solution_req.answer, solution_req.map_east, solution_req.map_north))
         print("Team {0} tested rebus {1} for the {2} time with result: {3}".format(self.teamname, rebus_solution.rc.section, rebus_solution.test_count, result))
         self.changed = True
 
