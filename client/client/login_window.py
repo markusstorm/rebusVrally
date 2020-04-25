@@ -167,8 +167,8 @@ class LoginWindow:
             return
 
         if self.running_as_exe:
-            args = ["server_main.exe", "-i", self.current_login_configuration.rally_id, "-l"]
-            working_dir = os.getcwd()
+            args = ["server/server_main.exe", "-i", self.current_login_configuration.rally_id, "-l"]
+            working_dir = os.path.join(os.getcwd(), "server")
         else:
             program = os.path.abspath(os.path.join(os.getcwd(), "../../server/server_main.py"))
             args = [sys.executable, program, "-i", self.current_login_configuration.rally_id, "-l"]

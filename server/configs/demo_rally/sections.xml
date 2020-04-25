@@ -1,8 +1,9 @@
 <sections start_section="1">
-	<!-- TODO: remove 55555555 -->
     <section number="1">
 		<videos>
 			<video view="front" file="#DATA#/demo_rally/data/1.mp4" fps="30.008598" start_offset_frame="200" end_frame="6900"/>
+			<video view="left" file="#DATA#/demo_rally/data/1.mp4" fps="30.008598" start_offset_frame="200" end_frame="6900"/>
+			<video view="right" file="#DATA#/demo_rally/data/1.mp4" fps="30.008598" start_offset_frame="200" end_frame="6900"/>
 		</videos>
         <turns>
             <turn direction="right" frame_offset="2130" description="Right to next section" next_section="2" automatic="false"/>
@@ -16,6 +17,8 @@
     <section number="2">
 		<videos>
 			<video view="front" file="#DATA#/demo_rally/data/2.mp4" fps="30.009656" start_offset_frame="700" end_frame="6200"/>
+			<video view="left" file="#DATA#/demo_rally/data/2.mp4" fps="30.009656" start_offset_frame="700" end_frame="6200"/>
+			<video view="right" file="#DATA#/demo_rally/data/2.mp4" fps="30.009656" start_offset_frame="700" end_frame="6200"/>
 		</videos>
         <turns>
             <turn direction="right" frame_offset="5250" description="Right to next section" next_section="3" automatic="false"/>
@@ -29,6 +32,8 @@
     <section number="3">
 		<videos>
 			<video view="front" file="#DATA#/demo_rally/data/3.mp4" fps="30.018246" start_offset_frame="350" end_frame="3280"/>
+			<video view="left" file="#DATA#/demo_rally/data/3.mp4" fps="30.018246" start_offset_frame="350" end_frame="3280"/>
+			<video view="right" file="#DATA#/demo_rally/data/3.mp4" fps="30.018246" start_offset_frame="350" end_frame="3280"/>
 		</videos>
         <turns>
             <turn direction="left" frame_offset="1015" description="Left to next section" next_section="4" automatic="false"/>
@@ -42,6 +47,8 @@
     <section number="4">
 		<videos>
 			<video view="front" file="#DATA#/demo_rally/data/4.mp4" fps="30.008404" start_offset_frame="1000" end_frame="7100"/>
+			<video view="left" file="#DATA#/demo_rally/data/4.mp4" fps="30.008404" start_offset_frame="1000" end_frame="7100"/>
+			<video view="right" file="#DATA#/demo_rally/data/4.mp4" fps="30.008404" start_offset_frame="1000" end_frame="7100"/>
 		</videos>
         <turns>
             <turn direction="left" frame_offset="5250" description="Left to next section" next_section="5" automatic="false"/>
@@ -58,6 +65,8 @@
     <section number="5">
 		<videos>
 			<video view="front" file="#DATA#/demo_rally/data/5.mp4" fps="30.003562" start_offset_frame="150" end_frame="16800"/>
+			<video view="left" file="#DATA#/demo_rally/data/5.mp4" fps="30.003562" start_offset_frame="150" end_frame="16800"/>
+			<video view="right" file="#DATA#/demo_rally/data/5.mp4" fps="30.003562" start_offset_frame="150" end_frame="16800"/>
 		</videos>
         <turns>
             <turn direction="left" frame_offset="11000" description="Left to next section" next_section="6" automatic="false"/>
@@ -75,6 +84,8 @@
     <section number="6">
 		<videos>
 			<video view="front" file="#DATA#/demo_rally/data/6.mp4" fps="30.002796" start_offset_frame="1400" end_frame="21000"/>
+			<video view="left" file="#DATA#/demo_rally/data/6.mp4" fps="30.002796" start_offset_frame="1400" end_frame="21000"/>
+			<video view="right" file="#DATA#/demo_rally/data/6.mp4" fps="30.002796" start_offset_frame="1400" end_frame="21000"/>
 		</videos>
         <turns>
 			<turn direction="missed" frame_offset="20900" description="Missed the correct turn" next_section="0"/>
@@ -95,6 +106,8 @@
     <section number="7">
 		<videos>
 			<video view="front" file="#DATA#/demo_rally/data/goal.mp4" fps="30" start_offset_frame="0" end_frame="1799"/>
+			<video view="left" file="#DATA#/demo_rally/data/goal.mp4" fps="30" start_offset_frame="0" end_frame="1799"/>
+			<video view="right" file="#DATA#/demo_rally/data/goal.mp4" fps="30" start_offset_frame="0" end_frame="1799"/>
 		</videos>
         <turns>
             <turn direction="straight" frame_offset="1500" description="Loop" next_section="8" automatic="true"/>
