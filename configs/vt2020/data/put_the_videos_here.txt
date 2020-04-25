@@ -1,0 +1,2 @@
+Put the data files for the real rally here!
+There should be a lot of ".dat" files in this same folder when you are ready.

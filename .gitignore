@@ -3,6 +3,7 @@ _site/
 __pycache__
 *.mov
 *.mp4
+*.dat
 .idea
 build
 dist
