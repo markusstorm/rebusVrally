@@ -81,9 +81,16 @@ class BaseConfigFinder:
         highest_config = None
         for config in self.rally_configs:
             if config.seq_number > highest_seq:
-                highest_seq = config.seq_number
-                highest_config = config
-        return highest_config
+                if config.validate_data_files():
+                    print("Validated ok: {0}".format(config.config_file))
+                    highest_seq = config.seq_number
+                    highest_config = config
+        if highest_config is not None:
+            return highest_config
+        # No configuration was validated as OK... just return the first one
+        if len(self.rally_configs) > 0:
+            return self.rally_configs[0]
+        return None
 
     def get_all_titles(self):
         titles = []

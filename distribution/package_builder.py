@@ -76,7 +76,7 @@ client_conf_folder = os.path.abspath(os.path.join(target_dir, "configs"))
 if not os.path.exists(client_conf_folder):
     os.mkdir(client_conf_folder)
 
-sync_source_folder("configs", client_conf_folder, (r'.*\.dat$',))
+sync_source_folder("configs", client_conf_folder, (r'.*\.dat$', r'vt2020',))
 
 # ----------------------------------------------------------
 # Server

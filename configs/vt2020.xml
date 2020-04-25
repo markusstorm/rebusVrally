@@ -1,4 +1,4 @@
 <?xml version='1.0' encoding='utf8'?>
-<rally title="S&#246;tg&#246;tarnas rebus(V)rally vt2020" id="vt2020" seq_number="20201" has_difficulty="false" login_background="#LOCATION#/vt2020/data/goethe.png">
+<rally title="S&#246;tg&#246;tarnas rebus(V)rally vt2020" id="vt2020" seq_number="20201" has_difficulty="false" login_background="#LOCATION#/vt2020/data/goethe.png" file_list="#LOCATION#/vt2020/files.xml">
   <login_details server_address="sotgotarna.spdns.org" team="" password="" username=""/>
 </rally>

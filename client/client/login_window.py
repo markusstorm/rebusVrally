@@ -29,7 +29,7 @@ class LoginWindow:
 
         self.config_finder = ClientConfigFinder(ask_for_other_location=self.ask_for_other_location)
         if len(self.config_finder.rally_configs) == 0:
-            print("ERROR! Unable to find a configuration") #TODO: messagebox instead
+            messagebox.showerror("Konfigurationsfel", "Kan inte hitta någon rally-konfiguration", parent=self.login_window)
             self.login_window.destroy()
             return
 
@@ -50,6 +50,7 @@ class LoginWindow:
         self.username_sv = None
         self.usernameEntry = None
         self.loginButton = None
+        self.login_frame = None
         self.entries = []
 
         self.layout()
@@ -70,14 +71,8 @@ class LoginWindow:
         return filename
 
     def layout(self):
-        if self.current_login_configuration.login_background is not None:
-            self.photos_img = ImageTk.PhotoImage(Image.open(self.current_login_configuration.login_background))
-            w = self.photos_img.width()
-            h = self.photos_img.height()
-            self.login_window.geometry('%dx%d+0+0' % (w, h))
-
-            self.background_label = Label(self.login_window, image=self.photos_img)
-            self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
+        self.background_label = Label(self.login_window, image=self.photos_img)
+        self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
         f = Frame(self.login_window, width=100, height=100)
 
@@ -138,15 +133,23 @@ class LoginWindow:
 
         f.pack()
         f.update()
+        self.login_frame = f
+
+        self.update_layout()
+        self.update_login_information()
+
+    def update_layout(self):
+        if self.current_login_configuration.login_background is not None:
+            self.photos_img = ImageTk.PhotoImage(Image.open(self.current_login_configuration.login_background))
+            w = self.photos_img.width()
+            h = self.photos_img.height()
+            self.login_window.geometry('%dx%d' % (w, h))
+            self.background_label["image"] = self.photos_img
 
         if self.current_login_configuration.login_background is not None:
-            f.place(x=max((w - f.winfo_width()) / 2, 0), y=max(0, h - f.winfo_height()))
+            self.login_frame.place(x=max((w - self.login_frame.winfo_width()) / 2, 0), y=max(0, h - self.login_frame.winfo_height()))
         else:
-            f.grid(row=0, column=0)
-
-        #self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
-
-        self.update_login_information()
+            self.login_frame.grid(row=0, column=0)
 
     def on_rally_cb_changed(self, data):
         self.update_login_information()
@@ -179,7 +182,7 @@ class LoginWindow:
     def update_login_information(self):
         selected_config_title = self.configuration_combobox.get()
         config = self.config_finder.get_rally_from_title(selected_config_title)
-        if config != None:
+        if config is not None:
             self.current_login_configuration = config
 
         self.difficulty_combobox["values"] = self.current_login_configuration.get_difficulties()
@@ -208,6 +211,14 @@ class LoginWindow:
         self.teamname_sv.set(teamname)
         self.password_sv.set(password)
         self.username_sv.set(username)
+
+        self.update_layout()
+
+        if not self.current_login_configuration.validate_data_files():
+            message = ""
+            for i in range(min(len(self.current_login_configuration.errors), 10)):
+                message += self.current_login_configuration.errors[i] + "\n"
+            messagebox.showwarning("Varning! Det saknas filer för denna konfiguration!", message, parent=self.login_window)
 
     def validateLoginFunction(self):
         server = self.server_sv.get().strip()
@@ -242,7 +253,7 @@ class LoginWindow:
 
         self.server_connection = None
 
-        messagebox.showerror("Login error", message, parent=self.login_window)
+        messagebox.showerror("Fel vid inloggning", message, parent=self.login_window)
 
         for entry in self.entries:
             entry.config(state="normal")

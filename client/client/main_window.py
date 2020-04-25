@@ -178,7 +178,7 @@ class MainWindow:
     def on_lost_connection(self):
         if self.main_window is not None:
             try:
-                messagebox.showerror("Lost connection to server", "Lost connection to server", parent=self.main_window)
+                messagebox.showerror("Förlorad koppling", "Förlorade kopplingen till servern", parent=self.main_window)
             except:
                 pass
         self.close_main_window()
