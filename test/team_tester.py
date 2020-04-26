@@ -119,8 +119,8 @@ class OneUser(threading.Thread):
                 return True, 2, None
             except google.protobuf.message.DecodeError as e:
                 return False, 3, "Incorrect message from {0} disconnected from {1}: {2}".format(self.username, self.team_server.teamname, e)
-            except Exception as e:
-                return False, 4, "Unknown error in communication from {0} disconnected from {1}: {2}".format(self.username,self.team_server.teamname, e)
+            # except Exception as e:
+            #     return False, 4, "Unknown error in communication from {0} disconnected from {1}: {2}".format(self.username,self.team_server.teamname, e)
         return False, 5, "Terminated"
 
     def send_message_to_server(self, client_to_server):

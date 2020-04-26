@@ -64,6 +64,7 @@ class StatusInformation:
         self.photo_answers_seq = 0
         self.rebus_answers = {}
         self.rebus_solutions = {}
+        self.extra_puzzles = {}
 
     def get_my_seat(self):
         for i in range(1, 10):
@@ -94,7 +95,6 @@ class StatusInformation:
             self.force_update = pos_update.force_update
 
     def update_status(self, status_update):
-        # TODO: complete this code
         if status_update.HasField("pos_update"):
             self.update_pos(status_update.pos_update)
         if status_update.HasField("bus_seating"):
@@ -109,6 +109,8 @@ class StatusInformation:
             self.update_rebus_status(status_update.rebus_answers)
         if status_update.HasField("rebus_solutions"):
             self.update_rebus_solutions(status_update.rebus_solutions)
+        if status_update.HasField("extra_puzzles"):
+            self.update_extra_puzzles(status_update.extra_puzzles)
 
     def update_seating(self, seating_update):
         for i in range(0, 10):
@@ -175,6 +177,19 @@ class StatusInformation:
         for solution in rebus_solutions.rebus_solutions:
             rs = RebusSolution(solution)
             self.rebus_solutions[rs.section] = rs
+
+    def update_extra_puzzles(self, extra_puzzles):
+        for extra_puzzle in extra_puzzles.extra_puzzles:
+            if extra_puzzle.HasField("puzzle_id"):
+                id = extra_puzzle.puzzle_id
+                opened = False
+                if extra_puzzle.HasField("opened"):
+                    opened = extra_puzzle.opened
+                if opened:
+                    instructions = "Öppnat! Men inga instruktioner tillgängliga..."
+                    if extra_puzzle.HasField("instructions"):
+                        instructions = extra_puzzle.instructions
+                    self.extra_puzzles[id] = instructions
 
     def compare_plate_or_photo_lists(self, l1, l2):
         if len(l1) != len(l2):

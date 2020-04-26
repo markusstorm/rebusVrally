@@ -23,6 +23,14 @@ class Turn:
         self.next_section = None
         if "next_section" in turn.attrib:
             self.next_section = int(turn.attrib["next_section"])
+        self.automatic = False
+        if "automatic" in turn.attrib:
+            self.automatic = Turn.xml_attribute_to_bool(turn.attrib["automatic"])
+        self.already_warned = False # To stop warnings from being printed several times
+
+    @staticmethod
+    def xml_attribute_to_bool(value):
+        return value.strip().casefold() == "true".casefold()
 
 
 class RebusPlace:

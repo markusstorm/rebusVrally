@@ -74,6 +74,17 @@ class VideoProcessTemplate(ProcessTemplate):
         args.append(str(self.direction))
 
 
+class ExtraTasksProcessTemplate(ProcessTemplate):
+    def __init__(self, running_as_exe, client_udp_port, rally_configuration, rally_conf_file, data_path, user_id, my_index, title, program, valid_seats):
+        ProcessTemplate.__init__(self, running_as_exe, client_udp_port, rally_conf_file, data_path, user_id, my_index, title, program, valid_seats)
+        self.rally_configuration = rally_configuration
+
+    def shall_be_started_for_seat(self, seat_index):
+        if len(self.rally_configuration.extra_puzzles) == 0:
+            return False
+        return seat_index in self.valid_seats
+
+
 class SubProcessesBase:
     @staticmethod
     def detect_if_running_as_exe(args):
@@ -121,7 +132,8 @@ class SubProcesses(SubProcessesBase):
             VideoProcessTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 3, "Left video", "../out_the_window/movie_window.py", [4, 7], "left"),
             VideoProcessTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 4, "Right video", "../out_the_window/movie_window.py", [6, 9], "right"),
             ProcessTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 10, "Rebus list", "../fishbone/fishbone.py", [5]),
-            ProcessTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 13, "Solve Rebus", "../solve_rebus/solve_rebus.py", [5])
+            ProcessTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 13, "Solve rebus", "../solve_rebus/solve_rebus.py", [5]),
+            ExtraTasksProcessTemplate(running_as_exe, udp_port, self.rally_configuration, config_file, data_path, user_id, 13, "Extra puzzles", "../extra_puzzles/extra_puzzles.py", [5])
             #ProcessTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 11, "Photo Answers", "../photo_report/photo_report.py", [5]),
             #ProcessTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 12, "Rebus Answers", "../rebus_answers/rebus_answers.py", [5]),
             # PhotoSheetTemplate(running_as_exe, udp_port, config_file, data_path, user_id, 5, "Photo sheet front", "../photo_sheet/photosheet.py", [1, 2, 3], 1),

@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='client',
   syntax='proto2',
   serialized_options=None,
-  serialized_pb=b'\n\x14\x63lientprotocol.proto\x12\x06\x63lient\"\xef\x02\n\x14ServerPositionUpdate\x12\x0f\n\x07stopped\x18\x01 \x02(\x08\x12\r\n\x05speed\x18\x02 \x02(\x02\x12\x17\n\x0f\x63urrent_section\x18\x03 \x02(\x05\x12\x10\n\x08\x64istance\x18\x04 \x02(\x01\x12I\n\x0brally_stage\x18\x05 \x01(\x0e\x32\'.client.ServerPositionUpdate.RallyStage:\x0bNOT_STARTED\x12\x19\n\x11looking_for_rebus\x18\x06 \x01(\x08\x12\x15\n\rrally_started\x18\x07 \x01(\x08\x12\x14\n\x0c\x66orce_update\x18\x08 \x01(\x08\x12\x19\n\x11\x61\x66ternoon_started\x18\t \x01(\x08\"^\n\nRallyStage\x12\x0f\n\x0bNOT_STARTED\x10\x00\x12\x0b\n\x07MORNING\x10\x01\x12\x0c\n\x08\x41T_LUNCH\x10\x02\x12\r\n\tAFTERNOON\x10\x03\x12\n\n\x06\x41T_END\x10\x04\x12\t\n\x05\x45NDED\x10\x05\"O\n\x11\x42usSeatAllocation\x12\x12\n\nseat_index\x18\x01 \x02(\x05\x12\x11\n\tplayer_id\x18\x02 \x01(\x05\x12\x13\n\x0bplayer_name\x18\x03 \x01(\t\"E\n\nBusSeating\x12\x37\n\x14\x62us_seat_allocations\x18\x01 \x03(\x0b\x32\x19.client.BusSeatAllocation\"L\n\x0bPhotoAnswer\x12\x16\n\x0esection_number\x18\x01 \x02(\x05\x12\x15\n\rsection_index\x18\x02 \x02(\x05\x12\x0e\n\x06\x61nswer\x18\x03 \x01(\x05\":\n\x0cPhotoAnswers\x12*\n\rphoto_answers\x18\x01 \x03(\x0b\x32\x13.client.PhotoAnswer\"L\n\x0bPlateAnswer\x12\x16\n\x0esection_number\x18\x01 \x02(\x05\x12\x15\n\rsection_index\x18\x02 \x02(\x05\x12\x0e\n\x06\x61nswer\x18\x03 \x01(\t\":\n\x0cPlateAnswers\x12*\n\rplate_answers\x18\x01 \x03(\x0b\x32\x13.client.PlateAnswer\"5\n\x0bRebusAnswer\x12\x16\n\x0esection_number\x18\x01 \x02(\x05\x12\x0e\n\x06\x61nswer\x18\x02 \x01(\t\":\n\x0cRebusAnswers\x12*\n\rrebus_answers\x18\x01 \x03(\x0b\x32\x13.client.RebusAnswer\"]\n\x14PhotoSheetAllocation\x12\x14\n\x0csheet_number\x18\x01 \x02(\x05\x12\x18\n\x10\x61llocation_place\x18\x02 \x02(\x05\x12\x15\n\rup_for_switch\x18\x03 \x01(\x08\"U\n\x15PhotoSheetAllocations\x12<\n\x16photo_sheet_allocation\x18\x01 \x03(\x0b\x32\x1c.client.PhotoSheetAllocation\"\xa0\x01\n\x05Rebus\x12\x0f\n\x07section\x18\x01 \x02(\x05\x12-\n\x04type\x18\x02 \x02(\x0e\x32\x17.client.Rebus.RebusType:\x06NORMAL\x12\x12\n\nrebus_text\x18\x03 \x01(\t\x12\x12\n\nextra_text\x18\x04 \x01(\t\"/\n\tRebusType\x12\n\n\x06NORMAL\x10\x00\x12\x08\n\x04HELP\x10\x01\x12\x0c\n\x08SOLUTION\x10\x02\"+\n\tRebusList\x12\x1e\n\x07rebuses\x18\x01 \x03(\x0b\x32\r.client.Rebus\"\xae\x01\n\rRebusSolution\x12\x0f\n\x07section\x18\x01 \x02(\x05\x12\x10\n\x08solution\x18\x02 \x02(\t\x12\x0c\n\x04\x65\x61st\x18\x03 \x02(\x05\x12\r\n\x05north\x18\x04 \x02(\x05\x12\x1a\n\x12target_description\x18\x05 \x02(\t\x12\x13\n\x0btarget_east\x18\x06 \x02(\x05\x12\x14\n\x0ctarget_north\x18\x07 \x02(\x05\x12\x16\n\x0etarget_picture\x18\x08 \x02(\t\"P\n\x0eRebusSolutions\x12\x0e\n\x06locked\x18\x01 \x01(\x08\x12.\n\x0frebus_solutions\x18\x02 \x03(\x0b\x32\x15.client.RebusSolution\"\x8e\x03\n\x12ServerStatusUpdate\x12\x30\n\npos_update\x18\x01 \x01(\x0b\x32\x1c.client.ServerPositionUpdate\x12\'\n\x0b\x62us_seating\x18\x02 \x01(\x0b\x32\x12.client.BusSeating\x12+\n\rphoto_answers\x18\x03 \x01(\x0b\x32\x14.client.PhotoAnswers\x12+\n\rrebus_answers\x18\x04 \x01(\x0b\x32\x14.client.RebusAnswers\x12>\n\x17photo_sheet_allocations\x18\x05 \x01(\x0b\x32\x1d.client.PhotoSheetAllocations\x12%\n\nrebus_list\x18\x06 \x01(\x0b\x32\x11.client.RebusList\x12+\n\rplate_answers\x18\x07 \x01(\x0b\x32\x14.client.PlateAnswers\x12/\n\x0frebus_solutions\x18\x08 \x01(\x0b\x32\x16.client.RebusSolutions\"(\n\x15ServerRequestResponse\x12\x0f\n\x07success\x18\x01 \x02(\x08\"G\n\x10\x42roadcastMessage\x12\x0f\n\x07message\x18\x01 \x02(\t\x12\x11\n\tdate_time\x18\x02 \x02(\t\x12\x0f\n\x07urgency\x18\x03 \x01(\x05\"\xd4\x01\n\x0eServerToClient\x12\x0f\n\x07\x63ounter\x18\x01 \x02(\x03\x12\x33\n\rstatus_update\x18\x03 \x01(\x0b\x32\x1a.client.ServerStatusUpdateH\x00\x12\x39\n\x10request_response\x18\x04 \x01(\x0b\x32\x1d.client.ServerRequestResponseH\x00\x12\x35\n\x11\x62roadcast_message\x18\x05 \x01(\x0b\x32\x18.client.BroadcastMessageH\x00\x42\n\n\x08messages\"\xcb\x01\n\x14\x43lientPositionUpdate\x12\r\n\x05speed\x18\x01 \x02(\x02\x12\x16\n\x0e\x64\x65lta_distance\x18\x02 \x02(\x01\x12\x17\n\x0f\x63urrent_section\x18\x03 \x02(\x05\x12\x43\n\tindicator\x18\x04 \x01(\x0e\x32*.client.ClientPositionUpdate.DirectionType:\x04NONE\".\n\rDirectionType\x12\x08\n\x04NONE\x10\x00\x12\x08\n\x04LEFT\x10\x01\x12\t\n\x05RIGHT\x10\x02\"+\n\x13ReachedEndOfSection\x12\x14\n\x0csection_name\x18\x01 \x02(\t\"P\n\tMakeATurn\x12.\n\x08position\x18\x01 \x02(\x0b\x32\x1c.client.ClientPositionUpdate\x12\x13\n\x0bnew_section\x18\x02 \x02(\x05\"E\n\x17SetPhotoSheetSwitchable\x12\x16\n\x0esheet_number_1\x18\x01 \x02(\x05\x12\x12\n\nswitchable\x18\x02 \x02(\x08\"B\n\x10SwitchPhotoSheet\x12\x16\n\x0esheet_number_1\x18\x01 \x02(\x05\x12\x16\n\x0esheet_number_2\x18\x02 \x02(\x05\"1\n\nSelectSeat\x12\x0f\n\x07user_id\x18\x01 \x02(\x05\x12\x12\n\nseat_index\x18\x02 \x02(\x05\";\n\x11SubClientRegister\x12\x14\n\x0c\x63lient_index\x18\x01 \x02(\x05\x12\x10\n\x08udp_port\x18\x02 \x02(\x05\"_\n\x11OpenRebusSolution\x12\x0f\n\x07user_id\x18\x01 \x02(\x05\x12\x0f\n\x07section\x18\x02 \x02(\x05\x12\x11\n\topen_help\x18\x03 \x01(\x08\x12\x15\n\ropen_solution\x18\x04 \x01(\x08\"@\n\x0eSetPhotoAnswer\x12\x0f\n\x07section\x18\x01 \x02(\x05\x12\r\n\x05index\x18\x02 \x02(\x05\x12\x0e\n\x06\x61nswer\x18\x03 \x02(\x05\"@\n\x0eSetPlateAnswer\x12\x0f\n\x07section\x18\x01 \x02(\x05\x12\r\n\x05index\x18\x02 \x02(\x05\x12\x0e\n\x06\x61nswer\x18\x03 \x02(\t\"1\n\x0eSetRebusAnswer\x12\x0f\n\x07section\x18\x01 \x02(\x05\x12\x0e\n\x06\x61nswer\x18\x02 \x02(\t\"\x1f\n\x0eSearchForRebus\x12\r\n\x05\x64ummy\x18\x01 \x02(\x05\"Y\n\x11TestRebusSolution\x12\x0f\n\x07section\x18\x01 \x02(\x05\x12\x0e\n\x06\x61nswer\x18\x02 \x02(\t\x12\x10\n\x08map_east\x18\x03 \x02(\x05\x12\x11\n\tmap_north\x18\x04 \x02(\x05\"\xea\x05\n\x0e\x43lientToServer\x12\x0f\n\x07\x63ounter\x18\x01 \x02(\x03\x12\x32\n\npos_update\x18\x02 \x01(\x0b\x32\x1c.client.ClientPositionUpdateH\x00\x12\x35\n\x0e\x65nd_of_section\x18\x03 \x01(\x0b\x32\x1b.client.ReachedEndOfSectionH\x00\x12(\n\x0bmake_a_turn\x18\x04 \x01(\x0b\x32\x11.client.MakeATurnH\x00\x12\x45\n\x1aset_photo_sheet_switchable\x18\x05 \x01(\x0b\x32\x1f.client.SetPhotoSheetSwitchableH\x00\x12\x36\n\x12switch_photo_sheet\x18\x06 \x01(\x0b\x32\x18.client.SwitchPhotoSheetH\x00\x12)\n\x0bselect_seat\x18\x07 \x01(\x0b\x32\x12.client.SelectSeatH\x00\x12\x38\n\x13sub_client_register\x18\x08 \x01(\x0b\x32\x19.client.SubClientRegisterH\x00\x12\x38\n\x13open_rebus_solution\x18\t \x01(\x0b\x32\x19.client.OpenRebusSolutionH\x00\x12\x32\n\x10set_photo_answer\x18\n \x01(\x0b\x32\x16.client.SetPhotoAnswerH\x00\x12\x32\n\x10set_plate_answer\x18\x0b \x01(\x0b\x32\x16.client.SetPlateAnswerH\x00\x12\x32\n\x10set_rebus_answer\x18\x0c \x01(\x0b\x32\x16.client.SetRebusAnswerH\x00\x12\x32\n\x10search_for_rebus\x18\r \x01(\x0b\x32\x16.client.SearchForRebusH\x00\x12\x38\n\x13test_rebus_solution\x18\x0e \x01(\x0b\x32\x19.client.TestRebusSolutionH\x00\x42\n\n\x08messages'
+  serialized_pb=b'\n\x14\x63lientprotocol.proto\x12\x06\x63lient\"\xef\x02\n\x14ServerPositionUpdate\x12\x0f\n\x07stopped\x18\x01 \x02(\x08\x12\r\n\x05speed\x18\x02 \x02(\x02\x12\x17\n\x0f\x63urrent_section\x18\x03 \x02(\x05\x12\x10\n\x08\x64istance\x18\x04 \x02(\x01\x12I\n\x0brally_stage\x18\x05 \x01(\x0e\x32\'.client.ServerPositionUpdate.RallyStage:\x0bNOT_STARTED\x12\x19\n\x11looking_for_rebus\x18\x06 \x01(\x08\x12\x15\n\rrally_started\x18\x07 \x01(\x08\x12\x14\n\x0c\x66orce_update\x18\x08 \x01(\x08\x12\x19\n\x11\x61\x66ternoon_started\x18\t \x01(\x08\"^\n\nRallyStage\x12\x0f\n\x0bNOT_STARTED\x10\x00\x12\x0b\n\x07MORNING\x10\x01\x12\x0c\n\x08\x41T_LUNCH\x10\x02\x12\r\n\tAFTERNOON\x10\x03\x12\n\n\x06\x41T_END\x10\x04\x12\t\n\x05\x45NDED\x10\x05\"O\n\x11\x42usSeatAllocation\x12\x12\n\nseat_index\x18\x01 \x02(\x05\x12\x11\n\tplayer_id\x18\x02 \x01(\x05\x12\x13\n\x0bplayer_name\x18\x03 \x01(\t\"E\n\nBusSeating\x12\x37\n\x14\x62us_seat_allocations\x18\x01 \x03(\x0b\x32\x19.client.BusSeatAllocation\"L\n\x0bPhotoAnswer\x12\x16\n\x0esection_number\x18\x01 \x02(\x05\x12\x15\n\rsection_index\x18\x02 \x02(\x05\x12\x0e\n\x06\x61nswer\x18\x03 \x01(\x05\":\n\x0cPhotoAnswers\x12*\n\rphoto_answers\x18\x01 \x03(\x0b\x32\x13.client.PhotoAnswer\"L\n\x0bPlateAnswer\x12\x16\n\x0esection_number\x18\x01 \x02(\x05\x12\x15\n\rsection_index\x18\x02 \x02(\x05\x12\x0e\n\x06\x61nswer\x18\x03 \x01(\t\":\n\x0cPlateAnswers\x12*\n\rplate_answers\x18\x01 \x03(\x0b\x32\x13.client.PlateAnswer\"5\n\x0bRebusAnswer\x12\x16\n\x0esection_number\x18\x01 \x02(\x05\x12\x0e\n\x06\x61nswer\x18\x02 \x01(\t\":\n\x0cRebusAnswers\x12*\n\rrebus_answers\x18\x01 \x03(\x0b\x32\x13.client.RebusAnswer\"]\n\x14PhotoSheetAllocation\x12\x14\n\x0csheet_number\x18\x01 \x02(\x05\x12\x18\n\x10\x61llocation_place\x18\x02 \x02(\x05\x12\x15\n\rup_for_switch\x18\x03 \x01(\x08\"U\n\x15PhotoSheetAllocations\x12<\n\x16photo_sheet_allocation\x18\x01 \x03(\x0b\x32\x1c.client.PhotoSheetAllocation\"\xa0\x01\n\x05Rebus\x12\x0f\n\x07section\x18\x01 \x02(\x05\x12-\n\x04type\x18\x02 \x02(\x0e\x32\x17.client.Rebus.RebusType:\x06NORMAL\x12\x12\n\nrebus_text\x18\x03 \x01(\t\x12\x12\n\nextra_text\x18\x04 \x01(\t\"/\n\tRebusType\x12\n\n\x06NORMAL\x10\x00\x12\x08\n\x04HELP\x10\x01\x12\x0c\n\x08SOLUTION\x10\x02\"+\n\tRebusList\x12\x1e\n\x07rebuses\x18\x01 \x03(\x0b\x32\r.client.Rebus\"\xae\x01\n\rRebusSolution\x12\x0f\n\x07section\x18\x01 \x02(\x05\x12\x10\n\x08solution\x18\x02 \x02(\t\x12\x0c\n\x04\x65\x61st\x18\x03 \x02(\x05\x12\r\n\x05north\x18\x04 \x02(\x05\x12\x1a\n\x12target_description\x18\x05 \x02(\t\x12\x13\n\x0btarget_east\x18\x06 \x02(\x05\x12\x14\n\x0ctarget_north\x18\x07 \x02(\x05\x12\x16\n\x0etarget_picture\x18\x08 \x02(\t\"P\n\x0eRebusSolutions\x12\x0e\n\x06locked\x18\x01 \x01(\x08\x12.\n\x0frebus_solutions\x18\x02 \x03(\x0b\x32\x15.client.RebusSolution\"F\n\x0b\x45xtraPuzzle\x12\x11\n\tpuzzle_id\x18\x01 \x01(\t\x12\x0e\n\x06opened\x18\x02 \x01(\x08\x12\x14\n\x0cinstructions\x18\x03 \x01(\t\":\n\x0c\x45xtraPuzzles\x12*\n\rextra_puzzles\x18\x01 \x03(\x0b\x32\x13.client.ExtraPuzzle\"\xbb\x03\n\x12ServerStatusUpdate\x12\x30\n\npos_update\x18\x01 \x01(\x0b\x32\x1c.client.ServerPositionUpdate\x12\'\n\x0b\x62us_seating\x18\x02 \x01(\x0b\x32\x12.client.BusSeating\x12+\n\rphoto_answers\x18\x03 \x01(\x0b\x32\x14.client.PhotoAnswers\x12+\n\rrebus_answers\x18\x04 \x01(\x0b\x32\x14.client.RebusAnswers\x12>\n\x17photo_sheet_allocations\x18\x05 \x01(\x0b\x32\x1d.client.PhotoSheetAllocations\x12%\n\nrebus_list\x18\x06 \x01(\x0b\x32\x11.client.RebusList\x12+\n\rplate_answers\x18\x07 \x01(\x0b\x32\x14.client.PlateAnswers\x12/\n\x0frebus_solutions\x18\x08 \x01(\x0b\x32\x16.client.RebusSolutions\x12+\n\rextra_puzzles\x18\t \x01(\x0b\x32\x14.client.ExtraPuzzles\"(\n\x15ServerRequestResponse\x12\x0f\n\x07success\x18\x01 \x02(\x08\"G\n\x10\x42roadcastMessage\x12\x0f\n\x07message\x18\x01 \x02(\t\x12\x11\n\tdate_time\x18\x02 \x02(\t\x12\x0f\n\x07urgency\x18\x03 \x01(\x05\"\xd4\x01\n\x0eServerToClient\x12\x0f\n\x07\x63ounter\x18\x01 \x02(\x03\x12\x33\n\rstatus_update\x18\x03 \x01(\x0b\x32\x1a.client.ServerStatusUpdateH\x00\x12\x39\n\x10request_response\x18\x04 \x01(\x0b\x32\x1d.client.ServerRequestResponseH\x00\x12\x35\n\x11\x62roadcast_message\x18\x05 \x01(\x0b\x32\x18.client.BroadcastMessageH\x00\x42\n\n\x08messages\"\xcb\x01\n\x14\x43lientPositionUpdate\x12\r\n\x05speed\x18\x01 \x02(\x02\x12\x16\n\x0e\x64\x65lta_distance\x18\x02 \x02(\x01\x12\x17\n\x0f\x63urrent_section\x18\x03 \x02(\x05\x12\x43\n\tindicator\x18\x04 \x01(\x0e\x32*.client.ClientPositionUpdate.DirectionType:\x04NONE\".\n\rDirectionType\x12\x08\n\x04NONE\x10\x00\x12\x08\n\x04LEFT\x10\x01\x12\t\n\x05RIGHT\x10\x02\"+\n\x13ReachedEndOfSection\x12\x14\n\x0csection_name\x18\x01 \x02(\t\"P\n\tMakeATurn\x12.\n\x08position\x18\x01 \x02(\x0b\x32\x1c.client.ClientPositionUpdate\x12\x13\n\x0bnew_section\x18\x02 \x02(\x05\"E\n\x17SetPhotoSheetSwitchable\x12\x16\n\x0esheet_number_1\x18\x01 \x02(\x05\x12\x12\n\nswitchable\x18\x02 \x02(\x08\"B\n\x10SwitchPhotoSheet\x12\x16\n\x0esheet_number_1\x18\x01 \x02(\x05\x12\x16\n\x0esheet_number_2\x18\x02 \x02(\x05\"1\n\nSelectSeat\x12\x0f\n\x07user_id\x18\x01 \x02(\x05\x12\x12\n\nseat_index\x18\x02 \x02(\x05\";\n\x11SubClientRegister\x12\x14\n\x0c\x63lient_index\x18\x01 \x02(\x05\x12\x10\n\x08udp_port\x18\x02 \x02(\x05\"_\n\x11OpenRebusSolution\x12\x0f\n\x07user_id\x18\x01 \x02(\x05\x12\x0f\n\x07section\x18\x02 \x02(\x05\x12\x11\n\topen_help\x18\x03 \x01(\x08\x12\x15\n\ropen_solution\x18\x04 \x01(\x08\"@\n\x0eSetPhotoAnswer\x12\x0f\n\x07section\x18\x01 \x02(\x05\x12\r\n\x05index\x18\x02 \x02(\x05\x12\x0e\n\x06\x61nswer\x18\x03 \x02(\x05\"@\n\x0eSetPlateAnswer\x12\x0f\n\x07section\x18\x01 \x02(\x05\x12\r\n\x05index\x18\x02 \x02(\x05\x12\x0e\n\x06\x61nswer\x18\x03 \x02(\t\"1\n\x0eSetRebusAnswer\x12\x0f\n\x07section\x18\x01 \x02(\x05\x12\x0e\n\x06\x61nswer\x18\x02 \x02(\t\"\x1f\n\x0eSearchForRebus\x12\r\n\x05\x64ummy\x18\x01 \x02(\x05\"Y\n\x11TestRebusSolution\x12\x0f\n\x07section\x18\x01 \x02(\x05\x12\x0e\n\x06\x61nswer\x18\x02 \x02(\t\x12\x10\n\x08map_east\x18\x03 \x02(\x05\x12\x11\n\tmap_north\x18\x04 \x02(\x05\"$\n\x0fOpenExtraPuzzle\x12\x11\n\tpuzzle_id\x18\x01 \x02(\t\"\xa0\x06\n\x0e\x43lientToServer\x12\x0f\n\x07\x63ounter\x18\x01 \x02(\x03\x12\x32\n\npos_update\x18\x02 \x01(\x0b\x32\x1c.client.ClientPositionUpdateH\x00\x12\x35\n\x0e\x65nd_of_section\x18\x03 \x01(\x0b\x32\x1b.client.ReachedEndOfSectionH\x00\x12(\n\x0bmake_a_turn\x18\x04 \x01(\x0b\x32\x11.client.MakeATurnH\x00\x12\x45\n\x1aset_photo_sheet_switchable\x18\x05 \x01(\x0b\x32\x1f.client.SetPhotoSheetSwitchableH\x00\x12\x36\n\x12switch_photo_sheet\x18\x06 \x01(\x0b\x32\x18.client.SwitchPhotoSheetH\x00\x12)\n\x0bselect_seat\x18\x07 \x01(\x0b\x32\x12.client.SelectSeatH\x00\x12\x38\n\x13sub_client_register\x18\x08 \x01(\x0b\x32\x19.client.SubClientRegisterH\x00\x12\x38\n\x13open_rebus_solution\x18\t \x01(\x0b\x32\x19.client.OpenRebusSolutionH\x00\x12\x32\n\x10set_photo_answer\x18\n \x01(\x0b\x32\x16.client.SetPhotoAnswerH\x00\x12\x32\n\x10set_plate_answer\x18\x0b \x01(\x0b\x32\x16.client.SetPlateAnswerH\x00\x12\x32\n\x10set_rebus_answer\x18\x0c \x01(\x0b\x32\x16.client.SetRebusAnswerH\x00\x12\x32\n\x10search_for_rebus\x18\r \x01(\x0b\x32\x16.client.SearchForRebusH\x00\x12\x38\n\x13test_rebus_solution\x18\x0e \x01(\x0b\x32\x19.client.TestRebusSolutionH\x00\x12\x34\n\x11open_extra_puzzle\x18\x0f \x01(\x0b\x32\x17.client.OpenExtraPuzzleH\x00\x42\n\n\x08messages'
 )
 
 
@@ -108,8 +108,8 @@ _CLIENTPOSITIONUPDATE_DIRECTIONTYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=2483,
-  serialized_end=2529,
+  serialized_start=2660,
+  serialized_end=2706,
 )
 _sym_db.RegisterEnumDescriptor(_CLIENTPOSITIONUPDATE_DIRECTIONTYPE)
 
@@ -777,6 +777,82 @@ _REBUSSOLUTIONS = _descriptor.Descriptor(
 )
 
 
+_EXTRAPUZZLE = _descriptor.Descriptor(
+  name='ExtraPuzzle',
+  full_name='client.ExtraPuzzle',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='puzzle_id', full_name='client.ExtraPuzzle.puzzle_id', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='opened', full_name='client.ExtraPuzzle.opened', index=1,
+      number=2, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='instructions', full_name='client.ExtraPuzzle.instructions', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto2',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1594,
+  serialized_end=1664,
+)
+
+
+_EXTRAPUZZLES = _descriptor.Descriptor(
+  name='ExtraPuzzles',
+  full_name='client.ExtraPuzzles',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='extra_puzzles', full_name='client.ExtraPuzzles.extra_puzzles', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto2',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1666,
+  serialized_end=1724,
+)
+
+
 _SERVERSTATUSUPDATE = _descriptor.Descriptor(
   name='ServerStatusUpdate',
   full_name='client.ServerStatusUpdate',
@@ -840,6 +916,13 @@ _SERVERSTATUSUPDATE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='extra_puzzles', full_name='client.ServerStatusUpdate.extra_puzzles', index=8,
+      number=9, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -852,8 +935,8 @@ _SERVERSTATUSUPDATE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1595,
-  serialized_end=1993,
+  serialized_start=1727,
+  serialized_end=2170,
 )
 
 
@@ -883,8 +966,8 @@ _SERVERREQUESTRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1995,
-  serialized_end=2035,
+  serialized_start=2172,
+  serialized_end=2212,
 )
 
 
@@ -928,8 +1011,8 @@ _BROADCASTMESSAGE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2037,
-  serialized_end=2108,
+  serialized_start=2214,
+  serialized_end=2285,
 )
 
 
@@ -983,8 +1066,8 @@ _SERVERTOCLIENT = _descriptor.Descriptor(
       name='messages', full_name='client.ServerToClient.messages',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=2111,
-  serialized_end=2323,
+  serialized_start=2288,
+  serialized_end=2500,
 )
 
 
@@ -1036,8 +1119,8 @@ _CLIENTPOSITIONUPDATE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2326,
-  serialized_end=2529,
+  serialized_start=2503,
+  serialized_end=2706,
 )
 
 
@@ -1067,8 +1150,8 @@ _REACHEDENDOFSECTION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2531,
-  serialized_end=2574,
+  serialized_start=2708,
+  serialized_end=2751,
 )
 
 
@@ -1105,8 +1188,8 @@ _MAKEATURN = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2576,
-  serialized_end=2656,
+  serialized_start=2753,
+  serialized_end=2833,
 )
 
 
@@ -1143,8 +1226,8 @@ _SETPHOTOSHEETSWITCHABLE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2658,
-  serialized_end=2727,
+  serialized_start=2835,
+  serialized_end=2904,
 )
 
 
@@ -1181,8 +1264,8 @@ _SWITCHPHOTOSHEET = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2729,
-  serialized_end=2795,
+  serialized_start=2906,
+  serialized_end=2972,
 )
 
 
@@ -1219,8 +1302,8 @@ _SELECTSEAT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2797,
-  serialized_end=2846,
+  serialized_start=2974,
+  serialized_end=3023,
 )
 
 
@@ -1257,8 +1340,8 @@ _SUBCLIENTREGISTER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2848,
-  serialized_end=2907,
+  serialized_start=3025,
+  serialized_end=3084,
 )
 
 
@@ -1309,8 +1392,8 @@ _OPENREBUSSOLUTION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2909,
-  serialized_end=3004,
+  serialized_start=3086,
+  serialized_end=3181,
 )
 
 
@@ -1354,8 +1437,8 @@ _SETPHOTOANSWER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3006,
-  serialized_end=3070,
+  serialized_start=3183,
+  serialized_end=3247,
 )
 
 
@@ -1399,8 +1482,8 @@ _SETPLATEANSWER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3072,
-  serialized_end=3136,
+  serialized_start=3249,
+  serialized_end=3313,
 )
 
 
@@ -1437,8 +1520,8 @@ _SETREBUSANSWER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3138,
-  serialized_end=3187,
+  serialized_start=3315,
+  serialized_end=3364,
 )
 
 
@@ -1468,8 +1551,8 @@ _SEARCHFORREBUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3189,
-  serialized_end=3220,
+  serialized_start=3366,
+  serialized_end=3397,
 )
 
 
@@ -1520,8 +1603,39 @@ _TESTREBUSSOLUTION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3222,
-  serialized_end=3311,
+  serialized_start=3399,
+  serialized_end=3488,
+)
+
+
+_OPENEXTRAPUZZLE = _descriptor.Descriptor(
+  name='OpenExtraPuzzle',
+  full_name='client.OpenExtraPuzzle',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='puzzle_id', full_name='client.OpenExtraPuzzle.puzzle_id', index=0,
+      number=1, type=9, cpp_type=9, label=2,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto2',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=3490,
+  serialized_end=3526,
 )
 
 
@@ -1630,6 +1744,13 @@ _CLIENTTOSERVER = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='open_extra_puzzle', full_name='client.ClientToServer.open_extra_puzzle', index=14,
+      number=15, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -1645,8 +1766,8 @@ _CLIENTTOSERVER = _descriptor.Descriptor(
       name='messages', full_name='client.ClientToServer.messages',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=3314,
-  serialized_end=4060,
+  serialized_start=3529,
+  serialized_end=4329,
 )
 
 _SERVERPOSITIONUPDATE.fields_by_name['rally_stage'].enum_type = _SERVERPOSITIONUPDATE_RALLYSTAGE
@@ -1660,6 +1781,7 @@ _REBUS.fields_by_name['type'].enum_type = _REBUS_REBUSTYPE
 _REBUS_REBUSTYPE.containing_type = _REBUS
 _REBUSLIST.fields_by_name['rebuses'].message_type = _REBUS
 _REBUSSOLUTIONS.fields_by_name['rebus_solutions'].message_type = _REBUSSOLUTION
+_EXTRAPUZZLES.fields_by_name['extra_puzzles'].message_type = _EXTRAPUZZLE
 _SERVERSTATUSUPDATE.fields_by_name['pos_update'].message_type = _SERVERPOSITIONUPDATE
 _SERVERSTATUSUPDATE.fields_by_name['bus_seating'].message_type = _BUSSEATING
 _SERVERSTATUSUPDATE.fields_by_name['photo_answers'].message_type = _PHOTOANSWERS
@@ -1668,6 +1790,7 @@ _SERVERSTATUSUPDATE.fields_by_name['photo_sheet_allocations'].message_type = _PH
 _SERVERSTATUSUPDATE.fields_by_name['rebus_list'].message_type = _REBUSLIST
 _SERVERSTATUSUPDATE.fields_by_name['plate_answers'].message_type = _PLATEANSWERS
 _SERVERSTATUSUPDATE.fields_by_name['rebus_solutions'].message_type = _REBUSSOLUTIONS
+_SERVERSTATUSUPDATE.fields_by_name['extra_puzzles'].message_type = _EXTRAPUZZLES
 _SERVERTOCLIENT.fields_by_name['status_update'].message_type = _SERVERSTATUSUPDATE
 _SERVERTOCLIENT.fields_by_name['request_response'].message_type = _SERVERREQUESTRESPONSE
 _SERVERTOCLIENT.fields_by_name['broadcast_message'].message_type = _BROADCASTMESSAGE
@@ -1696,6 +1819,7 @@ _CLIENTTOSERVER.fields_by_name['set_plate_answer'].message_type = _SETPLATEANSWE
 _CLIENTTOSERVER.fields_by_name['set_rebus_answer'].message_type = _SETREBUSANSWER
 _CLIENTTOSERVER.fields_by_name['search_for_rebus'].message_type = _SEARCHFORREBUS
 _CLIENTTOSERVER.fields_by_name['test_rebus_solution'].message_type = _TESTREBUSSOLUTION
+_CLIENTTOSERVER.fields_by_name['open_extra_puzzle'].message_type = _OPENEXTRAPUZZLE
 _CLIENTTOSERVER.oneofs_by_name['messages'].fields.append(
   _CLIENTTOSERVER.fields_by_name['pos_update'])
 _CLIENTTOSERVER.fields_by_name['pos_update'].containing_oneof = _CLIENTTOSERVER.oneofs_by_name['messages']
@@ -1735,6 +1859,9 @@ _CLIENTTOSERVER.fields_by_name['search_for_rebus'].containing_oneof = _CLIENTTOS
 _CLIENTTOSERVER.oneofs_by_name['messages'].fields.append(
   _CLIENTTOSERVER.fields_by_name['test_rebus_solution'])
 _CLIENTTOSERVER.fields_by_name['test_rebus_solution'].containing_oneof = _CLIENTTOSERVER.oneofs_by_name['messages']
+_CLIENTTOSERVER.oneofs_by_name['messages'].fields.append(
+  _CLIENTTOSERVER.fields_by_name['open_extra_puzzle'])
+_CLIENTTOSERVER.fields_by_name['open_extra_puzzle'].containing_oneof = _CLIENTTOSERVER.oneofs_by_name['messages']
 DESCRIPTOR.message_types_by_name['ServerPositionUpdate'] = _SERVERPOSITIONUPDATE
 DESCRIPTOR.message_types_by_name['BusSeatAllocation'] = _BUSSEATALLOCATION
 DESCRIPTOR.message_types_by_name['BusSeating'] = _BUSSEATING
@@ -1750,6 +1877,8 @@ DESCRIPTOR.message_types_by_name['Rebus'] = _REBUS
 DESCRIPTOR.message_types_by_name['RebusList'] = _REBUSLIST
 DESCRIPTOR.message_types_by_name['RebusSolution'] = _REBUSSOLUTION
 DESCRIPTOR.message_types_by_name['RebusSolutions'] = _REBUSSOLUTIONS
+DESCRIPTOR.message_types_by_name['ExtraPuzzle'] = _EXTRAPUZZLE
+DESCRIPTOR.message_types_by_name['ExtraPuzzles'] = _EXTRAPUZZLES
 DESCRIPTOR.message_types_by_name['ServerStatusUpdate'] = _SERVERSTATUSUPDATE
 DESCRIPTOR.message_types_by_name['ServerRequestResponse'] = _SERVERREQUESTRESPONSE
 DESCRIPTOR.message_types_by_name['BroadcastMessage'] = _BROADCASTMESSAGE
@@ -1767,6 +1896,7 @@ DESCRIPTOR.message_types_by_name['SetPlateAnswer'] = _SETPLATEANSWER
 DESCRIPTOR.message_types_by_name['SetRebusAnswer'] = _SETREBUSANSWER
 DESCRIPTOR.message_types_by_name['SearchForRebus'] = _SEARCHFORREBUS
 DESCRIPTOR.message_types_by_name['TestRebusSolution'] = _TESTREBUSSOLUTION
+DESCRIPTOR.message_types_by_name['OpenExtraPuzzle'] = _OPENEXTRAPUZZLE
 DESCRIPTOR.message_types_by_name['ClientToServer'] = _CLIENTTOSERVER
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -1874,6 +2004,20 @@ RebusSolutions = _reflection.GeneratedProtocolMessageType('RebusSolutions', (_me
   # @@protoc_insertion_point(class_scope:client.RebusSolutions)
   })
 _sym_db.RegisterMessage(RebusSolutions)
+
+ExtraPuzzle = _reflection.GeneratedProtocolMessageType('ExtraPuzzle', (_message.Message,), {
+  'DESCRIPTOR' : _EXTRAPUZZLE,
+  '__module__' : 'clientprotocol_pb2'
+  # @@protoc_insertion_point(class_scope:client.ExtraPuzzle)
+  })
+_sym_db.RegisterMessage(ExtraPuzzle)
+
+ExtraPuzzles = _reflection.GeneratedProtocolMessageType('ExtraPuzzles', (_message.Message,), {
+  'DESCRIPTOR' : _EXTRAPUZZLES,
+  '__module__' : 'clientprotocol_pb2'
+  # @@protoc_insertion_point(class_scope:client.ExtraPuzzles)
+  })
+_sym_db.RegisterMessage(ExtraPuzzles)
 
 ServerStatusUpdate = _reflection.GeneratedProtocolMessageType('ServerStatusUpdate', (_message.Message,), {
   'DESCRIPTOR' : _SERVERSTATUSUPDATE,
@@ -1993,6 +2137,13 @@ TestRebusSolution = _reflection.GeneratedProtocolMessageType('TestRebusSolution'
   # @@protoc_insertion_point(class_scope:client.TestRebusSolution)
   })
 _sym_db.RegisterMessage(TestRebusSolution)
+
+OpenExtraPuzzle = _reflection.GeneratedProtocolMessageType('OpenExtraPuzzle', (_message.Message,), {
+  'DESCRIPTOR' : _OPENEXTRAPUZZLE,
+  '__module__' : 'clientprotocol_pb2'
+  # @@protoc_insertion_point(class_scope:client.OpenExtraPuzzle)
+  })
+_sym_db.RegisterMessage(OpenExtraPuzzle)
 
 ClientToServer = _reflection.GeneratedProtocolMessageType('ClientToServer', (_message.Message,), {
   'DESCRIPTOR' : _CLIENTTOSERVER,

@@ -5,6 +5,38 @@ from rally.common.track_information import TrackInformation
 from rally.protocol import serverprotocol_pb2
 
 
+class ExtraPuzzle:
+    def __init__(self, xml):
+        self.id = ""
+        self.title = ""
+        self.cost = 0
+        self.description = ""
+        self.question = ""
+        self.instructions = ""
+        if "id" in xml.attrib:
+            self.id = xml.attrib["id"]
+        if "title" in xml.attrib:
+            self.title = xml.attrib["title"]
+        if "cost" in xml.attrib:
+            self.cost = int(xml.attrib["cost"])
+        for description in xml.findall("description"):
+            self.description = description.text
+        for question in xml.findall("question"):
+            self.question = question.text
+        for instructions in xml.findall("instructions"):
+            self.instructions = instructions.text
+
+    def build_client_config_xml(self, extra_puzzles_xml):
+        puzzle_xml = ET.SubElement(extra_puzzles_xml, "extra_puzzle", id=self.id, title=self.title, cost=str(self.cost))
+        if len(self.description) > 0:
+            desc_xml = ET.SubElement(puzzle_xml, "description")
+            desc_xml.text = self.description
+        if len(self.question) > 0:
+            question_xml = ET.SubElement(puzzle_xml, "question")
+            question_xml.text = self.question
+        # Dont' include the instructions
+
+
 class BaseRallyConfig:
     def __init__(self, config_file):
         self.config_file = config_file
@@ -14,6 +46,7 @@ class BaseRallyConfig:
         self.track_information = None
         self.is_local = False
         self.title = None
+        self.extra_puzzles = {}
 
         try:
             tree = ET.parse(config_file)
@@ -58,6 +91,11 @@ class BaseRallyConfig:
                     self.track_information = TrackInformation(self, xml=sections)
             else:
                 raise Exception("Can't define more than one <sections> in rally.xml")
+
+        for extra_puzzles in root.findall("extra_puzzles"):
+            for extra_puzzle in extra_puzzles.findall("extra_puzzle"):
+                puzzle = ExtraPuzzle(extra_puzzle)
+                self.extra_puzzles[puzzle.id] = puzzle
 
     def replace_locations(self, s):
         return s.replace("#LOCATION#", self.location)

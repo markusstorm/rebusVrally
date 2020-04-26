@@ -107,6 +107,9 @@ class ServerSideClient:
                         self.team_server.search_for_rebus()
                     if client_to_server.HasField("test_rebus_solution"):
                         self.team_server.test_rebus_solution(client_to_server.test_rebus_solution)
+                    if client_to_server.HasField("open_extra_puzzle"):
+                        self.team_server.open_extra_puzzle(client_to_server.open_extra_puzzle)
+
             except google.protobuf.message.DecodeError as e:
                 print("Incorrect message from {0} disconnected from {1}: {2}".format(self.username, self.team_server.teamname, e))
                 break

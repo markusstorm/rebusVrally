@@ -148,6 +148,7 @@ class TeamServer:
         self.photo_answers = []
         self.rebus_answers = {}
         self.rebus_solutions = {}
+        self.opened_extra_puzzles = {}
 
         self.try_to_restore_from_backup()
 
@@ -213,6 +214,7 @@ class TeamServer:
         _json["lunch-time"] = TeamServer.date_to_json(self.lunch_time) # can be None
         _json["found-goal-time"] = TeamServer.date_to_json(self.found_goal_time) # can be None
         _json["goal-time"] = TeamServer.date_to_json(self.goal_time) # can be None
+        _json["opened-extra-puzzles"] = self.opened_extra_puzzles
         solution_json = {}
         for section in self.rebus_solutions:
             rebus_solution = self.rebus_solutions[section]
@@ -246,6 +248,8 @@ class TeamServer:
         self.lunch_time = TeamServer.date_from_json(_json, "lunch-time")
         self.found_goal_time = TeamServer.date_from_json(_json, "found-goal-time")
         self.goal_time = TeamServer.date_from_json(_json, "goal-time")
+        if "opened-extra-puzzles" in _json:
+            self.opened_extra_puzzles = _json["opened-extra-puzzles"]
 
         if "rebus-solutions" in _json:
             rebus_solutions = _json["rebus-solutions"]
@@ -469,6 +473,15 @@ class TeamServer:
         diff = datetime.datetime.now() - self.lock_time
         return int(diff.total_seconds()) < 60
 
+    def open_extra_puzzle(self, message):
+        if message.HasField("puzzle_id"):
+            id = message.puzzle_id
+            if id in self.rally_configuration.extra_puzzles:
+                extra_puzzle = self.rally_configuration.extra_puzzles[id]
+                if not id in self.opened_extra_puzzles:
+                    self.action_logger.log_penalty(extra_puzzle.cost, "Opened extra puzzle: {0}".format(extra_puzzle.title))
+                    self.opened_extra_puzzles[id] = True
+
     def test_rebus_solution(self, solution_req):
         self.latest_action = datetime.datetime.now()
         ok_to_continue = not self.is_rebus_testing_locked()
@@ -536,6 +549,14 @@ class TeamServer:
             obj = solution.pack()
             rs.rebus_solutions.extend([obj])
 
+    def fill_extra_puzzles(self, extra_puzzles):
+        for extra_puzzle_id in self.opened_extra_puzzles:
+            ep = clientprotocol_pb2.ExtraPuzzle()
+            ep.puzzle_id = extra_puzzle_id
+            ep.opened = self.opened_extra_puzzles[extra_puzzle_id]
+            ep.instructions = self.rally_configuration.extra_puzzles[extra_puzzle_id].instructions
+            extra_puzzles.extra_puzzles.extend([ep])
+
     def send_updates_to_clients(self):
         if self.terminate:
             return
@@ -576,5 +597,8 @@ class TeamServer:
 
             status_update.rebus_solutions.SetInParent()
             self.fill_rebus_solutions(status_update.rebus_solutions)
+
+            status_update.extra_puzzles.SetInParent()
+            self.fill_extra_puzzles(status_update.extra_puzzles)
 
         self.send(server_to_client)

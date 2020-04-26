@@ -105,6 +105,16 @@ message RebusSolutions {
   repeated RebusSolution rebus_solutions = 2;
 }
 
+message ExtraPuzzle {
+  optional string puzzle_id = 1;
+  optional bool opened = 2;
+  optional string instructions = 3;
+}
+
+message ExtraPuzzles {
+  repeated ExtraPuzzle extra_puzzles = 1;
+}
+
 message ServerStatusUpdate {
   optional ServerPositionUpdate pos_update = 1;
   optional BusSeating bus_seating = 2;
@@ -114,6 +124,7 @@ message ServerStatusUpdate {
   optional RebusList rebus_list = 6;
   optional PlateAnswers plate_answers = 7;
   optional RebusSolutions rebus_solutions = 8;
+  optional ExtraPuzzles extra_puzzles = 9;
 }
 
 message ServerRequestResponse {
@@ -215,6 +226,10 @@ message TestRebusSolution {
   required int32 map_north = 4;
 }
 
+message OpenExtraPuzzle {
+    required string puzzle_id = 1;
+}
+
 message ClientToServer {
   required int64 counter = 1;
   oneof messages {
@@ -231,5 +246,6 @@ message ClientToServer {
     SetRebusAnswer set_rebus_answer = 12;
     SearchForRebus search_for_rebus = 13;
     TestRebusSolution test_rebus_solution = 14;
+    OpenExtraPuzzle open_extra_puzzle = 15;
   }
 }

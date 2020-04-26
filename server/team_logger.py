@@ -3,7 +3,8 @@ import os
 
 
 class TeamLoggerBase:
-    def __init__(self, logger_id, log_path, filename):
+    def __init__(self, team_id, logger_id, log_path, filename):
+        self.team_id = team_id
         self.logger_id = logger_id
         self.log_path = log_path
         self.formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
@@ -16,26 +17,31 @@ class TeamLoggerBase:
         self.logger.addHandler(self.handler)
 
     def info(self, message):
+        self.add_to_server_log("INFO", message)
         self.logger.info(message)
 
     def error(self, message):
+        self.add_to_server_log("ERROR", message)
         self.logger.error(message)
 
     def warning(self, message):
+        self.add_to_server_log("WARNING", message)
         self.logger.warning(message)
+
+    def add_to_server_log(self, level, message):
+        print("{0}: {1} {2}".format(self.team_id, level, message))
 
 
 class TeamLogger(TeamLoggerBase):
     def __init__(self, team_id, log_path):
-        self.team_id = team_id
         logger_id = "{0}.log".format(team_id)
-        TeamLoggerBase.__init__(self, logger_id, log_path, "team_log.txt")
+        TeamLoggerBase.__init__(self, team_id, logger_id, log_path, "team_log.txt")
 
 
 class TeamActionLogger(TeamLoggerBase):
     def __init__(self, team_id, log_path):
         logger_id = "{0}.actions".format(team_id)
-        TeamLoggerBase.__init__(self, logger_id, log_path, "team_actions.txt")
+        TeamLoggerBase.__init__(self, team_id, logger_id, log_path, "team_actions.txt")
 
     def log_penalty(self, number_of_points, message):
         self.info("PENALTY ({0}): {1}".format(message, number_of_points))

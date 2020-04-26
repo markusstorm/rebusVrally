@@ -84,14 +84,16 @@ class MiniBus:
                     turn_matched = True
                 if self.difficulty == serverprotocol_pb2.LoginRequest.EASY:
                     turn_matched = True
-                if turn_matched:
+                if turn_matched or turn.automatic:
                     self.current_section = turn.next_section
                     next_section = self.track_information.get_section(turn.next_section)
                     self.distance = next_section.get_start_distance()
                     self.force_update = True
                 else:
-                    # TODO: less logging from this
-                    print("Not taking turn to next section because there is no indicator light")
+                    if not turn.already_warned:
+                        turn.already_warned = True
+                        self.teamserver.action_logger.log_warning("Not taking turn to next section {0} because there is no indicator light".format(turn.next_section))
+
         if not turning_handled:
             # The above code didn't find a normal turn to handle, so check if the driver has gone too far
             if section.missed_all_turns(self.distance):

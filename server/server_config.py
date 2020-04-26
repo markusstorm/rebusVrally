@@ -195,6 +195,10 @@ class ServerRallyConfig(BaseRallyConfig):
     def get_client_config_xml(self):
         root = ET.Element("rally", id=self.rally_id, title=self.title)
         self.track_information.build_client_config_xml(root)
+        if len(self.extra_puzzles) > 0:
+            extra_puzzles_xml = ET.SubElement(root, "extra_puzzles")
+            for extra_puzzle in self.extra_puzzles.values():
+                extra_puzzle.build_client_config_xml(extra_puzzles_xml)
 
         tree = ET.ElementTree(root)
         xmlstr = ET.tostring(tree.getroot(), method='xml')

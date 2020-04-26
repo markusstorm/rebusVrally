@@ -1,5 +1,5 @@
 class RallyVersion:
-    VERSION = 3
+    VERSION = 4
 
     def __init__(self):
         pass
