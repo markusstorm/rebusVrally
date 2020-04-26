@@ -478,9 +478,10 @@ class TeamServer:
             id = message.puzzle_id
             if id in self.rally_configuration.extra_puzzles:
                 extra_puzzle = self.rally_configuration.extra_puzzles[id]
-                if not id in self.opened_extra_puzzles:
+                if id not in self.opened_extra_puzzles:
                     self.action_logger.log_penalty(extra_puzzle.cost, "Opened extra puzzle: {0}".format(extra_puzzle.title))
-                    self.opened_extra_puzzles[id] = True
+                    self.opened_extra_puzzles[id] = extra_puzzle.cost
+                    self.backup_status_to_disk()
 
     def test_rebus_solution(self, solution_req):
         self.latest_action = datetime.datetime.now()
@@ -553,7 +554,7 @@ class TeamServer:
         for extra_puzzle_id in self.opened_extra_puzzles:
             ep = clientprotocol_pb2.ExtraPuzzle()
             ep.puzzle_id = extra_puzzle_id
-            ep.opened = self.opened_extra_puzzles[extra_puzzle_id]
+            ep.opened = True
             ep.instructions = self.rally_configuration.extra_puzzles[extra_puzzle_id].instructions
             extra_puzzles.extra_puzzles.extend([ep])
 
