@@ -27,6 +27,7 @@ class Turn:
         if "automatic" in turn.attrib:
             self.automatic = Turn.xml_attribute_to_bool(turn.attrib["automatic"])
         self.already_warned = False # To stop warnings from being printed several times
+        self.already_warned_checkpoint = False
 
     @staticmethod
     def xml_attribute_to_bool(value):

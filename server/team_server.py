@@ -137,6 +137,7 @@ class TeamServer:
         self.goal_time = None
         self.latest_backup_contents = ""
         self.latest_action = datetime.datetime.now()
+        self.found_rebus_checkpoints = []
 
         #self.status_information = StatusInformation(rally_configuration.track_information)
         # TODO: use StatusInformation for seating and other position info?
@@ -215,6 +216,7 @@ class TeamServer:
         _json["found-goal-time"] = TeamServer.date_to_json(self.found_goal_time) # can be None
         _json["goal-time"] = TeamServer.date_to_json(self.goal_time) # can be None
         _json["opened-extra-puzzles"] = self.opened_extra_puzzles
+        _json["found-rebus-checkpoints"] = self.found_rebus_checkpoints
         solution_json = {}
         for section in self.rebus_solutions:
             rebus_solution = self.rebus_solutions[section]
@@ -250,7 +252,8 @@ class TeamServer:
         self.goal_time = TeamServer.date_from_json(_json, "goal-time")
         if "opened-extra-puzzles" in _json:
             self.opened_extra_puzzles = _json["opened-extra-puzzles"]
-
+        if "found-rebus-checkpoints" in _json:
+            self.found_rebus_checkpoints = _json["found-rebus-checkpoints"]
         if "rebus-solutions" in _json:
             rebus_solutions = _json["rebus-solutions"]
             for section_str in rebus_solutions:
@@ -446,6 +449,9 @@ class TeamServer:
             if rebus_place is None:
                 print("Warning: no rebus at that place...")
             else:
+                # The team has found a checkpoint, remember that!
+                if rebus_place.id not in self.found_rebus_checkpoints:
+                    self.found_rebus_checkpoints.append(rebus_place.id)
                 rc = self.rally_configuration.get_rebus_config(rebus_place.number)
                 if rc is None:
                     self.send_messages("Error in configuration, can't find rebus {0}!".format(rebus_place.number))

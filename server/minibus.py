@@ -85,10 +85,15 @@ class MiniBus:
                 if self.difficulty == serverprotocol_pb2.LoginRequest.EASY:
                     turn_matched = True
                 if turn_matched or turn.automatic:
-                    self.current_section = turn.next_section
-                    next_section = self.track_information.get_section(turn.next_section)
-                    self.distance = next_section.get_start_distance()
-                    self.force_update = True
+                    if not self.found_all_checkpoints_in_section(section):
+                        if not turn.already_warned_checkpoint:
+                            turn.already_warned_checkpoint = True
+                            self.teamserver.action_logger.log_warning("Not taking turn to next section {0} because the team hasn't found the rebus checkpoints in this section yet".format(turn.next_section))
+                    else:
+                        self.current_section = turn.next_section
+                        next_section = self.track_information.get_section(turn.next_section)
+                        self.distance = next_section.get_start_distance()
+                        self.force_update = True
                 else:
                     if not turn.already_warned:
                         turn.already_warned = True
@@ -100,6 +105,16 @@ class MiniBus:
                 # The team has missed the exit and has ended up at the end of the video
                 self.mark_missed_turn(section.section_number, section.get_last_turn())
                 # No need to do anything else here, the steering GUI will also tell the driver that he's gone too far
+
+    def found_all_checkpoints_in_section(self, section):
+        checkpoints_in_section = []
+        for rp in section.rebus_places:
+            checkpoints_in_section.append(rp.id)
+        found_checkpoints = []
+        for team_found in self.teamserver.found_rebus_checkpoints:
+            if team_found in checkpoints_in_section:
+                found_checkpoints.append(team_found)
+        return len(found_checkpoints) == len(checkpoints_in_section)
 
     def mark_missed_turn(self, section_number, turn):
         # Type is TURN_WRONG or TURN_MISSED
