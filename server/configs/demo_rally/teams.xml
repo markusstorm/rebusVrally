@@ -1,5 +1,5 @@
 <teams>
-  <team name="demo" number="1" password="1234">
+  <team name="Demo-laget" login_name="demo" number="1" password="1234">
     <answer_document url="https://docs.google.com/spreadsheets/d/18gCmRTinpni3h2k5eBB0CN-jHAIQwhGkckLhFRijAF8/edit?usp=sharing"/>
   </team>
 </teams>
