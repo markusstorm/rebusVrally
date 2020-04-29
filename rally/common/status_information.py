@@ -65,6 +65,7 @@ class StatusInformation:
         self.rebus_answers = {}
         self.rebus_solutions = {}
         self.extra_puzzles = {}
+        self.driving_message = ""
 
     def get_my_seat(self):
         for i in range(1, 10):
@@ -111,6 +112,10 @@ class StatusInformation:
             self.update_rebus_solutions(status_update.rebus_solutions)
         if status_update.HasField("extra_puzzles"):
             self.update_extra_puzzles(status_update.extra_puzzles)
+        if status_update.HasField("driving_message"):
+            self.update_driving_message(status_update.driving_message)
+        else:
+            self.driving_message = ""
 
     def update_seating(self, seating_update):
         for i in range(0, 10):
@@ -190,6 +195,12 @@ class StatusInformation:
                     if extra_puzzle.HasField("instructions"):
                         instructions = extra_puzzle.instructions
                     self.extra_puzzles[id] = instructions
+
+    def update_driving_message(self, driving_message):
+        if driving_message.HasField("message"):
+            self.driving_message = driving_message.message
+        else:
+            self.driving_message = ""
 
     def compare_plate_or_photo_lists(self, l1, l2):
         if len(l1) != len(l2):

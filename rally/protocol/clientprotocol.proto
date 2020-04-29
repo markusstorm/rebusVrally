@@ -115,6 +115,10 @@ message ExtraPuzzles {
   repeated ExtraPuzzle extra_puzzles = 1;
 }
 
+message DrivingMessage {
+  optional string message = 1;
+}
+
 message ServerStatusUpdate {
   optional ServerPositionUpdate pos_update = 1;
   optional BusSeating bus_seating = 2;
@@ -125,6 +129,7 @@ message ServerStatusUpdate {
   optional PlateAnswers plate_answers = 7;
   optional RebusSolutions rebus_solutions = 8;
   optional ExtraPuzzles extra_puzzles = 9;
+  optional DrivingMessage driving_message = 10;
 }
 
 message ServerRequestResponse {

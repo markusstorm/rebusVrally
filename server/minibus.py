@@ -103,6 +103,7 @@ class MiniBus:
             # The above code didn't find a normal turn to handle, so check if the driver has gone too far
             if section.missed_all_turns(self.distance):
                 # The team has missed the exit and has ended up at the end of the video
+                self.driving_message = "Ni har missat rätt sväng."
                 self.mark_missed_turn(section.section_number, section.get_last_turn())
                 # No need to do anything else here, the steering GUI will also tell the driver that he's gone too far
 
