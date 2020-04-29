@@ -84,6 +84,7 @@ class AllowedTeam:
         self.team_name = None
         self.team_number = None
         self.team_password = None
+        self.team_actual_name = None
         if "name" in team_xml.attrib:
             self.team_actual_name = team_xml.attrib["name"]
         if "login_name" in team_xml.attrib:
@@ -92,6 +93,8 @@ class AllowedTeam:
             self.team_number = int(team_xml.attrib["number"])
         if "password" in team_xml.attrib:
             self.team_password = team_xml.attrib["password"]
+        if self.team_actual_name is None:
+            self.team_actual_name = self.team_name
 
     def compare_name(self, team_name):
         return self.team_name.casefold() == team_name.casefold()
