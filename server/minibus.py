@@ -15,6 +15,7 @@ class MiniBus:
         self.indicator_light = clientprotocol_pb2.ClientPositionUpdate.NONE
         self.force_update = False
         self.incorrect_turns = {}
+        self.driving_message = ""
 
         self.seating = []
         for i in range(0, 10):
@@ -70,6 +71,7 @@ class MiniBus:
 
         turn = section.get_correct_turn()
         turning_handled = False
+        self.driving_message = ""
         if turn is not None:
             turn_distance = section.calculate_default_video_distance_from_frame(turn.frame_offset)
             if turn_distance <= self.distance <= turn_distance+100: # TODO: possibly less than 100 meters
@@ -86,6 +88,7 @@ class MiniBus:
                     turn_matched = True
                 if turn_matched or turn.automatic:
                     if not self.found_all_checkpoints_in_section(section):
+                        self.driving_message = "Ni har missat en kontroll\nLeta upp den innan\nni kör vidare."
                         if not turn.already_warned_checkpoint:
                             turn.already_warned_checkpoint = True
                             self.teamserver.action_logger.log_warning("Not taking turn to next section {0} because the team hasn't found the rebus checkpoints in this section yet".format(turn.next_section))
@@ -103,7 +106,7 @@ class MiniBus:
             # The above code didn't find a normal turn to handle, so check if the driver has gone too far
             if section.missed_all_turns(self.distance):
                 # The team has missed the exit and has ended up at the end of the video
-                self.driving_message = "Ni har missat rätt sväng."
+                self.driving_message = "Ni har tyvärr kört fel.\nBacka och leta\nupp rätt väg."
                 self.mark_missed_turn(section.section_number, section.get_last_turn())
                 # No need to do anything else here, the steering GUI will also tell the driver that he's gone too far
 

@@ -34,7 +34,6 @@ class SteeringWindow:
         self.current_brake = 0.0
         self.backup_timeout = None
         self.backing = False
-        self.driven_too_far = False
         self.stopped = True
         self.indicator_light = SteeringWindow.NONE
         self.showing_message = False
@@ -196,7 +195,6 @@ class SteeringWindow:
                 self.update_turn_indicators()
 
         section = self.track_information.get_section(self.current_section)
-        self.driven_too_far = section.missed_all_turns(self.distance)
 
         notice = None
         if self.looking_for_rebus:
@@ -205,9 +203,9 @@ class SteeringWindow:
         elif self.backing:
             notice = "Backar..."
             pos = [140, 250]
-        elif self.driven_too_far:
-            notice = "Ni har tyvärr kört fel.\nBacka och leta\nupp rätt väg."
-            pos = [50, 200]
+        elif status_information.driving_message is not None and len(status_information.driving_message) > 0:
+            notice = status_information.driving_message
+            pos = [50, 300]
         if notice is not None:
             self.notice_label["text"] = notice
             self.notice_label.place(x=pos[0], y=pos[1])

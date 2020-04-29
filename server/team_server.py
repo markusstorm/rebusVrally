@@ -608,4 +608,7 @@ class TeamServer:
             status_update.extra_puzzles.SetInParent()
             self.fill_extra_puzzles(status_update.extra_puzzles)
 
+            status_update.driving_message.SetInParent()
+            status_update.driving_message.message = self.minibus.driving_message
+
         self.send(server_to_client)

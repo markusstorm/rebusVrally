@@ -341,10 +341,6 @@ class Section:
         for video in self.videos.values():
             video.build_client_config_xml(xml_videos)
         xml_turns = ET.SubElement(xml_section, "turns")
-        for turn in self.turns:
-            # Only send incorrect turns to the client, it's the only thing used at the moment, and don't show too much about the rally to any nosy user
-            if turn.direction == Turn.TURN_MISSED:
-                ET.SubElement(xml_turns, "turn", direction=Turn.direction_translation_to_string[turn.direction], frame_offset=str(turn.frame_offset), description="", next_section=str(turn.next_section))
         self.segments.build_client_config_xml(xml_section)
 
     def get_default_video(self):
