@@ -93,6 +93,7 @@ class Segment:
             # Add an extra distance_per_frame to fill the gap onto this segment
             self.start_distance = previous_segment.end_distance + previous_segment.distance_per_frame
 
+        #self.end_distance = self.start_distance + ((self.end_frame - self.start_frame) / (self.default_video.fps*self.default_video.adjust_fps)) * self.speed
         self.end_distance = self.start_distance + ((self.end_frame - self.start_frame) / self.default_video.fps) * self.speed
         self.distance_per_frame = (self.end_distance - self.start_distance) / (self.end_frame - self.start_frame)
 
@@ -198,6 +199,9 @@ class Video:
             os.path.join(track_information.rally_config_object.replace_locations(video_xml.attrib["file"])))
         self.direction = Video.direction_map_to_int[video_xml.attrib["view"]]
         self.fps = float(video_xml.attrib["fps"])
+        self.adjust_fps = 1.0
+        if "adjust_fps" in video_xml.attrib:
+            self.adjust_fps = float(video_xml.attrib["adjust_fps"])
         self.start_offset_frame = 0
         if "start_offset_frame" in video_xml.attrib:
             self.start_offset_frame = int(video_xml.attrib["start_offset_frame"])
@@ -295,31 +299,30 @@ class Section:
         return self.segments.calculate_default_video_frame_from_distance(distance)
 
     def calculate_other_video_frame_from_distance(self, distance, viewing_direction):
-        # The distance really relates to a time in any video, so calculate the time and then multiply with fps to get frame
         video = self.get_video(viewing_direction)
         if video is not None:
-            video_time = self.calculate_other_video_second_from_distance(distance, viewing_direction)
-            return video_time * video.fps
+            # Calculate the default video frame
+            video_frame = self.calculate_default_video_frame_from_distance(distance)
+            # The number of frames into the section (i.e. with regard to the offset frames)
+            frame_in_section = video_frame - self.default_video.start_offset_frame
+            time_in_section = frame_in_section / self.default_video.fps
 
-        return 0.0
+            # Ok, so a distance corresponds to a number of seconds into the section
+            # Now make a similar calculation for the other video.
+            # Start with calculating the number of frames that the time corresponds to in this video
+            frame_count = time_in_section * video.fps
+            # Then simply add the start offset time (already calculated)
+            return frame_count + video.start_offset_frame
+        return 0
 
-    # def calculate_section_distance(self, frame_number):
-    #     for segment in self.segments:
-    #         if segment.start_frame <= frame_number <= segment.end_frame:
-    #             return segment.calculate_distance(frame_number)
-    #     return 0.0
-    #
-    # def calculate_frame_from_distance(self, distance, viewing_direction):
-    #     for segment in self.segments:
-    #         if segment.start_distance <= distance <= segment.end_distance:
-    #             return segment.calculate_frame_from_distance(distance)
-    #     return 0
-    #
-    # def _calculate_frame_from_distance(self, distance, viewing_direction):
-    #     for segment in self.segments:
-    #         if segment.start_distance <= distance <= segment.end_distance:
-    #             return segment.calculate_frame_from_distance(distance)
-    #     return 0
+    # The distance really relates to a time in any video, so calculate the time and then multiply with fps to get frame
+    #Ta hänsyn till skillnaden i FPS
+    #    video = self.get_video(viewing_direction)
+    #    if video is not None:
+    #        video_time = self.calculate_other_video_second_from_distance(distance, viewing_direction)
+    #        return video_time * video.fps
+    #    return 0.0
+
 
     def calculate_default_video_second_from_distance(self, distance):
         # All frames and times in video relates to the start of the actual video, NOT the start_offset
@@ -329,9 +332,22 @@ class Section:
     def calculate_other_video_second_from_distance(self, distance, viewing_direction):
         video = self.get_video(viewing_direction)
         if video is not None:
-            default_video_time = self.calculate_default_video_second_from_distance(distance)
-            return default_video_time - self.default_video.start_offset_time + video.start_offset_time
-        return 0.0
+            # Calculate the default video frame
+            video_frame = self.calculate_default_video_frame_from_distance(distance)
+            # The number of frames into the section (i.e. with regard to the offset frames)
+            frame_in_section = video_frame - self.default_video.start_offset_frame
+            time_in_section = frame_in_section / self.default_video.fps
+
+            # Ok, so we have the time into the section, then simply return that + the start offset time.
+            return time_in_section + video.start_offset_time
+
+# Ta hänsyn till skillnaden i FPS
+#
+#         video = self.get_video(viewing_direction)
+#         if video is not None:
+#             default_video_time = self.calculate_default_video_second_from_distance(distance)
+#             return default_video_time - self.default_video.start_offset_time + video.start_offset_time
+#         return 0.0
 
     # def calculate_video_second_from_distance(self, distance, viewing_direction):
     #     video = self.get_video(viewing_direction)
