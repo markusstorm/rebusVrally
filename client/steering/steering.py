@@ -1,5 +1,6 @@
 import argparse
 import datetime
+from functools import partial
 from tkinter import *
 from tkinter import messagebox
 
@@ -16,6 +17,7 @@ class SteeringWindow:
     RIGHT = 2
 
     def __init__(self, client_index, track_information):
+        self.debug_mode = False
         self.my_client_index = client_index
         self.connected = False
         self.speed = 0.0
@@ -50,6 +52,8 @@ class SteeringWindow:
         self.backup_label = None
         self.f_indicators = None
         self.speed_label = None
+
+        self.speed_locked = None
 
         self.layout()
 
@@ -135,6 +139,33 @@ class SteeringWindow:
         self.backup_label.bind("<Button-1>", self.backup_clicked)
 
         self.notice_label = Label(self.window, text="", font=("Arial Bold", 30), background="blue")
+
+        if self.debug_mode:
+            button = Button(self.window, text="15")
+            button.bind("<ButtonPress-1>", partial(self.fifty_button_on, 15))
+            button.bind("<ButtonRelease-1>", self.fifty_button_off)
+            button.bind("<Leave>", self.fifty_button_off)
+            button.grid(row=4, column=0)
+
+            button = Button(self.window, text="30")
+            button.bind("<ButtonPress-1>", partial(self.fifty_button_on, 30))
+            button.bind("<ButtonRelease-1>", self.fifty_button_off)
+            button.bind("<Leave>", self.fifty_button_off)
+            button.grid(row=4, column=1)
+
+            button = Button(self.window, text="50")
+            button.bind("<ButtonPress-1>", partial(self.fifty_button_on, 50))
+            button.bind("<ButtonRelease-1>", self.fifty_button_off)
+            button.bind("<Leave>", self.fifty_button_off)
+            button.grid(row=4, column=2)
+
+    def fifty_button_on(self, speed, event):
+        self.speed = speed / 3.6
+        self.speed_locked = speed / 3.6
+
+    def fifty_button_off(self, event):
+        self.speed = 0.0
+        self.speed_locked = None
 
     def run(self):
         self.window.after(1, self.update_speed)
@@ -376,6 +407,9 @@ class SteeringWindow:
         # Max speed of 75 km/h just to help reduce video bugs
         if self.speed * 3.6 > 75.0:
             self.speed = 75.0 / 3.6
+
+        if self.speed_locked is not None:
+            self.speed = self.speed_locked
 
         self.speed_variable.set(str(int(self.speed * 3.6)))
 
