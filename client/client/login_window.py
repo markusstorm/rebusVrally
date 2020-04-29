@@ -104,7 +104,7 @@ class LoginWindow:
         self.serverEntry.grid(row=main_row, column=1)
 
         main_row += 1
-        teamnameLabel = Label(f, text="Team Name").grid(row=main_row, column=0)
+        teamnameLabel = Label(f, text="Team Login Name").grid(row=main_row, column=0)
         self.teamname_sv = StringVar()
         self.teamname_sv.set("")
         self.teamnameEntry = Entry(f, textvariable=self.teamname_sv)

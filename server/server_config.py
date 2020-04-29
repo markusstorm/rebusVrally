@@ -85,7 +85,9 @@ class AllowedTeam:
         self.team_number = None
         self.team_password = None
         if "name" in team_xml.attrib:
-            self.team_name = team_xml.attrib["name"]
+            self.team_actual_name = team_xml.attrib["name"]
+        if "login_name" in team_xml.attrib:
+            self.team_name = team_xml.attrib["login_name"]
         if "number" in team_xml.attrib:
             self.team_number = int(team_xml.attrib["number"])
         if "password" in team_xml.attrib:
