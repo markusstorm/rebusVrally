@@ -48,6 +48,7 @@ allowed_when_moving = remove_from_list({Video.LEFT: True, Video.FRONT: True, Vid
 
 class App:
     def __init__(self, window, direction_str, track_information):
+        self.debug = False
         self.terminate = False
         self.track_information = track_information
         window_title = "Utsikt {0}".format(direction_translator[direction_str])
@@ -62,9 +63,9 @@ class App:
         self.distance = 0.0
         self.current_section = track_information.start_section
         self.pos_time = None
-        self.delay = 15 #TODO: set based on FPS
-        self.drop_a_frame = False
-        self.first_display = True
+        self.delay = int(1.0/30.0) # Mostly we are dealing with 30fps video, so set a default delay based on that
+        self.last_frame_time_shown = -1
+
         self.buttons = {}
         self.button_states = {Video.LEFT: False, Video.FRONT: False, Video.RIGHT: False}
 
@@ -81,10 +82,8 @@ class App:
 
         self.update()
 
-        # Debug, TODO: remove
-        self.frame_label = None
-
-        #print("A")
+        if self.debug:
+            self.frame_label = None
 
         self.window.mainloop()
         self.terminate = True
@@ -128,9 +127,9 @@ class App:
 
             self.update_view_buttons()
 
-            # TODO: remove frame counter or make configurable
-            self.frame_label = tkinter.Label(self.window, text="FRAME COUNT")
-            self.frame_label.place(x=0, y=0)
+            if self.debug:
+                self.frame_label = tkinter.Label(self.window, text="FRAME COUNT")
+                self.frame_label.place(x=0, y=0)
 
         self.reconfiguring = False
 
@@ -156,7 +155,6 @@ class App:
                 self.view_video_caps[direction] = MyVideoCapture(self.track_information, self.viewing_direction)
                 self.view_video_caps[direction].change_section(self.current_section, self.distance)
             self.force_update = True
-            #print("Force update")
 
     def update_view_buttons(self):
         if self.terminate:
@@ -176,14 +174,12 @@ class App:
             self.buttons[direction].config(state=state)
 
     def on_pos_updates(self, status_information):
-        #print("pos")
         self.pos_time = datetime.datetime.now()
         self.speed = status_information.speed
         self.stopped = status_information.stopped
         self.distance = status_information.distance
         if status_information.force_update:
             self.force_update = True
-        #print(self.current_section, status_information.current_section)
         if not self.connected:
             self.current_section = status_information.current_section
             self.change_video()
@@ -195,6 +191,15 @@ class App:
                 self.change_video()
         self.update_view_buttons()
 
+    def seek(self, vid_cap, video_target_msecs, video_speed):
+        # TODO: calculate how far into the future we should seek based on average seek time
+        seek_time_ms = 1000
+        # How many frame would be shown in one realtime second with the current speed?
+        seek_extra_frames = vid_cap.fps * self.speed / video_speed
+        # How much time does that correspond to in the video?
+        seek_extra_ms = seek_extra_frames / vid_cap.fps
+        vid_cap.seek_ms(video_target_msecs + seek_extra_ms)
+
     def update(self):
         delay = self._update()
         if delay is None or not delay:
@@ -203,107 +208,96 @@ class App:
             self.window.after(delay, self.update)
 
     def _update(self):
-        if not self.connected:
-            #print("Not connected")
+        # wait for position data to start arriving
+        if not self.connected or self.pos_time is None:
             return False
+        # Changing video, so don't show anything
         if self.reconfiguring:
-            #print("Reconfiguring")
             return False
 
         vid_cap = self.current_video_cap()
 
-        if self.first_display:
-            #print("First display")
-            self.first_display = False
-            ret, frame = vid_cap.get_frame()
-            if ret:
-                self.photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(frame))
-                self.canvas.create_image(0, 0, image=self.photo, anchor=tkinter.NW)
-            return False
-
-        # wait for position data to start arriving
-        if self.pos_time is None:
-            #print("No position")
-            return False
-        if self.speed == 0.0 and not self.force_update:
-            #print("Speed is 0")
-            return False
+        if self.force_update:
+            self.last_frame_time_shown = -1
 
         now = datetime.datetime.now()
         diff = now - self.pos_time
         interpolated_distance = self.distance + self.speed * diff.total_seconds()
         section = self.track_information.get_section(self.current_section)
+        video_speed = 50.0/3.6
         if section is not None:
+            video_speed = section.get_current_video_speed(interpolated_distance)
             if interpolated_distance < section.get_start_distance():
                 interpolated_distance = section.get_start_distance()
-        #print("id {0}".format(interpolated_distance))
-        #print("dist: {0}".format(interpolated_distance))
-        # 50 km/h statisk hastighet -> 50/3.6 m/s
-        #video_speed = 50.0 / 3.6
-        # With that speed, the current distance corresponds to
-        #video_target_secs = interpolated_distance / video_speed
         video_target_secs = self.track_information.get_section(self.current_section).calculate_other_video_second_from_distance(interpolated_distance, self.viewing_direction)
+        video_target_msecs = video_target_secs * 1000
 
-        # Before we try to show a frame, see if we should wait more or backup
-        # TODO: remove a lot of duplicated code (but first get something to work at all...)
-        diff_ms = vid_cap.frame_time - video_target_secs * 1000.0
-        if diff_ms > 0.0:
-            # Ok, so video is ahead of time
-            ret = False
-            if self.speed < -0.01:
-                # We are backing, should seek in the video and then show one frame
-                vid_cap.seek_ms(video_target_secs * 1000)
-                ret, frame = vid_cap.get_frame(True)
-                self.force_update = False
-            elif self.force_update:
-                # Video is ahead of time and we have a forced update, then also seek
-                vid_cap.seek_ms(video_target_secs * 1000)
-                ret, frame = vid_cap.get_frame(False)
-                self.force_update = False
-            if ret:
-                self.photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(frame))
-                self.canvas.create_image(0, 0, image=self.photo, anchor=tkinter.NW)
-                self.frame_label["text"] = str(vid_cap.frame_number)
-                return self.delay
-            # We are ahead with the video, wait for some more time before showing the next frame
-            return min(int(diff_ms), 100)
+        wait = 1
+        if self.speed < 0.0:
+            # We are backing, no fancy methods to handle this, simply seek always when we need a new frame
+            if abs(video_target_msecs - self.last_frame_time_shown) < vid_cap.one_frame_ms:
+                # We are still close to what we last displayed
+                ret, frame, frame_time = vid_cap.get_frame(self.force_update)
+                wait = vid_cap.one_frame_ms
+            else:
+                # We are backing and need a new frame, so seek and force the next frame
+                vid_cap.seek_ms(video_target_msecs)
+                ret, frame, frame_time = vid_cap.get_frame(True)
+                wait = 1 # Draw as quickly as possible
+        else:
+            # Either standing still or moving forward
+            if abs(video_target_msecs - self.last_frame_time_shown) < vid_cap.one_frame_ms:
+                # We are still close to what we last displayed
+                ret, frame, frame_time = vid_cap.get_frame(self.force_update)
+                wait = vid_cap.one_frame_ms
+            else:
+                # We need to show a new frame
+                diff_ms = video_target_msecs - self.last_frame_time_shown
+                if diff_ms > 0.0:
+                    behind = diff_ms
+                    # We are behind what we should show
+                    if behind > 1000:
+                        # We are more than one second behind than what should be shown
+                        # Seek to a time that is a bit into the future
+                        self.seek(vid_cap, video_target_msecs, video_speed)
+                        ret, frame, frame_time = vid_cap.get_frame(True)
+                        wait = 1 # Not sure, but should probably try do display again as soon as possible, to find out where we stand
+                    else:
+                        # Hope that we can catch up with the video soon
+                        ret, frame, frame_time = vid_cap.get_frame(True)
+                        wait = 1 # We are behind, so don't wait around to show the next frame
+                elif diff_ms < 0.0:
+                    # We are ahead of what we should show
+                    ahead_ms = -diff_ms
 
-        # Get a frame from the video source
-        # if self.drop_a_frame:
-        #     self.drop_a_frame = False
-        #     self.vid.get_frame()
-        #ret, frame = vid_cap.get_frame(not self.force_update)
+                    # How long would it take for the bus to arrive at the same time with the current speed?
+                    if abs(self.speed) > 0.01:
+                        travel_length = video_speed * ahead_ms / 1000
+                        t = travel_length / self.speed
+                        t_ms = t * 1000
+                    else:
+                        t_ms = 10000
+                    if t_ms > 3000:
+                        # It would take more than three wall clock seconds for the bus to catch up with the
+                        # video, so seek and force a frame update
+                        self.seek(vid_cap, video_target_msecs, video_speed)
+                        ret, frame, frame_time = vid_cap.get_frame(True)
+                        wait = 1
+                    else:
+                        # In not too long we could possibly catch up with the video
+                        # TODO: should probably return a new frame here every now and then, to not make the video too jumpy
+                        ret, frame, frame_time = vid_cap.get_frame(False)
+                        wait = vid_cap.one_frame_ms
 
-        ret, frame = vid_cap.get_frame(diff_ms < self.delay or self.force_update)
         self.force_update = False
-        # if self.viewing_direction != self.main_direction:
-        #     print(self.viewing_direction)
-        # print(ret)
+        self.last_frame_time_shown = frame_time
 
         if ret:
-            self.photo = PIL.ImageTk.PhotoImage(image = PIL.Image.fromarray(frame))
-            self.canvas.create_image(0, 0, image = self.photo, anchor = tkinter.NW)
+            self.photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(frame))
+            self.canvas.create_image(0, 0, image=self.photo, anchor=tkinter.NW)
+        if self.debug:
+            self.frame_label["text"] = str(vid_cap.frame_number)
 
-        self.frame_label["text"] = str(vid_cap.frame_number)
-
-        # OK, this have to get better in some way... but it's a first try
-        # Now we have presented a frame, it has the time self.vid.frame_time (millisecs)
-        diff_ms = vid_cap.frame_time - video_target_secs*1000.0
-        #print("Diff: {0}".format(diff_ms))
-        # if diff_ms is > 0 then we have presented the frame too early, so we need to wait
-        # otherwise we should just present the next frame as soon as possible
-        wait = 1
-        if diff_ms > 0.0:
-            wait = diff_ms
-        else:
-            if diff_ms < -2000:
-                # Too far behind, try to seek in the video
-                vid_cap.seek_ms(video_target_secs*1000 + 1000) #Add a bit of extra time, since it will take time to seek
-            elif diff_ms < -500:
-                self.drop_a_frame = True
-
-        #print("vid {0} and target {1} -> wait {2}".format(self.vid.frame_time, video_target_secs*1000.0, wait))
-        #self.window.after(int(wait), self.update)
         return min(int(wait), 100)
 
 #https://www.opencv-srf.com/2017/12/play-video-file-backwards.html - mini-buffrad approach

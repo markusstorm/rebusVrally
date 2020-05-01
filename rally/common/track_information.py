@@ -168,6 +168,17 @@ class Segments:
                 return segment.calculate_frame_from_distance(distance)
         return 0
 
+    def get_current_video_speed(self, distance):
+        if distance < self.first_segment.start_distance:
+            return self.first_segment.speed
+        if distance > self.last_segment.end_distance:
+            return self.last_segment.speed
+
+        for segment in self.segments:
+            if segment.start_distance <= distance <= segment.end_distance:
+                return segment.speed
+        return 0.0
+
     def calculate_default_video_time_from_distance(self, distance):
         frame = self.calculate_default_video_frame_from_distance(distance)
         return frame * self.default_video
@@ -312,6 +323,9 @@ class Section:
         # All frames and times in video relates to the start of the actual video, NOT the start_offset
         default_video_frame = self.segments.calculate_default_video_frame_from_distance(distance)
         return default_video_frame / self.default_video.fps
+
+    def get_current_video_speed(self, distance):
+        return self.segments.get_current_video_speed(distance)
 
     def calculate_other_video_second_from_distance(self, distance, viewing_direction):
         video = self.get_video(viewing_direction)
