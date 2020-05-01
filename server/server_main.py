@@ -63,22 +63,18 @@ if configuration is None:
 
 print("Starting server for '{0}'\n".format(configuration.rally_id))
 
-HOST = "0.0.0.0"
-if args.start_locally or configuration.is_local:
-    HOST = "127.0.0.1"
-NORMAL_PORT = 63332  # Port to listen on (non-privileged ports are > 1023)
-DYNDNS_PORT = 63343
-
 
 class ConnectionListener(threading.Thread):
-    def __init__(self, port, main_server):
+    def __init__(self, host, port, main_server):
         threading.Thread.__init__(self)
+        self.host = host
         self.port = port
         self.main_server = main_server
 
     def run(self):
+        print("Serving a rally at {0}:{1}".format(self.host, self.port))
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.bind((HOST, self.port))
+            s.bind((self.host, self.port))
             while True:
                 s.listen()
                 conn, addr = s.accept()
@@ -106,15 +102,7 @@ else:
         sys.exit(1)
 print("Using {0} as backup dir".format(backup_path))
 
-main_server = MainServer(configuration, HOST, backup_path)
-normal = ConnectionListener(NORMAL_PORT, main_server)
+main_server = MainServer(configuration, backup_path)
+normal = ConnectionListener(configuration.server_host, configuration.server_port, main_server)
 normal.start()
-if not args.start_locally:
-    dyndns = ConnectionListener(DYNDNS_PORT, main_server)
-    dyndns.start()
-else:
-    dyndns = None
-
 normal.join()
-if dyndns is not None:
-    dyndns.join()

@@ -268,7 +268,7 @@ class LoginWindow:
         #print("Login")
         # Tries to login and the result is reported to report_login_result
         # If the login is unsuccessful, then the ServerConnection exits its thread
-        self.server_connection = ServerConnection(server, teamname, password, username, self.report_login_result, None, difficulty)
+        self.server_connection = ServerConnection(server, self.current_login_configuration.server_port, teamname, password, username, self.report_login_result, None, difficulty)
         self.server_connection.start()
 
     def get_rally_config(self):

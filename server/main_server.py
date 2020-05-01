@@ -65,9 +65,8 @@ class BroadcastMessage:
 
 
 class MainServer:
-    def __init__(self, rally_configuration, host, backup_path):
+    def __init__(self, rally_configuration, backup_path):
         self.backup_path = backup_path
-        self.host = host
         self.team_servers = {}
         self.messages = []
         self.rally_is_started = False
@@ -78,7 +77,7 @@ class MainServer:
         self.scheduler = ClientUpdateScheduler(self)
         self.scheduler.start()
 
-        self.web_handler = WebHandler(self, self.host)
+        self.web_handler = WebHandler(self, self.rally_configuration.web_host, self.rally_configuration.web_port)
         self.web_handler.start()
 
     def find_team_server(self, team_name):
@@ -160,6 +159,11 @@ class MainServer:
             if team_server.team_number == team_number:
                 return team_server.to_json()
         return None
+
+    def set_team_goal_time(self, team_number):
+        for team_server in self.team_servers.values():
+            if team_server.team_number == team_number:
+                team_server.set_goal_time()
 
     def terminate_team(self, team_id):
         team_server = self.find_team_server_from_id(team_id)

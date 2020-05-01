@@ -1,3 +1,0 @@
-<rally title="Demo-rally (lokalt)" local="true" id="local_demo" seq_number="1" has_difficulty="true" login_background="#LOCATION#/demo_rally/data/goethe_demo.png" file_list="#LOCATION#/demo_rally/files.xml">
-  <login_details server_address="127.0.0.1" team="demo" password="1234" username=""/>
-</rally>

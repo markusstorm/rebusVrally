@@ -9,6 +9,7 @@ class ClientLoginConfig(BaseRallyConfig):
         self.login_background = None
         self.seq_number = 0
         self.default_server_address = ""
+        self.server_port = None
         self.default_team_name = ""
         self.default_password = ""
         self.default_username = ""
@@ -32,12 +33,16 @@ class ClientLoginConfig(BaseRallyConfig):
         for login_details in root.findall("login_details"):
             if "server_address" in login_details.attrib:
                 self.default_server_address = login_details.attrib["server_address"]
+            if "port" in login_details.attrib:
+                self.server_port = int(login_details.attrib["port"])
             if "team" in login_details.attrib:
                 self.default_team_name = login_details.attrib["team"]
             if "password" in login_details.attrib:
                 self.default_password = login_details.attrib["password"]
             if "username" in login_details.attrib:
                 self.default_username = login_details.attrib["username"]
+        if self.server_port is None:
+            self.server_port = 63332
 
     def validate_data_files(self):
         self.errors = []

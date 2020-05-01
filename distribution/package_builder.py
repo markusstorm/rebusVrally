@@ -42,7 +42,7 @@ if not args.skip_build:
     build_pyinstaller(build_folder, "../client/out_the_window/movie_window.py")
     build_pyinstaller(build_folder, "../client/steering/steering.py")
     build_pyinstaller(build_folder, "../client/fishbone/fishbone.py")
-    build_pyinstaller(build_folder, "../server/server_main.py")
+    #build_pyinstaller(build_folder, "../server/server_main.py")
 
 target_dir = os.path.abspath(os.path.join(build_folder, "rebusVrally"))
 if os.path.exists(target_dir) and not args.allow_unclean:
@@ -76,21 +76,22 @@ client_conf_folder = os.path.abspath(os.path.join(target_dir, "configs"))
 if not os.path.exists(client_conf_folder):
     os.mkdir(client_conf_folder)
 
-sync_source_folder("configs", client_conf_folder, (r'.*\.dat$', r'vt2020',))
+#sync_source_folder("configs", client_conf_folder, (r'.*\.dat$', r'vt2020',))
+sync_source_folder("configs", client_conf_folder, (r'.*\.dat$',))
 
 # ----------------------------------------------------------
 # Server
-server_folder = os.path.abspath(os.path.join(target_dir, "server"))
-if not os.path.exists(server_folder):
-    os.mkdir(server_folder)
-sync_folder("server_main", server_folder)
-
-
-server_conf_folder = os.path.abspath(os.path.join(server_folder, "configs"))
-if not os.path.exists(server_conf_folder):
-    os.mkdir(server_conf_folder)
-
-sync_source_folder("server/configs", server_conf_folder)
+# server_folder = os.path.abspath(os.path.join(target_dir, "server"))
+# if not os.path.exists(server_folder):
+#     os.mkdir(server_folder)
+# sync_folder("server_main", server_folder)
+#
+#
+# server_conf_folder = os.path.abspath(os.path.join(server_folder, "configs"))
+# if not os.path.exists(server_conf_folder):
+#     os.mkdir(server_conf_folder)
+#
+# sync_source_folder("server/configs", server_conf_folder)
 
 
 def remove_file(file):

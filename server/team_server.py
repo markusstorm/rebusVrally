@@ -271,6 +271,9 @@ class TeamServer:
             with open(new_backup_file, "w") as f:
                 f.write(json_str.replace(",", ",\n"))
 
+    def set_goal_time(self):
+        self.goal_time = datetime.datetime.now()
+
     def addClient(self, client):
         self.clients.append(client)
 

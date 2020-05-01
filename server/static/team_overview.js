@@ -14,6 +14,16 @@ function get_rally_stage(team_json) {
     return "N/A";
 }
 
+function on_team_goal(team_number) {
+    var answer = confirm("Marks team " + team_number + " as finished with the whole rally, are you sure?");
+    if (answer) {
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "/teams/" + team_number + "/goal", true);
+        xhttp.setRequestHeader("Content-type", "text/plain");
+        xhttp.send("Do it!");
+    }
+}
+
 function build_team_info(team_json) {
     //var s = "<h3>" + get_value(team_json, "team-number") + ": " + get_value(team_json, "team-name") + "</h3>\n";
     var s = "";
@@ -86,7 +96,14 @@ function build_team_info(team_json) {
     s += "Start time: " + get_json_date_value(team_json, "start-time") + "<br>\n";
     s += "Lunch time: " + get_json_date_value(team_json, "lunch-time") + "<br>\n";
     s += "Arrived at goal: " + get_json_date_value(team_json, "found-goal-time") + "<br>\n";
-    s += "Ended: " + get_json_date_value(team_json, "goal-time") + "<br>\n";
+    var ended = get_json_date_value(team_json, "goal-time");
+    if (ended == "-") {
+        s += 'Ended: <input type="button" onclick="on_team_goal(' + get_value(team_json, "team-number") + ')" value="Give goal time"/><br>';
+    } else {
+        s += "Ended: " + ended + "<br>\n";
+    }
+
+
     s += "Latest update: " + get_json_date_value(team_json, "watchdog") + "<br>\n";
 
     // Rebus overview

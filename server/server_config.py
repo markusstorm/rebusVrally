@@ -126,10 +126,31 @@ class ServerRallyConfig(BaseRallyConfig):
         self.lunch_messages = []
         self.at_end_messages = []
         self.end_messages = []
+        self.server_host = None
+        self.server_port = None
+        self.web_host = None
+        self.web_port = None
         BaseRallyConfig.__init__(self, config_file)
 
     def parse_xml(self, root):
         BaseRallyConfig.parse_xml(self, root)
+
+        if "host" in root.attrib:
+            self.server_host = root.attrib["host"]
+        if self.server_host is None:
+            self.server_host = "127.0.0.1"
+        if "port" in root.attrib:
+            self.server_port = int(root.attrib["port"])
+        if self.server_port is None:
+            self.server_port = 63332
+        if "web_host" in root.attrib:
+            self.web_host = root.attrib["web_host"]
+        if self.web_host is None:
+            self.web_host = "127.0.0.1"
+        if "web_port" in root.attrib:
+            self.web_port = int(root.attrib["web_port"])
+        if self.web_port is None:
+            self.web_port = 61333
 
         print("Config: reading start_messages")
         for start_messages in root.findall("start_messages"):

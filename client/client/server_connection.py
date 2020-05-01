@@ -12,12 +12,11 @@ from rally.protocol import serverprotocol_pb2, clientprotocol_pb2
 
 
 class ServerConnection(threading.Thread):
-    SERVER_PORT = 63332  # The port used by the server
-
-    def __init__(self, server, team_name, password, username, report_login_result, report_lost_connection, difficulty):
+    def __init__(self, server_host, server_port, team_name, password, username, report_login_result, report_lost_connection, difficulty):
         threading.Thread.__init__(self)
         self.connection = None
-        self.server = server
+        self.server_host = server_host
+        self.server_port = server_port
         self.team_name = team_name
         self.password = password
         self.username = username
@@ -89,7 +88,7 @@ class ServerConnection(threading.Thread):
 
     def login_phase(self):
         try:
-            self.connection.connect((self.server, ServerConnection.SERVER_PORT))
+            self.connection.connect((self.server_host, self.server_port))
         except ConnectionRefusedError as e:
             print("Connection error {0}".format(e))
             # TODO: tell the user that we can't contact the server

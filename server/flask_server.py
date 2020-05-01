@@ -5,9 +5,10 @@ from flask import Flask, request, jsonify
 import logging
 
 class WebHandler(threading.Thread):
-    def __init__(self, main_server, host):
+    def __init__(self, main_server, host, port):
         threading.Thread.__init__(self)
         self.host = host
+        self.port = port
         self.main_server = main_server
 
         # Turn off INFO logging from Flask
@@ -23,6 +24,7 @@ class WebHandler(threading.Thread):
         self.flask_app.add_url_rule("/teams", view_func=self.get_teams)
 
         self.flask_app.add_url_rule("/teams/<id>", view_func=self.get_team_status)
+        self.flask_app.add_url_rule("/teams/<id>/goal", view_func=self.set_team_goal_time, methods=['POST'])
 
         self.flask_app.add_url_rule("/sendmessage", view_func=self.send_message, methods=['POST'])
         self.flask_app.add_url_rule("/startrally", view_func=self.start_rally, methods=['POST'])
@@ -38,7 +40,7 @@ class WebHandler(threading.Thread):
         self.flask_app.add_url_rule("/debug_solved_lunch_rebus/<team_id>", view_func=self.debug_solved_lunch_rebus, methods=['POST'])
 
     def run(self):
-        self.flask_app.run(host=self.host, port=63352)
+        self.flask_app.run(host=self.host, port=self.port)
 
     def root(self):
         return self.flask_app.send_static_file('index.html')
@@ -56,6 +58,15 @@ class WebHandler(threading.Thread):
         except ValueError:
             return jsonify({"error": "Invalid team id, must be integer"})
         return jsonify(self.main_server.get_team_json(int_id))
+
+    def set_team_goal_time(self, id):
+        int_id = 0
+        try:
+            int_id = int(id)
+            self.main_server.set_team_goal_time(int_id)
+        except ValueError:
+            return jsonify({"error": "Invalid team id, must be integer"})
+        return ""
 
     def send_message(self):
         if len(request.data) > 0:
