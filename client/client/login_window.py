@@ -236,8 +236,11 @@ class LoginWindow:
             self.config_parser[section_name]["teamname"] = teamname
             self.config_parser[section_name]["password"] = password
             self.config_parser[section_name]["username"] = username
-            with open("config.ini", "w") as configout:
-                self.config_parser.write(configout)
+            try:
+                with open("config.ini", "w") as configout:
+                    self.config_parser.write(configout)
+            except PermissionError:
+                pass
             for entry in self.entries:
                 entry.config(state="disabled")
 

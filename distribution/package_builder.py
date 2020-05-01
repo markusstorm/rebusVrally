@@ -133,6 +133,7 @@ def copy_source_file(file, to_dir, remove_target_first_if_both_exists=True):
 adjust_filename("client_main.exe", "rebusVrally.exe", True)
 adjust_filename("client_main.exe.manifest", "rebusVrally.exe.manifest", True)
 remove_file("configs/demo_rally/data/put_the_videos_here.txt")
+remove_file("config.ini")
 
 copy_source_file("client/client/minibus.png", target_dir)
 copy_source_file("client/steering/backup.png", target_dir)

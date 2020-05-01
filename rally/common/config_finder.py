@@ -44,8 +44,12 @@ class BaseConfigFinder:
                             config_parser.read("startup.ini")
                             config_parser["config"] = {}
                             config_parser["config"]["config_path"] = other_location
-                            with open("startup.ini", "w") as configout:
-                                config_parser.write(configout)
+                            try:
+                                with open("startup.ini", "w") as configout:
+                                    config_parser.write(configout)
+                            except PermissionError:
+                                pass
+
             if len(self.rally_configs) == 0:
                 print("ERROR! Unable to find any rally configurations in {0}!".format(config_folder))
             else:
