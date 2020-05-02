@@ -23,6 +23,19 @@ class ScheduledAction:
         return self.action is None
 
 
+class TimeScheduledAction(ScheduledAction):
+    def __init__(self, schedule_time, action):
+        ScheduledAction.__init__(self, 1, action)
+        self.time = schedule_time
+
+    def decrease_time(self):
+        current_time = datetime.datetime.now().time()
+        if current_time >= self.time:
+            self.action()
+            # Mark ourselves as done
+            self.action = None
+
+
 class ClientUpdateScheduler(threading.Thread):
     BACKUP_INTERVAL = 60
 
@@ -57,6 +70,9 @@ class ClientUpdateScheduler(threading.Thread):
     def schedule_action(self, seconds_from_now, action):
         self.actions.append(ScheduledAction(seconds_from_now, action))
 
+    def schedule_action_obj(self, action_obj):
+        self.actions.append(action_obj)
+
 
 class BroadcastMessage:
     def __init__(self, message):
@@ -75,6 +91,13 @@ class MainServer:
         self.track_information = self.rally_configuration.track_information
 
         self.scheduler = ClientUpdateScheduler(self)
+        if rally_configuration.autostart_rally is not None:
+            print("Scheduling autostart of rally at {0}".format(rally_configuration.autostart_rally))
+            self.scheduler.schedule_action_obj(TimeScheduledAction(rally_configuration.autostart_rally, self.start_rally))
+        if rally_configuration.autostart_lunch is not None:
+            print("Scheduling autostart of afternoon at {0}".format(rally_configuration.autostart_lunch))
+            self.scheduler.schedule_action_obj(TimeScheduledAction(rally_configuration.autostart_lunch, self.start_afternoon))
+
         self.scheduler.start()
 
         self.web_handler = WebHandler(self, self.rally_configuration.web_host, self.rally_configuration.web_port)
@@ -112,6 +135,7 @@ class MainServer:
         #team_server.set_rally_stage(clientprotocol_pb2.ServerPositionUpdate.RallyStage.MORNING)
 
     def start_rally(self):
+        print("{0}: Starting the rally".format(datetime.datetime.now().time()))
         self.rally_is_started = True
         self.add_message("Den första rebusen finns nu i ert rebusfönster hos protokollföraren. Lycka till!")
         for team_server in self.team_servers.values():
@@ -124,6 +148,7 @@ class MainServer:
         #team_server.set_rally_stage(clientprotocol_pb2.ServerPositionUpdate.RallyStage.AFTERNOON)
 
     def start_afternoon(self):
+        print("{0}: Starting the afternoon".format(datetime.datetime.now().time()))
         self.afternoon_is_started = True
         self.add_message("Lunchrebusen finns nu i ert rebusfönster hos protokollföraren.")
         for team_server in self.team_servers.values():

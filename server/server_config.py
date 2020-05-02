@@ -1,7 +1,8 @@
+import datetime
+import time
 import xml.etree.ElementTree as ET
 
 from rally.common.rally_config import BaseRallyConfig
-from rally.common.track_information import TrackInformation
 
 
 class RebusConfig:
@@ -130,6 +131,8 @@ class ServerRallyConfig(BaseRallyConfig):
         self.server_port = None
         self.web_host = None
         self.web_port = None
+        self.autostart_rally = None
+        self.autostart_lunch = None
         BaseRallyConfig.__init__(self, config_file)
 
     def parse_xml(self, root):
@@ -151,6 +154,10 @@ class ServerRallyConfig(BaseRallyConfig):
             self.web_port = int(root.attrib["web_port"])
         if self.web_port is None:
             self.web_port = 61333
+        if "autostart_rally" in root.attrib:
+            self.autostart_rally = ServerRallyConfig.time_from_string(root.attrib["autostart_rally"])
+        if "autostart_lunch" in root.attrib:
+            self.autostart_lunch = ServerRallyConfig.time_from_string(root.attrib["autostart_lunch"])
 
         print("Config: reading start_messages")
         for start_messages in root.findall("start_messages"):
@@ -177,6 +184,16 @@ class ServerRallyConfig(BaseRallyConfig):
             if "file" in teams.attrib:
                 teams_file = self.replace_locations(teams.attrib["file"])
                 self.allowed_teams = AllowedTeam.read_file(teams_file)
+
+    @staticmethod
+    def time_from_string(s):
+        try:
+            if s is not None and len(s) > 0:
+                return datetime.datetime.strptime(s, "%H:%M").time()
+                #time.strptime(s, "%H:%M")
+        except ValueError as e:
+            print("Unable to restore time '{0}' from string. Error: {1}".format(s, e))
+        return None
 
     def has_team(self, team_name):
         team = self.find_team(team_name)
