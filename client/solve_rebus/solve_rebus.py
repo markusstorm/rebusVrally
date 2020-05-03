@@ -23,7 +23,7 @@ latest_status_information = None
 terminate = False
 my_answers = {}
 current_text = ""
-
+combo_select_rebus_number = None
 
 class MyAnswer:
     def __init__(self, txt, east, north):
@@ -47,6 +47,7 @@ def update_solution_text(cb_changed):
         answer_text.delete("1.0", END)
         current_text = ""
 
+    global combo_select_rebus_number
     section = int(combo_select_rebus_number.get())
     for key in latest_status_information.rebus_solutions:
         solution = latest_status_information.rebus_solutions[key]
@@ -87,6 +88,7 @@ def on_status_updates(status_information):
     update_solution_text(False)
 
     already_solved = False
+    global combo_select_rebus_number
     rebus_number = int(combo_select_rebus_number.get())
     if rebus_number in latest_status_information.rebus_solutions:
         solution = latest_status_information.rebus_solutions[rebus_number]
@@ -118,7 +120,6 @@ def send_rebus_answer(section, answer, east, north):
 
 window = Tk()
 window.title("Testa rebuslösning")
-combo_select_rebus_number = None
 
 
 
@@ -128,6 +129,7 @@ def on_section_cb_changed(data):
 
 
 def on_test_solution_clicked():
+    global combo_select_rebus_number
     section = int(combo_select_rebus_number.get())
     answer = solution_var.get().strip()
     east = None
