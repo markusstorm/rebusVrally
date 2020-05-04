@@ -24,6 +24,7 @@ parser.add_argument("-r", "--rally_configuration", type=str, help="Path to the r
 parser.add_argument("-l", "--start_locally", action='store_true', help="Start the server on 127.0.0.1", required=False, default=False)
 parser.add_argument("-i", "--rally_id", type=str, help="ID of the rally configuration to use", required=False)
 parser.add_argument("-b", "--backup_path", type=str, help="Folder to store team status backups in", required=False)
+parser.add_argument("-a", "--add_date", action='store_true', help="Add a date to the backup folder", required=False, default=False)
 args = parser.parse_args()
 
 config_finder = ServerConfigFinder(args.rally_configuration)
@@ -82,11 +83,16 @@ class ConnectionListener(threading.Thread):
                 connection_handler = IncomingConnectionHandler(conn, addr, self.main_server)
                 connection_handler.start()
 
+
 backup_path = args.backup_path
 if backup_path is not None:
     if not os.path.isdir(backup_path):
         print("Invalid backup path!")
         sys.exit(1)
+    if args.add_date:
+        backup_path = os.path.abspath(os.path.join(backup_path, datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")))
+        if not os.path.exists(backup_path):
+            os.mkdir(backup_path)
 else:
     backup_path = os.path.join(os.getcwd(), "backup")
     if not os.path.exists(backup_path):
