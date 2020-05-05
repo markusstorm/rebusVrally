@@ -90,7 +90,7 @@ if backup_path is not None:
         print("Invalid backup path!")
         sys.exit(1)
     if args.add_date:
-        backup_path = os.path.abspath(os.path.join(backup_path, datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")))
+        backup_path = os.path.abspath(os.path.join(backup_path, datetime.datetime.now().strftime("%Y-%m-%d")))
         if not os.path.exists(backup_path):
             os.mkdir(backup_path)
 else:
