@@ -82,18 +82,19 @@ class IncomingConnectionHandler(threading.Thread):
                         login_result = False
                         error_message = "Incorrect version, the server is running version {0} and you {1}".format(RallyVersion.VERSION, loginrequest.version)
                     else:
-                        team = self.main_server.rally_configuration.find_team(loginrequest.teamname)
+                        teamname = loginrequest.teamname.casefold()
+                        team = self.main_server.rally_configuration.find_team(teamname)
                         if team is not None:
                             if team.team_password == loginrequest.password:
                                 login_result = True
-                                print("{0} connected to {1}".format(loginrequest.name, loginrequest.teamname))
+                                print("{0} connected to {1}".format(loginrequest.name, teamname))
                                 difficulty = serverprotocol_pb2.LoginRequest.NORMAL
                                 if self.main_server.rally_configuration.has_difficulty:
                                     if loginrequest.HasField("difficulty"):
                                         difficulty = loginrequest.difficulty
-                                team_server = self.main_server.find_team_server(loginrequest.teamname)
+                                team_server = self.main_server.find_team_server(teamname)
                                 if team_server is None:
-                                    team_server = self.main_server.create_team_server(loginrequest.teamname, team.team_number, difficulty)
+                                    team_server = self.main_server.create_team_server(teamname, team.team_number, difficulty)
                                 client = ServerSideClient(team_server, loginrequest.name, self.connection, self.main_server)
                             else:
                                 error_message = "Incorrect password"
