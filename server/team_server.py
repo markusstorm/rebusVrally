@@ -167,7 +167,7 @@ class TeamServer:
                         return
 
                     try:
-                        _json = json.loads(content)
+                        _json = json.loads(content, strict=False)
                     except Exception as e:
                         print("Unable to convert the old state to json: {0}".format(e))
                         return
@@ -269,7 +269,8 @@ class TeamServer:
             filename = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".srb"
             new_backup_file = os.path.join(self.backup_path, filename)
             with open(new_backup_file, "w") as f:
-                f.write(json_str.replace(",", ",\n"))
+                f.write(json_str)
+                #f.write(json_str.replace(",", ",\n"))
 
     def set_goal_time(self):
         self.goal_time = datetime.datetime.now()

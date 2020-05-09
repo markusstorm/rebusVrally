@@ -248,9 +248,9 @@ class ServerRallyConfig(BaseRallyConfig):
         return xmlstr
 
 
-if __name__ == '__main__':
-    #sr = ServerRallyConfig("../../server/configs/local_demo_rally.xml")
-    sr = ServerRallyConfig("c:/Users/Markus/AppData/Local/Temp/tmp3bqtemp3")
-    print(sr)
-    print(sr.title)
+# if __name__ == '__main__':
+#     #sr = ServerRallyConfig("../../server/configs/local_demo_rally.xml")
+#     sr = ServerRallyConfig("c:/Users/Markus/AppData/Local/Temp/tmp3bqtemp3")
+#     print(sr)
+#     print(sr.title)
 
