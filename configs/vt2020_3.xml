@@ -1,0 +1,4 @@
+<?xml version='1.0' encoding='utf8'?>
+<rally title="Server3" id="vt2020" seq_number="20201" has_difficulty="false" login_background="#LOCATION#/vt2020/data/goethe.png" file_list="#LOCATION#/vt2020/files.xml">
+  <login_details server_address="sotgotarna.spdns.org" port="61332" team="" password="" username=""/>
+</rally>
