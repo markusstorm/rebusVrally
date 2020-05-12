@@ -1,0 +1,296 @@
+<sections start_section="1">
+    <section number="1">
+		<videos>
+		    <video view="left" file="#DATA#/vt2020/data/VwT_RkrNXytwuscD06Bv.dat" fps="30.000804" start_offset_frame="2370" end_frame="12100"/>
+			<video view="front" file="#DATA#/vt2020/data/NonSZVUJ8eA9Tru1oNj1.dat" fps="30.005900" start_offset_frame="480" end_frame="10150"/>
+			<video view="right" file="#DATA#/vt2020/data/TCJFhvlkwY5F0xUZbYDC.dat" fps="30.006292" start_offset_frame="250" end_frame="10000"/>
+		</videos>
+        <turns>
+            <turn direction="right" frame_offset="7970" description="Right to next section" next_section="2" automatic="false"/>
+			<turn direction="missed" frame_offset="10000" description="Missed the correct turn" next_section="0"/>
+        </turns>
+        <segments>
+            <segment start_lat="0" start_lon="0" end_lat="0" end_lon="0" speed_km="50" start_frame="0" end_frame="55555555"/>
+        </segments>
+    </section>
+
+    <section number="2">
+		<videos>
+			<video view="left" file="#DATA#/vt2020/data/3bHoydwNMXXY7QExMzqp.dat" fps="30.000828" start_offset_frame="1000" end_frame="8800"/>
+		    <video view="front" file="#DATA#/vt2020/data/uStH4bvamaYhq9s-V_X6.dat" fps="30.007530" start_offset_frame="200" end_frame="7900"/>
+			<video view="right" file="#DATA#/vt2020/data/kAhS0F8TvASeUvrY_4Q3.dat" fps="30.006400" start_offset_frame="140" end_frame="7950"/>
+		</videos>
+        <turns>
+            <turn direction="left" frame_offset="7890" description="Left to next section" next_section="3" automatic="true"/>
+        </turns>
+        <segments>
+            <segment start_lat="0" start_lon="0" end_lat="0" end_lon="0" speed_km="50" start_frame="0" end_frame="55555555"/>
+        </segments>
+    </section>
+
+    <section number="3">
+		<videos>
+			<video view="left" file="#DATA#/vt2020/data/nWibVyvb5OyOdjpjaUU8.dat" fps="30.0" start_offset_frame="0" end_frame="9769"/>
+		    <video view="front" file="#DATA#/vt2020/data/QZnWHTMFgIlTGC5O8ye6.dat" fps="30.005934" start_offset_frame="0" end_frame="9820"/>
+			<video view="right" file="#DATA#/vt2020/data/Z5WZnHt3kCsVjFzHiAZq.dat" fps="30.006354" start_offset_frame="50" end_frame="9850"/>
+		</videos>
+        <turns>
+            <turn direction="straight" frame_offset="9820" description="Straight to next section" next_section="4" automatic="true"/>
+        </turns>
+        <segments>
+            <segment start_lat="0" start_lon="0" end_lat="0" end_lon="0" speed_km="50" start_frame="0" end_frame="55555555"/>
+        </segments>
+    </section>
+
+    <section number="4">
+		<videos>
+		    <video view="left" file="#DATA#/vt2020/data/BTthbDnE83UbYYkG7829.dat" fps="28.571566" start_offset_frame="170" end_frame="7200"/>
+			<video view="front" file="#DATA#/vt2020/data/BGB0SYTuWyjPJPGHhZYd.dat" fps="30.008046" start_offset_frame="400" end_frame="7460"/>
+			<video view="right" file="#DATA#/vt2020/data/1VdjG8sn8NEdXvv_8eG9.dat" fps="30.006242" start_offset_frame="380" end_frame="7430"/>
+		</videos>
+        <turns>
+            <turn direction="left" frame_offset="7450" description="Left to next section" next_section="5" automatic="true"/>
+        </turns>
+        <rebus_places>
+            <rebus_place id="RK1" rebus_config_number="2" frame_offset="4050" find_frames_before="100" find_frames_after="100"/>
+        </rebus_places>
+        <segments>
+            <segment start_lat="0" start_lon="0" end_lat="0" end_lon="0" speed_km="50" start_frame="0" end_frame="55555555"/>
+        </segments>
+    </section>
+
+    <section number="5">
+		<videos>
+		    <video view="left" file="#DATA#/vt2020/data/jfIC_kyRkN1RU9DH9ScE.dat" fps="30.008954" start_offset_frame="50" end_frame="4150"/>
+			<video view="front" file="#DATA#/vt2020/data/DE6yZXypUx6VATXPQB7S.dat" fps="30.014326" start_offset_frame="50" end_frame="4150"/>
+			<video view="right" file="#DATA#/vt2020/data/-MFNJmXtJGHi4pI6SjwH.dat" fps="30.006280" start_offset_frame="100" end_frame="4200"/>
+		</videos>
+        <turns>
+            <turn direction="right" frame_offset="1980" description="Right to next section" next_section="6" automatic="false"/>
+			<turn direction="missed" frame_offset="4000" description="Missed the correct turn" next_section="0"/>
+        </turns>
+        <segments>
+            <segment start_lat="0" start_lon="0" end_lat="0" end_lon="0" speed_km="50" start_frame="0" end_frame="55555555"/>
+        </segments>
+    </section>
+
+    <section number="6">
+		<videos>
+		    <video view="left" file="#DATA#/vt2020/data/z-IJfE6tIjmlNmbAa40W.dat" fps="30.007188" start_offset_frame="500" end_frame="10500"/>
+			<video view="front" file="#DATA#/vt2020/data/YbBbA6iuhVH5gWSG7HuL.dat" fps="30.005650" start_offset_frame="400" end_frame="10400"/>
+			<video view="right" file="#DATA#/vt2020/data/PbaaJvZhIGZo027jk3vF.dat" fps="30.006326" start_offset_frame="180" end_frame="10200"/>
+		</videos>
+        <turns>
+            <turn direction="right" frame_offset="8600" description="Right to next section" next_section="7" automatic="false"/>
+			<turn direction="missed" frame_offset="10300" description="Missed the correct turn" next_section="0"/>
+        </turns>
+        <segments>
+            <segment start_lat="0" start_lon="0" end_lat="0" end_lon="0" speed_km="50" start_frame="0" end_frame="55555555"/>
+        </segments>
+    </section>
+
+    <section number="7">
+		<videos>
+		    <video view="left" file="#DATA#/vt2020/data/hdCb8ZjffS25ETnSwuRm.dat" fps="29.983068" start_offset_frame="530" end_frame="20850"/>
+			<video view="front" file="#DATA#/vt2020/data/Oq6W66bTcXciB0y9QBNt.dat" fps="30.002860" start_offset_frame="600" end_frame="20990"/>
+			<video view="right" file="#DATA#/vt2020/data/zce6sJD8jpQqxZ3bkpiA.dat" fps="30.006304" start_offset_frame="600" end_frame="20930"/>
+		</videos>
+        <turns>
+            <turn direction="right" frame_offset="20980" description="Right to next section" next_section="8" automatic="true"/>
+        </turns>
+        <rebus_places>
+            <rebus_place id="RK2" rebus_config_number="3" frame_offset="15640" find_frames_before="100" find_frames_after="100"/>
+        </rebus_places>
+        <segments>
+            <segment start_lat="0" start_lon="0" end_lat="0" end_lon="0" speed_km="50" start_frame="0" end_frame="55555555"/>
+        </segments>
+    </section>
+
+    <section number="8">
+		<videos>
+		    <video view="left" file="#DATA#/vt2020/data/ATyV2y84ln4DQLQqabDp.dat" fps="30.008264" start_offset_frame="0" end_frame="15130"/>
+			<video view="front" file="#DATA#/vt2020/data/3lj9Y4e0gzPFyciqBxja.dat" fps="30.003952" start_offset_frame="40" end_frame="15180"/>
+			<video view="right" file="#DATA#/vt2020/data/F5yf1KMzO7Mf-D9sKMs4.dat" fps="30.006298" start_offset_frame="80" end_frame="15200"/>
+		</videos>
+        <turns>
+            <turn direction="left" frame_offset="15150" description="Left to next section" next_section="9" automatic="true"/>
+        </turns>
+        <rebus_places>
+            <rebus_place id="RK3" rebus_config_number="4" frame_offset="14230" find_frames_before="100" find_frames_after="100"/>
+        </rebus_places>
+        <segments>
+            <segment start_lat="0" start_lon="0" end_lat="0" end_lon="0" speed_km="50" start_frame="0" end_frame="55555555"/>
+        </segments>
+    </section>
+
+    <section number="9">
+		<videos>
+		    <video view="left" file="#DATA#/vt2020/data/xtV8EZJce7SPz_F_0WSD.dat" fps="30" start_offset_frame="45" end_frame="7570"/>
+			<video view="front" file="#DATA#/vt2020/data/4wv4iWjOF3n2D8cWvF02.dat" fps="30.008012" start_offset_frame="0" end_frame="7470"/>
+			<video view="right" file="#DATA#/vt2020/data/h3QPzlKVrEAxp-R1GMSO.dat" fps="30.006410" start_offset_frame="20" end_frame="7480"/>
+		</videos>
+        <turns>
+            <turn direction="straight" frame_offset="6270" description="Straight to next section" next_section="10" automatic="true"/>
+        </turns>
+        <segments>
+            <segment start_lat="0" start_lon="0" end_lat="0" end_lon="0" speed_km="50" start_frame="0" end_frame="55555555"/>
+        </segments>
+    </section>
+
+    <section number="10">
+		<videos>
+		    <video view="left" file="#DATA#/vt2020/data/a0tCScOD3vJdvEw5iAJB.dat" fps="30.008310" start_offset_frame="1080" end_frame="18400"/>
+			<video view="front" file="#DATA#/vt2020/data/dP8faIJ5EITXMYMPBYKp.dat" fps="30.003268" start_offset_frame="1050" end_frame="18300"/>
+			<video view="right" file="#DATA#/vt2020/data/DubtJ_7nEpH1OA4JipWY.dat" fps="30.006310" start_offset_frame="960" end_frame="18250"/>
+		</videos>
+        <turns>
+            <turn direction="right" frame_offset="15450" description="Right to next section" next_section="11" automatic="false"/>
+			<turn direction="missed" frame_offset="18200" description="Missed the correct turn" next_section="0"/>
+        </turns>
+        <segments>
+            <segment start_lat="0" start_lon="0" end_lat="0" end_lon="0" speed_km="50" start_frame="0" end_frame="55555555"/>
+        </segments>
+    </section>
+
+    <section number="11">
+		<videos>
+		    <video view="left" file="#DATA#/vt2020/data/wthLniAynFM7DGsJ2gjz.dat" fps="30.008790" start_offset_frame="0" end_frame="22550"/>
+			<video view="front" file="#DATA#/vt2020/data/O6dmeUFZiNl0oLAbll5V.dat" fps="30.002650" start_offset_frame="150" end_frame="22640"/>
+			<video view="right" file="#DATA#/vt2020/data/AIYboAQ9sNOrv0b8ieoT.dat" fps="30.006298" start_offset_frame="70" end_frame="22600"/>
+		</videos>
+        <turns>
+            <turn direction="left" frame_offset="20750" description="Left to next section" next_section="12" automatic="false"/>
+			<turn direction="missed" frame_offset="22500" description="Missed the correct turn" next_section="0"/>
+        </turns>
+        <rebus_places>
+            <rebus_place id="RK4" rebus_config_number="9" frame_offset="7030" find_frames_before="100" find_frames_after="100" next_section="11"/>
+        </rebus_places>
+        <segments>
+            <segment start_lat="0" start_lon="0" end_lat="0" end_lon="0" speed_km="40" start_frame="0" end_frame="55555555"/>
+        </segments>
+    </section>
+
+    <section number="12">
+		<videos>
+		    <video view="left" file="#DATA#/vt2020/data/naPz6fQiZdVtj3hzLCPc.dat" fps="30.008322" start_offset_frame="220" end_frame="24600"/>
+			<video view="front" file="#DATA#/vt2020/data/E--Sj4Hoi93Z-r7kpSjy.dat" fps="30.002446" start_offset_frame="200" end_frame="24500"/>
+			<video view="right" file="#DATA#/vt2020/data/yFaJ0-I_UpRJ52cYTA8G.dat" fps="30.006308" start_offset_frame="180" end_frame="24450"/>
+		</videos>
+        <turns>
+            <turn direction="straight" frame_offset="24500" description="Straight to next section" next_section="13" automatic="true"/>
+        </turns>
+        <rebus_places>
+            <rebus_place id="RK5" rebus_config_number="6" frame_offset="18200" find_frames_before="100" find_frames_after="100"/>
+        </rebus_places>
+        <segments>
+            <segment start_lat="0" start_lon="0" end_lat="0" end_lon="0" speed_km="40" start_frame="0" end_frame="55555555"/>
+        </segments>
+    </section>
+
+    <section number="13">
+		<videos>
+		    <video view="left" file="#DATA#/vt2020/data/MalWFeN5pC2ez2VjFJpO.dat" fps="30.003194" start_offset_frame="0" end_frame="15600"/>
+			<video view="front" file="#DATA#/vt2020/data/0zQj8TnU--N30eMwqAcy.dat" fps="30.003840" start_offset_frame="0" end_frame="15620"/>
+			<video view="right" file="#DATA#/vt2020/data/qm2sckrFOdCXzpcD1zoB.dat" fps="30.006334" start_offset_frame="0" end_frame="15600"/>
+		</videos>
+        <turns>
+            <turn direction="left" frame_offset="15590" description="Left to next section" next_section="14" automatic="true"/>
+        </turns>
+        <segments>
+            <segment start_lat="0" start_lon="0" end_lat="0" end_lon="0" speed_km="40" start_frame="0" end_frame="55555555"/>
+        </segments>
+    </section>
+
+    <section number="14">
+		<videos>
+		    <video view="left" file="#DATA#/vt2020/data/6WccL_8uRYm4SVoUU8Z8.dat" fps="29.998878" start_offset_frame="20" end_frame="11900"/>
+			<video view="front" file="#DATA#/vt2020/data/8iC-YqZ0eSQfD1GP2EB6.dat" fps="30.005032 " start_offset_frame="50" end_frame="11900"/>
+			<video view="right" file="#DATA#/vt2020/data/I6XiIkxaFO-qW5sEMddg.dat" fps="30.006278" start_offset_frame="70" end_frame="11930"/>
+		</videos>
+        <turns>
+            <turn direction="left" frame_offset="7670" description="Left to next section" next_section="15" automatic="false"/>
+			<turn direction="missed" frame_offset="11800" description="Missed the correct turn" next_section="0"/>
+        </turns>
+        <segments>
+            <segment start_lat="0" start_lon="0" end_lat="0" end_lon="0" speed_km="50" start_frame="0" end_frame="55555555"/>
+        </segments>
+    </section>
+
+    <section number="15">
+		<videos>
+		    <video view="left" file="#DATA#/vt2020/data/YQ5BZ8sPJ0fb6OXWkdE0.dat" fps="30.008502" start_offset_frame="400" end_frame="21000"/>
+			<video view="front" file="#DATA#/vt2020/data/valDW6p6GT0QJvXX-J1o.dat" fps="30.002886" start_offset_frame="250" end_frame="20700"/>
+			<video view="right" file="#DATA#/vt2020/data/NXdGYtiL_lq-IhyuTBWM.dat" fps="30.006316" start_offset_frame="300" end_frame="20850"/>
+		</videos>
+        <turns>
+            <turn direction="right" frame_offset="17730" description="Right to next section" next_section="16" automatic="false"/>
+			<turn direction="missed" frame_offset="20600" description="Missed the correct turn" next_section="0"/>
+        </turns>
+         <rebus_places>
+            <rebus_place id="RK6" rebus_config_number="7" frame_offset="6050" find_frames_before="100" find_frames_after="100"/>
+        </rebus_places>
+       <segments>
+            <segment start_lat="0" start_lon="0" end_lat="0" end_lon="0" speed_km="50" start_frame="0" end_frame="55555555"/>
+        </segments>
+    </section>
+
+    <section number="16">
+		<videos>
+		    <video view="left" file="#DATA#/vt2020/data/AYbuBEu8UHhnssgub3p2.dat" fps="30.007812" start_offset_frame="400" end_frame="6000"/>
+			<video view="front" file="#DATA#/vt2020/data/hrQvqHX1rUOfV5dMgzcQ.dat" fps="30.007588" start_offset_frame="600" end_frame="7000"/>
+			<video view="right" file="#DATA#/vt2020/data/lRRmxTdl3wL2LzJKQl3i.dat" fps="30.006374" start_offset_frame="230" end_frame="5800"/>
+		</videos>
+        <turns>
+            <turn direction="straight" frame_offset="6100" description="Straight to next section" next_section="17" automatic="true"/>
+        </turns>
+        <segments>
+            <segment start_lat="0" start_lon="0" end_lat="0" end_lon="0" speed_km="40" start_frame="0" end_frame="55555555"/>
+        </segments>
+    </section>
+
+    <section number="17">
+		<videos>
+		<!-- 200 frames after the reflex art -->
+		    <video view="left" file="#DATA#/vt2020/data/49XmEhy1XPyrO48rwIpw.dat" fps="30.007562" start_offset_frame="800" end_frame="9300"/>
+			<video view="front" file="#DATA#/vt2020/data/XJgBAVjGFimzH3Nc2JqQ.dat" fps="30.006492" start_offset_frame="750" end_frame="9230"/>
+			<video view="right" file="#DATA#/vt2020/data/BpTGsGYSyjnn70QGWN6b.dat" fps="30.006334" start_offset_frame="690" end_frame="9220"/>
+		</videos>
+        <turns>
+            <turn direction="right" frame_offset="9230" description="Right to next section" next_section="18" automatic="true"/>
+        </turns>
+        <segments>
+            <segment start_lat="0" start_lon="0" end_lat="0" end_lon="0" speed_km="40" start_frame="0" end_frame="55555555"/>
+        </segments>
+    </section>
+
+    <section number="18">
+		<videos>
+		    <video view="left" file="#DATA#/vt2020/data/k7W_boXssTynYk9d4t8-.dat" fps="30.008230" start_offset_frame="25" end_frame="27600"/>
+			<video view="front" file="#DATA#/vt2020/data/2EapvxxeaHFbKU1nEUO8.dat" fps="30.002158" start_offset_frame="50" end_frame="27700"/>
+			<video view="right" file="#DATA#/vt2020/data/hRcFDPfZGVaHk3Xv9-PU.dat" fps="30.006310" start_offset_frame="100" end_frame="27700"/>
+		</videos>
+        <rebus_places>
+            <rebus_place id="RK7" rebus_config_number="8" frame_offset="1090" find_frames_before="100" find_frames_after="100"/>
+			<rebus_place id="RK8" rebus_config_number="10" frame_offset="26200" find_frames_before="100" find_frames_after="100" next_section="19"/>
+			<turn direction="missed" frame_offset="27600" description="Missed the correct turn" next_section="0"/>
+        </rebus_places>
+        <segments>
+            <segment start_lat="0" start_lon="0" end_lat="0" end_lon="0" speed_km="50" start_frame="0" end_frame="55555555"/>
+        </segments>
+    </section>
+
+    <!-- Goal section, just showing a looping video -->
+    <section number="19">
+		<videos>
+		    <video view="left" file="#DATA#/vt2020/data/mtPiXb7NZlDtjqQolanO.dat" fps="30" start_offset_frame="0" end_frame="1799"/>
+			<video view="front" file="#DATA#/vt2020/data/mtPiXb7NZlDtjqQolanO.dat" fps="30" start_offset_frame="0" end_frame="1799"/>
+			<video view="right" file="#DATA#/vt2020/data/mtPiXb7NZlDtjqQolanO.dat" fps="30" start_offset_frame="0" end_frame="1799"/>
+		</videos>
+        <turns>
+            <turn direction="straight" frame_offset="1500" description="Loop" next_section="19" automatic="true"/>
+        </turns>
+        <segments>
+            <segment start_lat="0" start_lon="0" end_lat="0" end_lon="0" speed_km="50" start_frame="0" end_frame="55555555"/>
+        </segments>
+    </section>
+</sections>

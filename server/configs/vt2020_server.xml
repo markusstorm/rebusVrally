@@ -1,0 +1,40 @@
+<rally title="Sotgotarnas rebus(V)rally vt 2020" id="vt2020" has_difficulty="false" host="0.0.0.0" port="62343" web_host="0.0.0.0" web_port="62543">
+  <start_messages>
+    <message>Välkommen till Sotgotarnas VIRTUELLA rebusrally vt2020!</message>
+	<message>Klockan 09:00 hälsar vi er välkomna via Twitch på:
+https://www.twitch.tv/sotgotarna
+Därefter börjar rallyt!</message>
+  </start_messages>
+
+  <lunch_messages>
+    <message>Ni har hittat till lunchen!
+Ät mat eller pyssla vidare, klockan 13 släpper vi lunchrebusen.</message>
+  </lunch_messages>  
+
+  <at_end_messages>
+    <message>Ni har hittat till målet!
+Rallyvägen slutar nu. Kontakta oss när ni är redo att lämna in alla svar. Det är tiden när ni meddelar att ni är klara som räknas som tid för målgång.</message>
+  </at_end_messages>  
+
+  <end_messages>
+    <message>Vi har nu tagit emot era svar och rallyt är slut för idag!</message>
+	<message>Senare ikväll presenterar vi resultatet via Twitch på:
+https://www.twitch.tv/sotgotarna</message>
+  </end_messages>  
+
+  <extra_puzzles>
+    <extra_puzzle id="stjälpplock" title="Stjälpplock" cost="60">
+      <description>Extra fotoplock som kan ge en fördel i slutet</description>
+      <question>Vill ni öppnna stjälpplocken? Det kostar 60 prickar att öppna, men är värt 160 prickar så ni kan tjäna upp till 100 prickar.</question>
+	  <instructions>Ni har öppnat stjälpplocken! De finns här:
+https://drive.google.com/open?id=1RbytUQAiroSW1t1POpb8w1B23hqoIxDr
+	  </instructions>
+    </extra_puzzle>
+  </extra_puzzles>
+
+  <sections file="#LOCATION#/vt2020/sections.xml"/>
+
+  <rebuses file="#LOCATION#/vt2020/rebuses.xml"/>
+
+  <teams file="#LOCATION#/vt2020/teams.xml"/>
+</rally>

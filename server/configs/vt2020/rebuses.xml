@@ -1,0 +1,62 @@
+<rebuses>
+    <rebus section="1" is_first="true" map_east="58" map_north="52" is_start="true">
+      <normal text="https://www.youtube.com/embed/k_soiCPPlEE?autoplay=1&amp;controls=0&amp;loop=1&amp;start=181&amp;end=300"/>
+      <help text="https://www.youtube.com/embed/c2YL9tiAoqU?autoplay=1&amp;controls=0&amp;loop=1&amp;start=35&amp;end=59"/>
+      <solution text="Fågelsången"/>
+      <target description="Korsningen" map_east="49" map_north="62" zoomed_map_url="https://drive.google.com/open?id=1MTAfssuf4DpVIrzqQNrpjj2URHnqcxJv"/>
+    </rebus>
+    <rebus section="2" map_east="55" map_north="57">
+      <normal text="RSNPERN"/>
+      <help text="KORROMVPENGA"/>
+      <solution text="Ören"/>
+      <target description="Korsningen" map_east="59" map_north="60" zoomed_map_url="https://drive.google.com/open?id=1FbRu87c60ZEDsB8Pscr2KvJgybDowa_k"/>
+    </rebus>
+    <rebus section="3" map_east="65" map_north="59">
+      <normal text="SKLRMAN"/>
+      <help text="5092887"/>
+      <solution text="Luran"/>
+      <target description="Korsningen" map_east="57" map_north="54" zoomed_map_url="https://drive.google.com/open?id=1rAAOV1fMuYxfY_g7a6eIrwBCqz304yzm"/>
+    </rebus>
+    <rebus section="4" map_east="55" map_north="51">
+      <normal text="ESERN"/>
+      <help text="LSGOTSKFAMJ"/>
+      <solution text="Glan"/>
+      <target description="Korsningen" map_east="65" map_north="53" zoomed_map_url="https://drive.google.com/open?id=1yDMND9YGtGtTnPMBHH2ZT6ehQ2Iduly7"/>
+    </rebus>
+    <rebus section="5" map_east="51" map_north="61" is_lunch="true">
+      <normal text="https://drive.google.com/open?id=1zQ5x_B2lhMgRo6RoJ7KzARQPtgTRqs5X"/>
+      <help text="https://drive.google.com/open?id=1DBw5tYoRepNfInokctzGNXc3ftzBAuaA"/>
+      <solution text="Rösten"/>
+      <target description="Korsningen" map_east="69" map_north="56" zoomed_map_url="https://drive.google.com/open?id=1wc5GhEjtXY5_A5z4nLwSKcKjK68R_zzY"/>
+    </rebus>
+    <rebus section="6" map_east="67" map_north="61">
+      <normal text="LEBADENVAPLYTKA"/>
+      <help text="VHOMIR"/>
+      <solution text="Lindh"/>
+      <target description="Korsningen" map_east="66" map_north="59" zoomed_map_url="https://drive.google.com/open?id=1jAeKXYqTOcenNDxQPR-wtwLGBCDE-x9R"/>
+    </rebus>
+    <rebus section="7" map_east="49" map_north="56">
+      <normal text="ERAKÖJTN"/>
+      <help text="URFÅRELN"/>
+      <solution text="Röken"/>
+      <target description="Korsningen" map_east="61" map_north="59" zoomed_map_url="https://drive.google.com/open?id=1qL_4HlF-N6kcUzD3GlpmSHhX0BkX9l9i"/>
+    </rebus>
+    <rebus section="8" map_east="50" map_north="58">
+      <normal text="MASENOMNSÅ"/>
+      <help text="KPAPALAND"/>
+      <solution text="Ungen"/>
+      <target description="Korsningen" map_east="60" map_north="68" zoomed_map_url="https://drive.google.com/open?id=1lod8GslpIZsJMOTZDy7m21vccCofz69E"/>
+    </rebus>
+    <rebus section="9" map_east="0" map_north="0" found_lunch="true">
+      <normal text=""/>
+      <help text=""/>
+      <solution text=""/>
+      <target description="Dummy rebus checkpoint for lunch" map_east="0" map_north="0" zoomed_map_url=""/>
+    </rebus>
+    <rebus section="10" map_east="0" map_north="0" is_goal="true">
+      <normal text=""/>
+      <help text=""/>
+      <solution text=""/>
+      <target description="Dummy rebus checkpoint for goal" map_east="0" map_north="0" zoomed_map_url=""/>
+    </rebus>
+</rebuses>

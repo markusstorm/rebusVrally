@@ -1,0 +1,5 @@
+<teams>
+	<team name="Test Team" login_name="test" number="0" password="test">
+	    <answer_document url="http://exempel.com"/>
+	</team>
+</teams>

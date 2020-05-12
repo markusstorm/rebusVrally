@@ -1,0 +1,24 @@
+<rally id="demo" title="Demo-rally" has_difficulty="true" host="0.0.0.0" port="63343" web_host="0.0.0.0" web_port="63543" autostart_rally="07:00" autostart_lunch="07:00">
+  <start_messages>
+	<message>Välkommen till ett demo av Sötgötarnas VIRTUELLA rebusrally!</message>
+	<message>Här kan du öva på att köra bussen, lösa rebusar och det mesta som kommer att hända under det riktiga rallyt.</message>
+	<message>Kartan hittar du här: https://drive.google.com/open?id=1xPMwMI2NgmrMTvv7IC5qljrWgwHUudnd</message>
+	<message>Lycka till!</message>
+  </start_messages>
+
+  <lunch_messages>
+    <message>Ni har hittat till lunchen!</message>
+	<message>Ät mat eller pyssla vidare, klockan 13 släpper vi lunchrebusen (som protokollföraren hittar i fiskbens-programmet.</message>
+  </lunch_messages>  
+
+  <at_end_messages>
+    <message>Ni har hittat till målet!</message>
+	<message>Rallyvägen slutar nu och det gör även demot-rallyt. På det riktiga rallyt skulle ni nu pyssla klart sedan ta kontakt med oss för att lämna in era svar och få en tid för målgång.</message>
+  </at_end_messages>  
+
+  <sections file="#LOCATION#/demo_rally/sections.xml"/>
+
+  <rebuses file="#LOCATION#/demo_rally/rebuses.xml"/>
+
+  <teams file="#LOCATION#/demo_rally/teams.xml"/>
+</rally>
